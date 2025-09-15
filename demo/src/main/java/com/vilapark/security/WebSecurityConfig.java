@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+<<<<<<< HEAD
 import com.vilapark.security.jwt.AuthEntryPointJwt;
 import com.vilapark.security.jwt.AuthTokenFilter;
 import com.vilapark.security.services.UserDetailsServiceImpl;
@@ -27,12 +28,27 @@ import com.vilapark.security.services.UserDetailsServiceImpl;
 // (securedEnabled = true,
 // jsr250Enabled = true,
 // prePostEnabled = true) // by default
+=======
+import com.bezkoder.spring.login.security.jwt.AuthEntryPointJwt;
+import com.bezkoder.spring.login.security.jwt.AuthTokenFilter;
+import com.bezkoder.spring.login.security.services.UserDetailsServiceImpl;
+
+@Configuration
+//@EnableWebSecurity
+@EnableMethodSecurity
+//(securedEnabled = true,
+//jsr250Enabled = true,
+//prePostEnabled = true) // by default
+>>>>>>> e3780a7 (all class but not change package in import yet)
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   @Autowired
   UserDetailsServiceImpl userDetailsService;
 
+<<<<<<< HEAD
   
 
+=======
+>>>>>>> e3780a7 (all class but not change package in import yet)
   @Autowired
   private AuthEntryPointJwt unauthorizedHandler;
 
