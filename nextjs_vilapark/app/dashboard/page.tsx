@@ -10,9 +10,16 @@ type User = {
   roles: string[];
 };
 
+type Cat = {
+  id: number;
+  name: string;
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [cats, setCats] = useState<Cat[]>([]);
+  const [loadingCats, setLoadingCats] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -23,16 +30,32 @@ export default function DashboardPage() {
     }
   }, [router]);
 
+  useEffect(() => {
+    if (user) {
+      fetch("http://localhost:8081/cats")
+        .then((res) => res.json())
+        .then((data: Cat[]) => {
+          setCats(data);
+          setLoadingCats(false);
+        })
+        .catch((err) => {
+          console.error("Fetch cats error:", err);
+          setLoadingCats(false);
+        });
+    }
+  }, [user]);
+
   function handleLogout() {
-    localStorage.removeItem("user"); // เคลียร์ user ที่เก็บไว้
-    router.push("/login"); // กลับไปหน้า login
+    localStorage.removeItem("user");
+    router.push("/login");
   }
 
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <button
           onClick={handleLogout}
@@ -42,9 +65,34 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <p className="mt-2">Welcome, {user.username}!</p>
-      <p>Email: {user.email}</p>
-      <p>Roles: {user.roles.join(", ")}</p>
+      {/* User Info */}
+      <div className="bg-gray-100 p-4 rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-2">User Info</h2>
+        <ul className="list-disc pl-5">
+          <li>ID: {user.id}</li>
+          <li>Username: {user.username}</li>
+          <li>Email: {user.email}</li>
+          <li>Roles: {user.roles.join(", ")}</li>
+        </ul>
+      </div>
+
+      {/* Cats List */}
+      <div className="bg-gray-100 p-4 rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-2">Pet Cats</h2>
+        {loadingCats ? (
+          <p>Loading cats...</p>
+        ) : cats.length === 0 ? (
+          <p>No cats found</p>
+        ) : (
+          <ul className="list-disc pl-5">
+            {cats.map((cat) => (
+              <li key={cat.id}>
+                {cat.id} - {cat.name}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
