@@ -17,9 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.bezkoder.spring.login.security.jwt.AuthEntryPointJwt;
-import com.bezkoder.spring.login.security.jwt.AuthTokenFilter;
-import com.bezkoder.spring.login.security.services.UserDetailsServiceImpl;
+import com.vilapark.security.jwt.AuthEntryPointJwt;
+import com.vilapark.security.jwt.AuthTokenFilter;
+import com.vilapark.security.services.UserDetailsServiceImpl;
 
 @Configuration
 //@EnableWebSecurity

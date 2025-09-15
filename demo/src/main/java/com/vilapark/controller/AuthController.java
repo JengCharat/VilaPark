@@ -21,17 +21,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bezkoder.spring.login.models.ERole;
-import com.bezkoder.spring.login.models.Role;
-import com.bezkoder.spring.login.models.User;
-import com.bezkoder.spring.login.payload.request.LoginRequest;
-import com.bezkoder.spring.login.payload.request.SignupRequest;
-import com.bezkoder.spring.login.payload.response.UserInfoResponse;
-import com.bezkoder.spring.login.payload.response.MessageResponse;
-import com.bezkoder.spring.login.repository.RoleRepository;
-import com.bezkoder.spring.login.repository.UserRepository;
-import com.bezkoder.spring.login.security.jwt.JwtUtils;
-import com.bezkoder.spring.login.security.services.UserDetailsImpl;
+import com.vilapark.models.ERole;
+import com.vilapark.models.Role;
+import com.vilapark.models.User;
+import com.vilapark.payload.request.LoginRequest;
+import com.vilapark.payload.request.SignupRequest;
+import com.vilapark.payload.response.UserInfoResponse;
+import com.vilapark.payload.response.MessageResponse;
+import com.vilapark.repository.RoleRepository;
+import com.vilapark.repository.UserRepository;
+import com.vilapark.security.jwt.JwtUtils;
+import com.vilapark.security.services.UserDetailsImpl;
 
 //for Angular Client (withCredentials)
 //@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600, allowCredentials="true")
