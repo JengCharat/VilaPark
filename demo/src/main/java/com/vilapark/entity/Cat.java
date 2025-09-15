@@ -1,6 +1,5 @@
+package com.vilapark.entity;
 
-
-package com.example.demo.entity;
 
 import jakarta.persistence.*;
 

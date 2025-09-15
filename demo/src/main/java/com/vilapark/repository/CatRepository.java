@@ -1,6 +1,6 @@
-package com.example.demo.repository;
+package com.vilapark.repository;
 
-import com.example.demo.entity.Cat;
+import com.vilapark.entity.Cat;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CatRepository extends JpaRepository<Cat, Long> {

@@ -1,7 +1,7 @@
-package com.example.demo.controller;
+package com.vilapark.controller;
 
-import com.example.demo.entity.Cat;
-import com.example.demo.repository.CatRepository;
+import com.vilapark.entity.Cat;
+import com.vilapark.repository.CatRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;
