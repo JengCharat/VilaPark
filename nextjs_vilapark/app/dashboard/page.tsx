@@ -1,5 +1,6 @@
 "use client";
 
+import '../globals.css'
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
@@ -56,7 +57,53 @@ export default function DashboardPage() {
   return (
         <>
             <Navbar/>
-    <div className="p-6 space-y-6">
+
+
+
+
+    <div id="home" className="page">
+        <div className="gradient-bg text-white py-20">
+            <div className="max-w-7xl mx-auto px-4 text-center">
+                <h1 className="text-5xl font-bold mb-6">🐱 ยินดีต้อนรับสู่ Meow Palace Hotel</h1>
+                <p className="text-xl mb-8">โรงแรมแมวหรูที่ดูแลน้องแมวของคุณด้วยความรักและใส่ใจ</p>
+                <button onclick="showPage('booking')" className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300">
+                    จองห้องพักเลย! 🏨
+                </button>
+            </div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 py-16">
+            <div className="grid md:grid-cols-3 gap-8">
+                <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div className="text-4xl mb-4">🏨</div>
+                    <h3 className="text-xl font-semibold mb-2">ห้องพักหรู</h3>
+                    <p className="text-gray-600">ห้องพักสะอาด ปลอดภัย พร้อมของเล่นและที่นอนนุ่มสบาย</p>
+                </div>
+                <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div className="text-4xl mb-4">📸</div>
+                    <h3 className="text-xl font-semibold mb-2">อัปเดตประจำวัน</h3>
+                    <p className="text-gray-600">รับรูปภาพและข้อความอัปเดตน้องแมวของคุณทุกวัน</p>
+                </div>
+                <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div className="text-4xl mb-4">💝</div>
+                    <h3 className="text-xl font-semibold mb-2">ดูแลด้วยใจ</h3>
+                    <p className="text-gray-600">พนักงานมืออาชีพที่รักแมวและดูแลด้วยความใส่ใจ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <div className="p-6 space-y-6 gradient-bg">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Dashboard</h1>

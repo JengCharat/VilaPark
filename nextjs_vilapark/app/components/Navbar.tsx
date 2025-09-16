@@ -22,7 +22,7 @@ const showPage = (page) => {
           </div>
 
           <div className="hidden md:flex space-x-4">
-            <button onClick={() => showPage('home')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('dashboard')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
               หน้าแรก
             </button>
             <button onClick={() => showPage('booking')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
