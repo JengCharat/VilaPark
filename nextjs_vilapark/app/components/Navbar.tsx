@@ -42,6 +42,10 @@ const showPage = (page) => {
                   <button onClick={() => showPage('signin')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                     🔑 Sign In
                   </button>
+
+                  <button onClick={() => showPage('signup')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                    🔑 Sign Up
+                  </button>
                   <button onClick={() => showPage('staff-dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                     👨‍💼 พนักงาน
                   </button>
