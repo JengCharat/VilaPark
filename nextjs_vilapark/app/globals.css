@@ -16,7 +16,6 @@
     --foreground: #ededed;
   }
 }
-
 /* Body default */
 body {
   background: var(--background);

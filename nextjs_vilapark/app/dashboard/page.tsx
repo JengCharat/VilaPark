@@ -64,9 +64,9 @@ export default function DashboardPage() {
     <div id="home" className="page">
         <div className="gradient-bg text-white py-20">
             <div className="max-w-7xl mx-auto px-4 text-center">
-                <h1 className="text-5xl font-bold mb-6">🐱 ยินดีต้อนรับสู่ Meow Palace Hotel</h1>
+                <h1 className="text-5xl font-bold mb-6">🐱 ยินดีต้อนรับสู่ Vila Park</h1>
                 <p className="text-xl mb-8">โรงแรมแมวหรูที่ดูแลน้องแมวของคุณด้วยความรักและใส่ใจ</p>
-                <button onclick="showPage('booking')" className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300">
+                <button onClick={() => showPage('booking')} className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300">
                     จองห้องพักเลย! 🏨
                 </button>
             </div>
