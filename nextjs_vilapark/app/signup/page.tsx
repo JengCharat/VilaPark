@@ -46,7 +46,7 @@ export default function SignupPage() {
         onSubmit={handleSignup}
         className="bg-white p-6 rounded-xl shadow-md w-80 space-y-4"
       >
-        <h1 className="text-2xl font-bold text-center">Sign Up</h1>
+        <h1 className="text-green-500 text-2xl font-bold text-center">Sign Up</h1>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
         {success && <p className="text-green-500 text-sm">{success}</p>}
@@ -56,7 +56,7 @@ export default function SignupPage() {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="text-green-500 w-full p-2 border rounded"
           required
         />
 
@@ -65,7 +65,7 @@ export default function SignupPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="text-green-500 w-full p-2 border rounded"
           required
         />
 
@@ -74,7 +74,7 @@ export default function SignupPage() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="text-green-500 w-full p-2 border rounded"
           required
         />
 

@@ -44,7 +44,7 @@ export default function Signin() {
         onSubmit={handleLogin}
         className="bg-white p-6 rounded-xl shadow-md w-80 space-y-4"
       >
-        <h1 className="text-2xl font-bold text-center">Login</h1>
+        <h1 className="text-blue-500 text-2xl font-bold text-center">Login</h1>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
@@ -53,7 +53,7 @@ export default function Signin() {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="text-blue-500 w-full p-2 border rounded"
           required
         />
 
@@ -62,7 +62,7 @@ export default function Signin() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="text-blue-500 w-full p-2 border rounded"
           required
         />
 

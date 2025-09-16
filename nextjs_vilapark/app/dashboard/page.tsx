@@ -24,7 +24,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) {
-      router.push("/login"); // ถ้าไม่มี user -> กลับไป login
+      router.push("/signin"); // ถ้าไม่มี user -> กลับไป login
     } else {
       setUser(JSON.parse(storedUser));
     }
@@ -47,7 +47,8 @@ export default function DashboardPage() {
 
   function handleLogout() {
     localStorage.removeItem("user");
-    router.push("/login");
+    router.push("/signin");
+
   }
 
   if (!user) return <p>Loading...</p>;
