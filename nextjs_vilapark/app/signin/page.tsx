@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import Navbar from "../components/Navbar";
 export default function Signin() {
   const router = useRouter();
   const [username, setUsername] = useState("");
@@ -39,6 +39,8 @@ export default function Signin() {
   }
 
   return (
+        <>
+            <Navbar/>
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <form
         onSubmit={handleLogin}
@@ -74,5 +76,6 @@ export default function Signin() {
         </button>
       </form>
     </div>
+    </>
   );
 }

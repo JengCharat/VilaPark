@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import Navbar from "../components/Navbar";
 type User = {
   id: number;
   username: string;
@@ -54,6 +54,8 @@ export default function DashboardPage() {
   if (!user) return <p>Loading...</p>;
 
   return (
+        <>
+            <Navbar/>
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
@@ -95,5 +97,6 @@ export default function DashboardPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
