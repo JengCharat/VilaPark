@@ -112,13 +112,11 @@ implementation 'org.projectlombok:lombok'
 ## API / Cat Feature
 
 - com.vilapark.controller
-  - AuthController.java
   - CatController.java
 - com.vilapark.entity
   - Cat.java
 - com.vilapark.repository
   - CatRepository.java
-
 
 
 
