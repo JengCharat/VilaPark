@@ -32,9 +32,9 @@
                     <button onclick="showPage('booking')" class="nav-item px-3 py-2 rounded-md text-sm font-medium">จองห้องพัก</button>
                     <button onclick="showPage('customer-dashboard')" class="nav-item px-3 py-2 rounded-md text-sm font-medium">แดชบอร์ดลูกค้า</button>
                     <div class="relative">
-            <button onClick={() => showPage('signin')}>
-                  เข้าสู่ระบบ
-                </button>
+                        <button onclick="toggleUserMenu()" class="nav-item px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                            เข้าสู่ระบบ <span class="ml-1">▼</span>
+                        </button>
                         <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                             <button onclick="showPage('staff-dashboard')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">👨‍💼 พนักงาน</button>
                             <button onclick="showPage('admin-dashboard')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">👑 ผู้จัดการ</button>
