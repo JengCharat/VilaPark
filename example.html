@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 Cat Condo Booking System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Kanit', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .room-available { border-left: 4px solid #10b981; }
+        .room-booked { border-left: 4px solid #f59e0b; }
+        .room-occupied { border-left: 4px solid #ef4444; }
+        .star-rating { color: #fbbf24; }
+        .modal { backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl">🐱</span>
+                    <h1 class="text-2xl font-bold">Cat Condo Resort</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="loginBtn" class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition">เข้าสู่ระบบ</button>
+                    <button id="registerBtn" class="border border-white px-4 py-2 rounded-lg font-medium hover:bg-white hover:text-purple-600 transition">สมัครสมาชิก</button>
+                    <div id="userMenu" class="hidden">
+                        <span id="userName" class="mr-4"></span>
+                        <button id="logoutBtn" class="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition">ออกจากระบบ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">ที่พักสุดพิเศษสำหรับแมวของคุณ</h2>
+            <p class="text-xl text-gray-600 mb-8">ห้องพักหรูหรา บริการครบครัน ดูแลด้วยใจ</p>
+            
+            <!-- Quick Booking -->
+            <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+                <h3 class="text-2xl font-semibold mb-4">จองห้องพักแมว</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">วันเข้าพัก</label>
+                        <input type="date" id="checkIn" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">วันออก</label>
+                        <input type="date" id="checkOut" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ประเภทห้อง</label>
+                        <select id="roomType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">ทุกประเภท</option>
+                            <option value="small">ห้องเล็ก</option>
+                            <option value="large">ห้องใหญ่</option>
+                            <option value="vip">VIP Suite</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button id="searchRooms" class="w-full bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition font-medium">ค้นหาห้องว่าง</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Listings -->
+        <div class="mb-12">
+            <h3 class="text-3xl font-bold text-gray-800 mb-8 text-center">ห้องพักของเรา</h3>
+            <div id="roomGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Rooms will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Admin Panel (Hidden by default) -->
+        <div id="adminPanel" class="hidden bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 class="text-2xl font-bold mb-6">🔧 Admin Dashboard</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-blue-800 mb-2">จัดการห้อง</h4>
+                    <button id="addRoomBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">เพิ่มห้องใหม่</button>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-green-800 mb-2">การจอง</h4>
+                    <button id="viewBookingsBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">ดูรายการจอง</button>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-purple-800 mb-2">รายงาน</h4>
+                    <button id="reportsBtn" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">ออกรายงาน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6">เข้าสู่ระบบ</h3>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">อีเมล</label>
+                    <input type="email" id="loginEmail" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+                    <input type="password" id="loginPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                </div>
+                <div class="flex justify-between items-center mb-6">
+                    <a href="#" class="text-purple-600 hover:underline">ลืมรหัสผ่าน?</a>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="button" id="closeLoginModal" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition">ยกเลิก</button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition">เข้าสู่ระบบ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6">สมัครสมาชิก</h3>
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อ-นามสกุล</label>
+                    <input type="text" id="registerName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">อีเมล</label>
+                    <input type="email" id="registerEmail" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์</label>
+                    <input type="tel" id="registerPhone" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+                    <input type="password" id="registerPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="button" id="closeRegisterModal" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition">ยกเลิก</button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition">สมัครสมาชิก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+            <h3 class="text-2xl font-bold mb-6">จองห้องพัก</h3>
+            <form id="bookingForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Room Info -->
+                    <div class="md:col-span-2">
+                        <div id="selectedRoomInfo" class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <!-- Room details will be populated -->
+                        </div>
+                    </div>
+                    
+                    <!-- Booking Dates -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">วันเข้าพัก</label>
+                        <input type="date" id="bookingCheckIn" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">วันออก</label>
+                        <input type="date" id="bookingCheckOut" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                    </div>
+                    
+                    <!-- Cat Information -->
+                    <div class="md:col-span-2">
+                        <h4 class="text-lg font-semibold mb-4">ข้อมูลแมว</h4>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อแมว</label>
+                        <input type="text" id="catName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">อายุ (ปี)</label>
+                        <input type="number" id="catAge" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" min="0" max="30" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">สายพันธุ์</label>
+                        <input type="text" id="catBreed" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">เพศ</label>
+                        <select id="catGender" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                            <option value="">เลือกเพศ</option>
+                            <option value="male">ผู้</option>
+                            <option value="female">เมียเมีย</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">โรคประจำตัว / ข้อมูลสุขภาพ</label>
+                        <textarea id="catHealth" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" rows="3" placeholder="ระบุโรคประจำตัว ยาที่ต้องทาน หรือข้อมูลสุขภาพที่สำคัญ"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ความต้องการพิเศษ</label>
+                        <textarea id="specialRequests" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" rows="3" placeholder="อาหารพิเศษ นิสัยของแมว หรือข้อควรระวังอื่นๆ"></textarea>
+                    </div>
+                    
+                    <!-- Total Cost -->
+                    <div class="md:col-span-2">
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-semibold">ราคารวม:</span>
+                                <span id="totalCost" class="text-2xl font-bold text-purple-600">0 บาท</span>
+                            </div>
+                            <div id="costBreakdown" class="text-sm text-gray-600 mt-2">
+                                <!-- Cost breakdown will be shown here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4 mt-8">
+                    <button type="button" id="closeBookingModal" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition">ยกเลิก</button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition">ยืนยันการจอง</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6">ชำระเงิน</h3>
+            <div class="mb-6">
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <div class="flex justify-between">
+                        <span>ยอดที่ต้องชำระ:</span>
+                        <span id="paymentAmount" class="font-bold text-purple-600">0 บาท</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">วิธีการชำระเงิน</label>
+                        <select id="paymentMethod" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="transfer">โอนเงินผ่านธนาคาร</option>
+                            <option value="promptpay">PromptPay</option>
+                            <option value="credit">บัตรเครดิต</option>
+                        </select>
+                    </div>
+                    
+                    <div id="paymentDetails" class="bg-blue-50 p-4 rounded-lg">
+                        <p class="text-sm text-blue-800">
+                            <strong>ธนาคารกสิกรไทย</strong><br>
+                            เลขที่บัญชี: 123-4-56789-0<br>
+                            ชื่อบัญชี: Cat Condo Resort Co., Ltd.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">อัปโหลดหลักฐานการโอนเงิน</label>
+                        <input type="file" id="paymentProof" accept="image/*" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button type="button" id="closePaymentModal" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition">ยกเลิก</button>
+                <button type="button" id="confirmPayment" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition">ยืนยันการชำระเงิน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6">เขียนรีวิว</h3>
+            <form id="reviewForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">คะแนน</label>
+                    <div class="flex space-x-1" id="starRating">
+                        <span class="star cursor-pointer text-2xl text-gray-300 hover:text-yellow-400" data-rating="1">⭐</span>
+                        <span class="star cursor-pointer text-2xl text-gray-300 hover:text-yellow-400" data-rating="2">⭐</span>
+                        <span class="star cursor-pointer text-2xl text-gray-300 hover:text-yellow-400" data-rating="3">⭐</span>
+                        <span class="star cursor-pointer text-2xl text-gray-300 hover:text-yellow-400" data-rating="4">⭐</span>
+                        <span class="star cursor-pointer text-2xl text-gray-300 hover:text-yellow-400" data-rating="5">⭐</span>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ความคิดเห็น</label>
+                    <textarea id="reviewComment" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" rows="4" placeholder="แบ่งปันประสบการณ์ของคุณ..."></textarea>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="button" id="closeReviewModal" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition">ยกเลิก</button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition">ส่งรีวิว</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        let rooms = [
+            {
+                id: 1,
+                name: "ห้องเล็ก - Cozy Corner",
+                type: "small",
+                price: 300,
+                size: "2x2 เมตร",
+                capacity: "1-2 ตัว",
+                amenities: ["เตียงนอนนุ่ม", "ของเล่น", "น้ำดื่มสะอาด", "ห้องน้ำส่วนตัว"],
+                status: "available",
+                image: "🏠",
+                rating: 4.5,
+                reviews: 23
+            },
+            {
+                id: 2,
+                name: "ห้องใหญ่ - Luxury Suite",
+                type: "large",
+                price: 500,
+                size: "3x3 เมตร",
+                capacity: "2-4 ตัว",
+                amenities: ["เตียงนอนพรีเมียม", "ของเล่นหลากหลาย", "น้ำดื่มสะอาด", "ห้องน้ำส่วนตัว", "พื้นที่เล่น"],
+                status: "available",
+                image: "🏰",
+                rating: 4.8,
+                reviews: 45
+            },
+            {
+                id: 3,
+                name: "VIP Suite - Royal Palace",
+                type: "vip",
+                price: 800,
+                size: "4x4 เมตร",
+                capacity: "1-6 ตัว",
+                amenities: ["เตียงนอนหรูหรา", "ของเล่นพรีเมียม", "น้ำดื่มสะอาด", "ห้องน้ำส่วนตัว", "พื้นที่เล่นขนาดใหญ่", "บริการอาบน้ำ", "กล้องวงจรปิด"],
+                status: "booked",
+                image: "👑",
+                rating: 4.9,
+                reviews: 67
+            }
+        ];
+
+        let bookings = [];
+        let currentUser = null;
+        let selectedRoom = null;
+        let selectedRating = 0;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            renderRooms();
+            setupEventListeners();
+            setMinDates();
+        });
+
+        function setMinDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('checkIn').min = today;
+            document.getElementById('checkOut').min = today;
+            document.getElementById('bookingCheckIn').min = today;
+            document.getElementById('bookingCheckOut').min = today;
+        }
+
+        function setupEventListeners() {
+            // Modal controls
+            document.getElementById('loginBtn').addEventListener('click', () => showModal('loginModal'));
+            document.getElementById('registerBtn').addEventListener('click', () => showModal('registerModal'));
+            document.getElementById('closeLoginModal').addEventListener('click', () => hideModal('loginModal'));
+            document.getElementById('closeRegisterModal').addEventListener('click', () => hideModal('registerModal'));
+            document.getElementById('closeBookingModal').addEventListener('click', () => hideModal('bookingModal'));
+            document.getElementById('closePaymentModal').addEventListener('click', () => hideModal('paymentModal'));
+            document.getElementById('closeReviewModal').addEventListener('click', () => hideModal('reviewModal'));
+
+            // Forms
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('bookingForm').addEventListener('submit', handleBooking);
+            document.getElementById('reviewForm').addEventListener('submit', handleReview);
+
+            // Search
+            document.getElementById('searchRooms').addEventListener('click', searchRooms);
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+            // Payment
+            document.getElementById('confirmPayment').addEventListener('click', handlePayment);
+            document.getElementById('paymentMethod').addEventListener('change', updatePaymentDetails);
+
+            // Star rating
+            document.querySelectorAll('.star').forEach(star => {
+                star.addEventListener('click', function() {
+                    selectedRating = parseInt(this.dataset.rating);
+                    updateStarDisplay();
+                });
+            });
+
+            // Date validation
+            document.getElementById('checkIn').addEventListener('change', validateDates);
+            document.getElementById('checkOut').addEventListener('change', validateDates);
+            document.getElementById('bookingCheckIn').addEventListener('change', calculateCost);
+            document.getElementById('bookingCheckOut').addEventListener('change', calculateCost);
+        }
+
+        function renderRooms(filteredRooms = rooms) {
+            const roomGrid = document.getElementById('roomGrid');
+            roomGrid.innerHTML = '';
+
+            filteredRooms.forEach(room => {
+                const statusClass = room.status === 'available' ? 'room-available' : 
+                                  room.status === 'booked' ? 'room-booked' : 'room-occupied';
+                const statusText = room.status === 'available' ? 'ว่าง' : 
+                                 room.status === 'booked' ? 'ถูกจอง' : 'กำลังใช้งาน';
+                const statusColor = room.status === 'available' ? 'text-green-600' : 
+                                  room.status === 'booked' ? 'text-yellow-600' : 'text-red-600';
+
+                const roomCard = document.createElement('div');
+                roomCard.className = `bg-white rounded-xl shadow-lg overflow-hidden card-hover ${statusClass}`;
+                roomCard.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="text-4xl">${room.image}</div>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium ${statusColor} bg-gray-100">${statusText}</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">${room.name}</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="star-rating mr-2">
+                                ${'⭐'.repeat(Math.floor(room.rating))}
+                            </div>
+                            <span class="text-sm text-gray-600">${room.rating} (${room.reviews} รีวิว)</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">ขนาด: ${room.size} | จุได้: ${room.capacity}</p>
+                        <div class="mb-4">
+                            <h4 class="font-semibold mb-2">สิ่งอำนวยความสะดวก:</h4>
+                            <div class="flex flex-wrap gap-1">
+                                ${room.amenities.map(amenity => `<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">${amenity}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-2xl font-bold text-purple-600">${room.price} บาท/คืน</div>
+                            <button onclick="bookRoom(${room.id})" 
+                                    class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition ${room.status !== 'available' ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${room.status !== 'available' ? 'disabled' : ''}>
+                                ${room.status === 'available' ? 'จองเลย' : 'ไม่ว่าง'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                roomGrid.appendChild(roomCard);
+            });
+        }
+
+        function searchRooms() {
+            const checkIn = document.getElementById('checkIn').value;
+            const checkOut = document.getElementById('checkOut').value;
+            const roomType = document.getElementById('roomType').value;
+
+            let filteredRooms = rooms;
+
+            if (roomType) {
+                filteredRooms = filteredRooms.filter(room => room.type === roomType);
+            }
+
+            // In a real application, you would check availability against bookings
+            if (checkIn && checkOut) {
+                // For demo purposes, show only available rooms
+                filteredRooms = filteredRooms.filter(room => room.status === 'available');
+            }
+
+            renderRooms(filteredRooms);
+            
+            // Show notification
+            showNotification(`พบห้องที่ตรงกับเงื่อนไข ${filteredRooms.length} ห้อง`, 'success');
+        }
+
+        function bookRoom(roomId) {
+            if (!currentUser) {
+                showNotification('กรุณาเข้าสู่ระบบก่อนทำการจอง', 'error');
+                showModal('loginModal');
+                return;
+            }
+
+            selectedRoom = rooms.find(room => room.id === roomId);
+            if (!selectedRoom) return;
+
+            // Populate room info in booking modal
+            document.getElementById('selectedRoomInfo').innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <div class="text-3xl">${selectedRoom.image}</div>
+                    <div>
+                        <h4 class="text-lg font-bold">${selectedRoom.name}</h4>
+                        <p class="text-gray-600">ขนาด: ${selectedRoom.size} | จุได้: ${selectedRoom.capacity}</p>
+                        <p class="text-purple-600 font-bold">${selectedRoom.price} บาท/คืน</p>
+                    </div>
+                </div>
+            `;
+
+            showModal('bookingModal');
+        }
+
+        function calculateCost() {
+            if (!selectedRoom) return;
+
+            const checkIn = new Date(document.getElementById('bookingCheckIn').value);
+            const checkOut = new Date(document.getElementById('bookingCheckOut').value);
+
+            if (checkIn && checkOut && checkOut > checkIn) {
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                const total = nights * selectedRoom.price;
+
+                document.getElementById('totalCost').textContent = `${total.toLocaleString()} บาท`;
+                document.getElementById('costBreakdown').innerHTML = `
+                    ${nights} คืน × ${selectedRoom.price} บาท = ${total.toLocaleString()} บาท
+                `;
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Demo login - in real app, validate against backend
+            if (email === 'admin@catcondo.com' && password === 'admin123') {
+                currentUser = { email, name: 'Admin', role: 'admin' };
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else {
+                currentUser = { email, name: email.split('@')[0], role: 'user' };
+            }
+
+            updateUserInterface();
+            hideModal('loginModal');
+            showNotification('เข้าสู่ระบบสำเร็จ!', 'success');
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+
+            currentUser = { email, name, phone, role: 'user' };
+            updateUserInterface();
+            hideModal('registerModal');
+            showNotification('สมัครสมาชิกสำเร็จ!', 'success');
+        }
+
+        function handleBooking(e) {
+            e.preventDefault();
+            
+            const bookingData = {
+                id: Date.now(),
+                roomId: selectedRoom.id,
+                roomName: selectedRoom.name,
+                userId: currentUser.email,
+                checkIn: document.getElementById('bookingCheckIn').value,
+                checkOut: document.getElementById('bookingCheckOut').value,
+                catName: document.getElementById('catName').value,
+                catAge: document.getElementById('catAge').value,
+                catBreed: document.getElementById('catBreed').value,
+                catGender: document.getElementById('catGender').value,
+                catHealth: document.getElementById('catHealth').value,
+                specialRequests: document.getElementById('specialRequests').value,
+                totalCost: parseInt(document.getElementById('totalCost').textContent.replace(/[^\d]/g, '')),
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            bookings.push(bookingData);
+            hideModal('bookingModal');
+            
+            // Show payment modal
+            document.getElementById('paymentAmount').textContent = document.getElementById('totalCost').textContent;
+            showModal('paymentModal');
+        }
+
+        function handlePayment() {
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const paymentProof = document.getElementById('paymentProof').files[0];
+
+            if (paymentMethod === 'transfer' && !paymentProof) {
+                showNotification('กรุณาอัปโหลดหลักฐานการโอนเงิน', 'error');
+                return;
+            }
+
+            hideModal('paymentModal');
+            showNotification('ส่งข้อมูลการชำระเงินเรียบร้อย! เจ้าหน้าที่จะตรวจสอบและแจ้งกลับภายใน 24 ชั่วโมง', 'success');
+            
+            // Update room status
+            selectedRoom.status = 'booked';
+            renderRooms();
+        }
+
+        function updatePaymentDetails() {
+            const method = document.getElementById('paymentMethod').value;
+            const detailsDiv = document.getElementById('paymentDetails');
+            
+            switch(method) {
+                case 'transfer':
+                    detailsDiv.innerHTML = `
+                        <p class="text-sm text-blue-800">
+                            <strong>ธนาคารกสิกรไทย</strong><br>
+                            เลขที่บัญชี: 123-4-56789-0<br>
+                            ชื่อบัญชี: Cat Condo Resort Co., Ltd.
+                        </p>
+                    `;
+                    break;
+                case 'promptpay':
+                    detailsDiv.innerHTML = `
+                        <p class="text-sm text-blue-800">
+                            <strong>PromptPay</strong><br>
+                            เบอร์โทร: 02-123-4567<br>
+                            ชื่อบัญชี: Cat Condo Resort Co., Ltd.
+                        </p>
+                    `;
+                    break;
+                case 'credit':
+                    detailsDiv.innerHTML = `
+                        <p class="text-sm text-blue-800">
+                            <strong>บัตรเครดิต</strong><br>
+                            ระบบจะเปลี่ยนเส้นทางไปยังหน้าชำระเงินที่ปลอดภัย
+                        </p>
+                    `;
+                    break;
+            }
+        }
+
+        function handleReview(e) {
+            e.preventDefault();
+            
+            if (selectedRating === 0) {
+                showNotification('กรุณาให้คะแนน', 'error');
+                return;
+            }
+
+            const comment = document.getElementById('reviewComment').value;
+            
+            // In a real app, save review to backend
+            hideModal('reviewModal');
+            showNotification('ขอบคุณสำหรับรีวิว!', 'success');
+            
+            // Reset form
+            selectedRating = 0;
+            updateStarDisplay();
+            document.getElementById('reviewComment').value = '';
+        }
+
+        function updateStarDisplay() {
+            document.querySelectorAll('.star').forEach((star, index) => {
+                if (index < selectedRating) {
+                    star.classList.remove('text-gray-300');
+                    star.classList.add('text-yellow-400');
+                } else {
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-gray-300');
+                }
+            });
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('adminPanel').classList.add('hidden');
+            updateUserInterface();
+            showNotification('ออกจากระบบเรียบร้อย', 'success');
+        }
+
+        function updateUserInterface() {
+            if (currentUser) {
+                document.getElementById('loginBtn').classList.add('hidden');
+                document.getElementById('registerBtn').classList.add('hidden');
+                document.getElementById('userMenu').classList.remove('hidden');
+                document.getElementById('userName').textContent = `สวัสดี, ${currentUser.name}`;
+            } else {
+                document.getElementById('loginBtn').classList.remove('hidden');
+                document.getElementById('registerBtn').classList.remove('hidden');
+                document.getElementById('userMenu').classList.add('hidden');
+            }
+        }
+
+        function validateDates() {
+            const checkIn = new Date(document.getElementById('checkIn').value);
+            const checkOut = new Date(document.getElementById('checkOut').value);
+            
+            if (checkIn && checkOut && checkOut <= checkIn) {
+                showNotification('วันออกต้องหลังจากวันเข้าพัก', 'error');
+                document.getElementById('checkOut').value = '';
+            }
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Admin functions (demo)
+        document.getElementById('addRoomBtn')?.addEventListener('click', () => {
+            showNotification('ฟีเจอร์เพิ่มห้องใหม่ - Demo เท่านั้น', 'info');
+        });
+
+        document.getElementById('viewBookingsBtn')?.addEventListener('click', () => {
+            showNotification(`มีการจอง ${bookings.length} รายการ`, 'info');
+        });
+
+        document.getElementById('reportsBtn')?.addEventListener('click', () => {
+            showNotification('ออกรายงาน - Demo เท่านั้น', 'info');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e869bd44c48961',t:'MTc1Nzc3NDU2Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+
