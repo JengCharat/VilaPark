@@ -5,9 +5,11 @@ import com.vilapark.repository.CatRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
 @RestController
 @RequestMapping("/cats")
 @CrossOrigin(origins = "*")
+
 public class CatController {
 
     private final CatRepository repo;

@@ -20,6 +20,8 @@ public class Cat {
     @Column(length = 500) // note อาจเป็นข้อความยาว
     private String note;
 
+    private String breed; // ✅ ฟิลด์สายพันธุ์แมวใหม่
+
     public Cat() {
     } // default constructor สำคัญ
 
@@ -70,5 +72,13 @@ public class Cat {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
     }
 }
