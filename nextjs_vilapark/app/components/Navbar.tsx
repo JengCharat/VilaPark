@@ -4,7 +4,7 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const router = useRouter();
 
-const showPage = (page) => {
+const showPage = (page: string) => {
     router.push(`/${page}`);
     setUserMenuOpen(false);
   };

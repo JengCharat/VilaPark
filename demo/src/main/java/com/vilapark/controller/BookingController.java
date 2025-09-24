@@ -1,136 +1,141 @@
-package com.vilapark.controller; 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import jakarta.validation.Valid;
+package com.vilapark.controller;
 
+import com.vilapark.dto.BookingUIResponse;
+import com.vilapark.entity.Booking;
+import com.vilapark.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.vilapark.models.ERole;
-import com.vilapark.models.Role;
-import com.vilapark.models.User;
-import com.vilapark.payload.request.LoginRequest;
-import com.vilapark.payload.request.SignupRequest;
-import com.vilapark.payload.response.UserInfoResponse;
-import com.vilapark.payload.response.MessageResponse;
-import com.vilapark.repository.RoleRepository;
-import com.vilapark.repository.UserRepository;
-import com.vilapark.security.jwt.JwtUtils;
-import com.vilapark.security.services.UserDetailsImpl;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-//for Angular Client (withCredentials)
-//@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600, allowCredentials="true")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
-public class AuthController {
-  @Autowired
-  AuthenticationManager authenticationManager;
+@RequestMapping("/api/bookings")
+public class BookingController {
 
   @Autowired
-  UserRepository userRepository;
+  private BookingRepository bookingRepository;
 
-  @Autowired
-  RoleRepository roleRepository;
-
-  @Autowired
-  PasswordEncoder encoder;
-
-  @Autowired
-  JwtUtils jwtUtils;
-
-  @PostMapping("/signin")
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
-    Authentication authentication = authenticationManager
-        .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-    ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
-    List<String> roles = userDetails.getAuthorities().stream()
-        .map(item -> item.getAuthority())
-        .collect(Collectors.toList());
-
-    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-        .body(new UserInfoResponse(userDetails.getId(),
-                                   userDetails.getUsername(),
-                                   userDetails.getEmail(),
-                                   roles));
+  // ---------- CRUD เดิม ----------
+  @GetMapping
+  public List<Booking> getAllBookings() {
+    return bookingRepository.findAll();
   }
 
-  @PostMapping("/signup")
-  public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-    if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-      return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
-    }
-
-    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-      return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
-    }
-
-    // Create new user's account
-    User user = new User(signUpRequest.getUsername(),
-                         signUpRequest.getEmail(),
-                         encoder.encode(signUpRequest.getPassword()));
-
-    Set<String> strRoles = signUpRequest.getRole();
-    Set<Role> roles = new HashSet<>();
-
-    if (strRoles == null) {
-      Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-      roles.add(userRole);
-    } else {
-      strRoles.forEach(role -> {
-        switch (role) {
-        case "admin":
-          Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(adminRole);
-
-          break;
-        case "mod":
-          Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(modRole);
-
-          break;
-        default:
-          Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(userRole);
-        }
-      });
-    }
-
-    user.setRoles(roles);
-    userRepository.save(user);
-
-    return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+  @GetMapping("/{id}")
+  public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
+    Optional<Booking> booking = bookingRepository.findById(id);
+    return booking.map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
   }
 
-  @PostMapping("/signout")
-  public ResponseEntity<?> logoutUser() {
-    ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-        .body(new MessageResponse("You've been signed out!"));
+  @PostMapping
+  public Booking createBooking(@RequestBody Booking booking) {
+    return bookingRepository.save(booking);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @RequestBody Booking bookingDetails) {
+    Optional<Booking> opt = bookingRepository.findById(id);
+    if (opt.isEmpty())
+      return ResponseEntity.notFound().build();
+
+    Booking b = opt.get();
+    b.setUserId(bookingDetails.getUserId());
+    b.setRoomId(bookingDetails.getRoomId());
+    b.setCatId(bookingDetails.getCatId());
+    b.setCheckinDate(bookingDetails.getCheckinDate());
+    b.setCheckoutDate(bookingDetails.getCheckoutDate());
+    b.setStatus(bookingDetails.getStatus());
+    b.setCreatedAt(bookingDetails.getCreatedAt());
+
+    return ResponseEntity.ok(bookingRepository.save(b));
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
+    if (!bookingRepository.existsById(id))
+      return ResponseEntity.notFound().build();
+    bookingRepository.deleteById(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  // ---------- Endpoints สำหรับ UI ----------
+
+  // ส่งรายการ booking ที่ map เป็น DTO มี catName พร้อม
+  @GetMapping("/ui")
+
+  public List<BookingUIResponse> getBookingsForUI() {
+    return toUI(bookingRepository.findAll());
+  }
+
+  // ส่ง "งานวันนี้" (check-in วันนี้ + check-out วันนี้ + งานสถานะ UPDATE
+  // วันนี้ถ้าคุณใช้งาน)
+  @GetMapping("/today")
+  public List<BookingUIResponse> getTasksToday(
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    LocalDate d = (date != null) ? date : LocalDate.now(ZoneId.of("Asia/Bangkok"));
+    // รวมงานที่เกี่ยวกับวันนี้: check-in วันนี้, check-out วันนี้, หรือ status
+    // บางตัวที่คุณนับเป็นงาน
+    var list = bookingRepository.findByCheckinDate(d);
+    list.addAll(bookingRepository.findByCheckoutDate(d));
+    // ถ้าต้องการดึง "UPDATE วันนี้" และคุณเก็บวันไว้ที่ created_at ให้กรองเพิ่มจาก
+    // findAll() ก็ได้
+    // list.addAll(bookingRepository.findByStatus("UPDATE"));
+
+    // เอางานซ้ำออก (ถ้าเผอิญตรงเงื่อนไขมากกว่า 1) แล้ว map เป็น DTO
+    return toUI(list.stream().distinct().collect(Collectors.toList()));
+  }
+
+  // ส่งสรุปตัวเลข (การ์ด 4 ใบ) ตามภาพแดชบอร์ด
+  @GetMapping("/summary")
+  public SummaryResponse getSummary(
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    LocalDate d = (date != null) ? date : LocalDate.now(ZoneId.of("Asia/Bangkok"));
+    var all = bookingRepository.findAll();
+
+    long stayingToday = all.stream()
+        .filter(b -> {
+          // checkin <= d และ (checkout เป็น null หรือ > d)
+          boolean in = (b.getCheckinDate() != null && !b.getCheckinDate().isAfter(d));
+          boolean out = (b.getCheckoutDate() == null || b.getCheckoutDate().isAfter(d));
+          return in && out;
+        })
+        .count();
+
+    long checkinToday = all.stream().filter(b -> d.equals(b.getCheckinDate())).count();
+    long checkoutToday = all.stream().filter(b -> d.equals(b.getCheckoutDate())).count();
+    long needUpdate = all.stream().filter(b -> "PENDING".equalsIgnoreCase(b.getStatus())
+        || "UPDATE".equalsIgnoreCase(b.getStatus())).count();
+
+    return new SummaryResponse(stayingToday, checkinToday, checkoutToday, needUpdate);
+  }
+
+  // ---------- Helpers ----------
+  private List<BookingUIResponse> toUI(List<Booking> list) {
+    return list.stream().map(b -> new BookingUIResponse(
+        b.getId(),
+        b.getRoomId(),
+        (b.getCat() != null && b.getCat().getName() != null)
+            ? b.getCat().getName()
+            : ("#" + (b.getCatId() == null ? "-" : b.getCatId())),
+        b.getCheckinDate() == null ? null : b.getCheckinDate().toString(),
+        b.getCheckoutDate() == null ? null : b.getCheckoutDate().toString(),
+        b.getStatus(),
+        b.getCreatedAt() == null ? null : b.getCreatedAt().toString())).toList();
+  }
+
+  // ใช้เป็น payload ของการ์ดสรุป
+  public record SummaryResponse(
+      long stayingToday,
+      long checkinToday,
+      long checkoutToday,
+      long needUpdate) {
   }
 }
