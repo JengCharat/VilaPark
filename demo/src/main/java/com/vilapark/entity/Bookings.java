@@ -1,8 +1,8 @@
 package com.vilapark.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
@@ -12,33 +12,36 @@ public class Bookings {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
+    // ให้สามารถเป็น null ได้
+    @Column(name = "user_id", nullable = true)
     private Long userId;
 
-    @Column(name = "room_id")
-    private Long roomId;
-
-    @Column(name = "cat_id")
+    // ให้สามารถเป็น null ได้
+    @Column(name = "cat_id", nullable = true)
     private Long catId;
 
-    @Column(name = "checkin_date")
+    @Column(name = "room_id", nullable = false)
+    private Long roomId;
+
+    @Column(name = "checkin_date", nullable = false)
     private LocalDate checkinDate;
 
-    @Column(name = "checkout_date")
+    @Column(name = "checkout_date", nullable = false)
     private LocalDate checkoutDate;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     public Bookings() {
-        // ค่าเริ่มต้นให้ created_at เป็นเวลาปัจจุบัน
+        // ตั้งค่า createdAt เป็นเวลาปัจจุบัน
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters & Setters
+    // ------------------ Getters & Setters ------------------
+
     public Long getId() {
         return id;
     }
@@ -55,20 +58,20 @@ public class Bookings {
         this.userId = userId;
     }
 
-    public Long getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
-    }
-
     public Long getCatId() {
         return catId;
     }
 
     public void setCatId(Long catId) {
         this.catId = catId;
+    }
+
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
     }
 
     public LocalDate getCheckinDate() {
