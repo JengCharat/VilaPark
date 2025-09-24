@@ -1,12 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
 
+interface Room {
+    id: number;
+    roomNumber: string;
+    type: string;
+    price: number;
+}
+
 export default function BookingPage() {
-    const [rooms, setRooms] = useState([]);
+    const [rooms, setRooms] = useState<Room[]>([]);
     const [formData, setFormData] = useState({
         checkinDate: "",
         checkoutDate: "",
-        roomId: "",
+        roomId: 0, // ใช้ number แทน string
     });
 
     // ดึงข้อมูลห้องจาก API
@@ -17,23 +24,25 @@ export default function BookingPage() {
             .catch((err) => console.error("Error loading rooms:", err));
     }, []);
 
-    // เมื่อเลือกวันที่หรือห้อง
+    // เปลี่ยนค่า input วันที่
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSelectRoom = (roomId: string) => {
+    // เลือกห้อง
+    const handleSelectRoom = (roomId: number) => {
         setFormData({ ...formData, roomId });
     };
 
-    // กดถัดไป → ส่งข้อมูลไป bookings
+    // ส่งข้อมูล Booking
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.roomId) {
             alert("กรุณาเลือกห้องก่อน");
             return;
         }
+
         try {
             const response = await fetch("http://localhost:8081/bookings", {
                 method: "POST",
@@ -42,13 +51,13 @@ export default function BookingPage() {
                     roomId: formData.roomId,
                     checkinDate: formData.checkinDate,
                     checkoutDate: formData.checkoutDate,
-                    status: "จองแล้ว"
+                    status: "จองแล้ว",
                 }),
             });
 
             if (response.ok) {
                 alert("จองห้องสำเร็จ!");
-                setFormData({ checkinDate: "", checkoutDate: "", roomId: "" });
+                setFormData({ checkinDate: "", checkoutDate: "", roomId: 0 });
             } else {
                 alert("จองห้องไม่สำเร็จ");
             }
@@ -71,7 +80,6 @@ export default function BookingPage() {
                         value={formData.checkinDate}
                         onChange={handleChange}
                         className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-400"
-                        placeholder="วันที่เข้าพัก"
                         required
                     />
                     <input
@@ -80,7 +88,6 @@ export default function BookingPage() {
                         value={formData.checkoutDate}
                         onChange={handleChange}
                         className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-400"
-                        placeholder="วันที่ออก"
                         required
                     />
                 </div>
@@ -89,13 +96,11 @@ export default function BookingPage() {
                 <div>
                     <p className="font-semibold mb-3">ประเภทห้อง</p>
                     <div className="grid grid-cols-3 gap-3">
-                        {rooms.map((room: any) => (
+                        {rooms.map((room) => (
                             <div
                                 key={room.id}
                                 onClick={() => handleSelectRoom(room.id)}
-                                className={`p-4 border rounded-lg cursor-pointer hover:border-purple-500 transition ${formData.roomId === String(room.id)
-                                        ? "border-purple-500 bg-purple-50"
-                                        : "border-gray-300"
+                                className={`p-4 border rounded-lg cursor-pointer hover:border-purple-500 transition ${formData.roomId === room.id ? "border-purple-500 bg-purple-50" : "border-gray-300"
                                     }`}
                             >
                                 <p className="font-bold">{room.type}</p>
@@ -106,7 +111,7 @@ export default function BookingPage() {
                     </div>
                 </div>
 
-                {/* ปุ่มถัดไป */}
+                {/* ปุ่มส่งข้อมูล */}
                 <button
                     type="submit"
                     className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
