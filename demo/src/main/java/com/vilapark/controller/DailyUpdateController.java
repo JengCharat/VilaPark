@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/daily-updates")
-//@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*")
 public class DailyUpdateController {
 
     @Autowired

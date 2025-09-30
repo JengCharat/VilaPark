@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "daily_updates")
 public class DailyUpdate {
@@ -16,6 +17,7 @@ public class DailyUpdate {
     // ความสัมพันธ์กับ Cat
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id", nullable = false)
+    @JsonIgnore
     private Cat cat;
 
     @Column(name = "update_date", nullable = false)
