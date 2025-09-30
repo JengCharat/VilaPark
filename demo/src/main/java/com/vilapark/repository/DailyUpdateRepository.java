@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+
 public interface DailyUpdateRepository extends JpaRepository<DailyUpdate, Long> {
 
     List<DailyUpdate> findByCat(Cat cat);
