@@ -54,7 +54,7 @@ export default function DashboardPage() {
 
   // ปุ่มจองห้อง → ไปหน้า BookingPage
   function goToBookingPage() {
-    router.push("from/Booking"); // สมมติไฟล์อยู่ pages/booking.tsx
+    router.push("form"); // สมมติไฟล์อยู่ pages/booking.tsx
   }
 
   if (!user) return <p>Loading...</p>;

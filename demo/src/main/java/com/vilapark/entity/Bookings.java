@@ -12,12 +12,8 @@ public class Bookings {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ให้สามารถเป็น null ได้
-    @Column(name = "user_id", nullable = true)
     private Long userId;
 
-    // ให้สามารถเป็น null ได้
-    @Column(name = "cat_id", nullable = true)
     private Long catId;
 
     @Column(name = "room_id", nullable = false)
