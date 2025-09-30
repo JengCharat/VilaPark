@@ -26,6 +26,14 @@ export default function DashboardBookingPage() {
 
     const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
 
+    const [contactInfo, setContactInfo] = useState({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        email: "",
+        address: "",
+    });
+
     // โหลด user
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -66,73 +74,93 @@ export default function DashboardBookingPage() {
         router.push("/signin");
     }
 
-    // handle form
+    // ---------- STEP 1 ----------
     const handleBookingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setBookingData({ ...bookingData, [name]: value });
     };
-
     const handleSelectRoom = (roomId: number) => {
         setBookingData({ ...bookingData, roomId });
     };
-
-    const handleSelectCat = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCatId(Number(e.target.value));
-    };
-
-    // Next & Prev
-    const handleNextStep = () => {
+    const handleNextStep1 = () => {
         if (!bookingData.checkinDate || !bookingData.checkoutDate || bookingData.roomId === 0) {
             alert("กรุณากรอกข้อมูลการจองให้ครบถ้วน");
             return;
         }
         setStep(2);
     };
-    const handlePrevStep = () => setStep(1);
 
-    // Submit Booking
-const handleSubmit = async () => {
-    if (!userId) {
-        alert("ไม่พบ User ID");
-        return;
-    }
-    if (!selectedCatId) {
-        alert("กรุณาเลือกแมวก่อน");
-        return;
-    }
-
-    const payload = {
-        userId,
-        catId: selectedCatId,
-        roomId: bookingData.roomId,
-        checkinDate: bookingData.checkinDate,
-        checkoutDate: bookingData.checkoutDate,
-        status: "1",
+    // ---------- STEP 2 ----------
+    const handleSelectCat = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCatId(Number(e.target.value));
+    };
+    const handlePrevStep2 = () => setStep(1);
+    const handleNextStep2 = () => {
+        if (!selectedCatId) {
+            alert("กรุณาเลือกแมวก่อน");
+            return;
+        }
+        setStep(3);
     };
 
-    // alert JSON ก่อนส่ง
-    alert("JSON ที่จะส่ง:\n" + JSON.stringify(payload, null, 2));
-
-    try {
-        const response = await fetch("http://localhost:8081/bookings", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
-
-        if (response.ok) {
-            alert("✅ จองห้องและเลือกแมวสำเร็จ!");
-            setBookingData({ checkinDate: "", checkoutDate: "", roomId: 0 });
-            setSelectedCatId(null);
-            setStep(1);
-        } else {
-            alert("❌ เกิดข้อผิดพลาด");
+    // ---------- STEP 3 ----------
+    const handleContactChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setContactInfo({ ...contactInfo, [name]: value });
+    };
+    const handlePrevStep3 = () => setStep(2);
+    const handleNextStep3 = () => {
+        // ตรวจสอบข้อมูลเจ้าของ
+        if (!contactInfo.firstName || !contactInfo.lastName || !contactInfo.phone || !contactInfo.email || !contactInfo.address) {
+            alert("กรุณากรอกข้อมูลเจ้าของให้ครบถ้วน");
+            return;
         }
-    } catch (error) {
-        console.error(error);
-        alert("⚠️ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์");
-    }
-};
+        setStep(4);
+    };
+
+    // ---------- STEP 4 ----------
+    const handlePrevStep4 = () => setStep(3);
+
+    // ---------- SUBMIT ----------
+    const handleSubmit = async () => {
+        if (!userId) {
+            alert("ไม่พบ User ID");
+            return;
+        }
+
+        const payload = {
+            userId,
+            catId: selectedCatId,
+            roomId: bookingData.roomId,
+            checkinDate: bookingData.checkinDate,
+            checkoutDate: bookingData.checkoutDate,
+            status: "1",
+            owner: contactInfo,
+        };
+
+        alert("JSON ที่จะส่ง:\n" + JSON.stringify(payload, null, 2));
+
+        try {
+            const response = await fetch("http://localhost:8081/bookings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                alert("✅ จองห้องและเลือกแมวสำเร็จ!");
+                setBookingData({ checkinDate: "", checkoutDate: "", roomId: 0 });
+                setSelectedCatId(null);
+                setContactInfo({ firstName: "", lastName: "", phone: "", email: "", address: "" });
+                setStep(1);
+            } else {
+                alert("❌ เกิดข้อผิดพลาด");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("⚠️ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์");
+        }
+    };
 
     if (!user) return <p>Loading...</p>;
 
@@ -141,7 +169,7 @@ const handleSubmit = async () => {
             <Navbar />
             <div className="bg-white min-h-screen py-10 text-black">
 
-                {/* STEP 1: ข้อมูลการจอง */}
+                {/* STEP 1 */}
                 {step === 1 && (
                     <div className="p-6 max-w-3xl mx-auto rounded-lg shadow-md bg-white mt-10">
                         <h1 className="text-2xl font-bold mb-6 text-center">📅 จองห้องพัก</h1>
@@ -191,7 +219,7 @@ const handleSubmit = async () => {
 
                             <div className="flex justify-center mt-6">
                                 <button
-                                    onClick={handleNextStep}
+                                    onClick={handleNextStep1}
                                     className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                                 >
                                     ถัดไป
@@ -201,7 +229,7 @@ const handleSubmit = async () => {
                     </div>
                 )}
 
-                {/* STEP 2: เลือกแมว */}
+                {/* STEP 2 */}
                 {step === 2 && (
                     <div className="p-6 max-w-3xl mx-auto rounded-lg shadow-md bg-white mt-10">
                         <h1 className="text-2xl font-bold mb-6 text-center">🐱 เลือกแมว</h1>
@@ -228,21 +256,153 @@ const handleSubmit = async () => {
                                 <div className="flex justify-between mt-6">
                                     <button
                                         type="button"
-                                        onClick={handlePrevStep}
+                                        onClick={handlePrevStep2}
                                         className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
                                     >
                                         ย้อนกลับ
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={handleSubmit}
+                                        onClick={handleNextStep2}
                                         className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                                     >
-                                        ยืนยันจอง
+                                        ถัดไป
                                     </button>
                                 </div>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* STEP 3 */}
+                {step === 3 && (
+                    <div className="p-6 max-w-3xl mx-auto rounded-lg shadow-md bg-white mt-10">
+                        <h3 className="text-xl font-semibold mb-4">ข้อมูลเจ้าของ</h3>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium mb-2">ชื่อ</label>
+                                <input
+                                    type="text"
+                                    name="firstName"
+                                    value={contactInfo.firstName}
+                                    onChange={handleContactChange}
+                                    className="w-full p-3 border rounded-lg"
+                                    placeholder="ชื่อจริง"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-2">นามสกุล</label>
+                                <input
+                                    type="text"
+                                    name="lastName"
+                                    value={contactInfo.lastName}
+                                    onChange={handleContactChange}
+                                    className="w-full p-3 border rounded-lg"
+                                    placeholder="นามสกุล"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-2">เบอร์โทรศัพท์</label>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={contactInfo.phone}
+                                    onChange={handleContactChange}
+                                    className="w-full p-3 border rounded-lg"
+                                    placeholder="08X-XXX-XXXX"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-2">อีเมล</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={contactInfo.email}
+                                    onChange={handleContactChange}
+                                    className="w-full p-3 border rounded-lg"
+                                    placeholder="example@email.com"
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium mb-2">ที่อยู่</label>
+                            <textarea
+                                name="address"
+                                value={contactInfo.address}
+                                onChange={handleContactChange}
+                                className="w-full p-3 border rounded-lg"
+                                rows={3}
+                                placeholder="ที่อยู่สำหรับติดต่อ"
+                            />
+                        </div>
+                        <div className="flex space-x-4 mt-6">
+                            <button
+                                type="button"
+                                onClick={handlePrevStep3}
+                                className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
+                            >
+                                ย้อนกลับ
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleNextStep3}
+                                className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+                            >
+                                ถัดไป
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* STEP 4 */}
+                {step === 4 && (
+                    <div className="p-6 max-w-3xl mx-auto rounded-lg shadow-md bg-white mt-10">
+                        <h3 className="text-xl font-semibold mb-4">ยืนยันการจอง</h3>
+
+                        <div className="space-y-4">
+                            <div>
+                                <h4 className="font-semibold">ข้อมูลการจอง</h4>
+                                <p>เช็คอิน: {bookingData.checkinDate}</p>
+                                <p>เช็คเอาท์: {bookingData.checkoutDate}</p>
+                                {rooms.find(r => r.id === bookingData.roomId) && (
+                                    <p>ห้อง: {rooms.find(r => r.id === bookingData.roomId)?.type} - {rooms.find(r => r.id === bookingData.roomId)?.roomNumber}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <h4 className="font-semibold">แมวที่เลือก</h4>
+                                {cats.find(c => c.id === selectedCatId) ? (
+                                    <p>{cats.find(c => c.id === selectedCatId)?.name}</p>
+                                ) : (
+                                    <p>ไม่ได้เลือกแมว</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <h4 className="font-semibold">ข้อมูลเจ้าของ</h4>
+                                <p>ชื่อ: {contactInfo.firstName} {contactInfo.lastName}</p>
+                                <p>เบอร์โทร: {contactInfo.phone}</p>
+                                <p>อีเมล: {contactInfo.email}</p>
+                                <p>ที่อยู่: {contactInfo.address}</p>
+                            </div>
+                        </div>
+
+                        <div className="flex space-x-4 mt-6">
+                            <button
+                                type="button"
+                                onClick={handlePrevStep4}
+                                className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
+                            >
+                                ย้อนกลับ
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleSubmit}
+                                className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+                            >
+                                ยืนยันการจอง
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
