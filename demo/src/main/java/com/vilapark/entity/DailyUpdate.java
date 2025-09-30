@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "daily_updates")
 public class DailyUpdate {
@@ -14,8 +15,9 @@ public class DailyUpdate {
     private Long id;
 
     // ความสัมพันธ์กับ Cat
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cat_id", nullable = false)
+   @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Cat cat;
 
     @Column(name = "update_date", nullable = false)
