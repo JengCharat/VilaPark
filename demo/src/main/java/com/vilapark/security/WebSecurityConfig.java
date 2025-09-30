@@ -31,6 +31,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   @Autowired
   UserDetailsServiceImpl userDetailsService;
 
+  
+
   @Autowired
   private AuthEntryPointJwt unauthorizedHandler;
 
@@ -93,6 +95,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
+        
             .requestMatchers("/api/test/**").permitAll()
             .requestMatchers("/cats/**").permitAll()
             .requestMatchers( "/api/daily-updates","/api/daily-updates/**").permitAll()
