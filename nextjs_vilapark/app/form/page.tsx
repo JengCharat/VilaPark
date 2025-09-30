@@ -16,7 +16,7 @@ export default function DashboardBookingPage() {
     const [cats, setCats] = useState<Cat[]>([]);
     const [loadingCats, setLoadingCats] = useState(true);
     const [rooms, setRooms] = useState<Room[]>([]);
-    const [step, setStep] = useState(1); // 👈 เริ่มต้นที่ Step 1 แทน 0
+    const [step, setStep] = useState(1);
 
     const [bookingData, setBookingData] = useState({
         checkinDate: "",
@@ -24,14 +24,7 @@ export default function DashboardBookingPage() {
         roomId: 0,
     });
 
-    const [catData, setCatData] = useState({
-        name: "",
-        breed: "",
-        gender: "",
-        age: "",
-        habit: "",
-        note: "",
-    });
+    const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
 
     // โหลด user
     useEffect(() => {
@@ -83,11 +76,8 @@ export default function DashboardBookingPage() {
         setBookingData({ ...bookingData, roomId });
     };
 
-    const handleCatChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        const { name, value } = e.target;
-        setCatData({ ...catData, [name]: value });
+    const handleSelectCat = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCatId(Number(e.target.value));
     };
 
     // Next & Prev
@@ -100,51 +90,61 @@ export default function DashboardBookingPage() {
     };
     const handlePrevStep = () => setStep(1);
 
-    // Submit Booking + Cat
-    const handleSubmit = async () => {
-        if (!userId) {
-            alert("ไม่พบ User ID");
-            return;
-        }
+    // Submit Booking
+const handleSubmit = async () => {
+    if (!userId) {
+        alert("ไม่พบ User ID");
+        return;
+    }
+    if (!selectedCatId) {
+        alert("กรุณาเลือกแมวก่อน");
+        return;
+    }
 
-        try {
-            const response = await fetch("http://localhost:8081/bookings", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    booking: { ...bookingData, userId },
-                    cat: catData,
-                }),
-                credentials: "include",
-            });
-
-            if (response.ok) {
-                alert("✅ จองห้องและบันทึกข้อมูลแมวสำเร็จ!");
-                setBookingData({ checkinDate: "", checkoutDate: "", roomId: 0 });
-                setCatData({ name: "", breed: "", gender: "", age: "", habit: "", note: "" });
-                setStep(0);
-            } else {
-                alert("❌ เกิดข้อผิดพลาด");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("⚠️ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์");
-        }
+    const payload = {
+        userId,
+        catId: selectedCatId,
+        roomId: bookingData.roomId,
+        checkinDate: bookingData.checkinDate,
+        checkoutDate: bookingData.checkoutDate,
+        status: "1",
     };
+
+    // alert JSON ก่อนส่ง
+    alert("JSON ที่จะส่ง:\n" + JSON.stringify(payload, null, 2));
+
+    try {
+        const response = await fetch("http://localhost:8081/bookings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+            alert("✅ จองห้องและเลือกแมวสำเร็จ!");
+            setBookingData({ checkinDate: "", checkoutDate: "", roomId: 0 });
+            setSelectedCatId(null);
+            setStep(1);
+        } else {
+            alert("❌ เกิดข้อผิดพลาด");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("⚠️ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์");
+    }
+};
 
     if (!user) return <p>Loading...</p>;
 
     return (
         <>
             <Navbar />
-
             <div className="bg-white min-h-screen py-10 text-black">
 
                 {/* STEP 1: ข้อมูลการจอง */}
                 {step === 1 && (
                     <div className="p-6 max-w-3xl mx-auto rounded-lg shadow-md bg-white mt-10">
                         <h1 className="text-2xl font-bold mb-6 text-center">📅 จองห้องพัก</h1>
-
                         <div className="space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -177,8 +177,8 @@ export default function DashboardBookingPage() {
                                             key={room.id}
                                             onClick={() => handleSelectRoom(room.id)}
                                             className={`p-4 border rounded-lg cursor-pointer hover:border-purple-500 transition ${bookingData.roomId === room.id
-                                                    ? "border-purple-500 bg-purple-50"
-                                                    : "border-gray-300"
+                                                ? "border-purple-500 bg-purple-50"
+                                                : "border-gray-300"
                                                 }`}
                                         >
                                             <p className="font-semibold">{room.type}</p>
@@ -201,105 +201,48 @@ export default function DashboardBookingPage() {
                     </div>
                 )}
 
-                {/* STEP 2: ข้อมูลน้องแมว */}
+                {/* STEP 2: เลือกแมว */}
                 {step === 2 && (
                     <div className="p-6 max-w-3xl mx-auto rounded-lg shadow-md bg-white mt-10">
-                        <h1 className="text-2xl font-bold mb-6 text-center">🐱 กรอกข้อมูลน้องแมว</h1>
-                        <form className="space-y-6">
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">ชื่อน้องแมว</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={catData.name}
-                                        onChange={handleCatChange}
-                                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                        placeholder="เช่น มิวมิว"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">สายพันธุ์</label>
-                                    <select
-                                        name="breed"
-                                        value={catData.breed}
-                                        onChange={handleCatChange}
-                                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    >
-                                        <option value="">เลือกสายพันธุ์</option>
-                                        <option value="แมวไทย">แมวไทย</option>
-                                        <option value="เปอร์เซีย">เปอร์เซีย</option>
-                                        <option value="สก็อตติช โฟลด์">สก็อตติช โฟลด์</option>
-                                        <option value="อื่นๆ">อื่นๆ</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">เพศ</label>
-                                    <select
-                                        name="gender"
-                                        value={catData.gender}
-                                        onChange={handleCatChange}
-                                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    >
-                                        <option value="">เลือกเพศ</option>
-                                        <option value="ผู้">ผู้</option>
-                                        <option value="เมีย">เมีย</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">อายุ (เดือน)</label>
-                                    <input
-                                        type="number"
-                                        name="age"
-                                        value={catData.age}
-                                        onChange={handleCatChange}
-                                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    />
-                                </div>
-                            </div>
+                        <h1 className="text-2xl font-bold mb-6 text-center">🐱 เลือกแมว</h1>
 
-                            <div>
-                                <label className="block text-sm font-medium mb-2">ลักษณะนิสัย</label>
-                                <textarea
-                                    name="habit"
-                                    value={catData.habit}
-                                    onChange={handleCatChange}
+                        {loadingCats ? (
+                            <p>Loading cats...</p>
+                        ) : cats.length === 0 ? (
+                            <p>ยังไม่มีแมวในระบบ</p>
+                        ) : (
+                            <div className="space-y-4">
+                                <label className="block text-sm font-medium mb-2">เลือกแมว</label>
+                                <select
+                                    value={selectedCatId ?? ""}
+                                    onChange={handleSelectCat}
                                     className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    rows={3}
-                                    placeholder="เช่น ชอบเล่น กลัวเสียงดัง"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-2">ข้อควรระวัง / โรคประจำตัว</label>
-                                <textarea
-                                    name="note"
-                                    value={catData.note}
-                                    onChange={handleCatChange}
-                                    className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    rows={3}
-                                    placeholder="เช่น แพ้อาหารทะเล ต้องกินยา"
-                                />
-                            </div>
-
-                            <div className="flex justify-between mt-6">
-                                <button
-                                    type="button"
-                                    onClick={handlePrevStep}
-                                    className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
                                 >
-                                    ย้อนกลับ
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleSubmit}
-                                    className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-                                >
-                                     ยืนยันจอง
-                                </button>
+                                    <option value="">-- เลือกแมว --</option>
+                                    {cats.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="flex justify-between mt-6">
+                                    <button
+                                        type="button"
+                                        onClick={handlePrevStep}
+                                        className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                                    >
+                                        ย้อนกลับ
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleSubmit}
+                                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                                    >
+                                        ยืนยันจอง
+                                    </button>
+                                </div>
                             </div>
-                        </form>
+                        )}
                     </div>
                 )}
             </div>
