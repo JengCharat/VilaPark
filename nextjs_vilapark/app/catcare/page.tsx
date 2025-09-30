@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 
 type Cat = {
@@ -13,11 +14,12 @@ type Cat = {
 type DailyUpdate = {
   id?: number;
   cat: { id: number };
+  staff: { id: number };
   updateDate: string;
   mood: string;
   activity: string;
   specialNotes: string;
-  checklist: Record<string, boolean>;
+  checklist: string[];
   messageToOwner: string;
   imageUrls: string[];
 };
@@ -28,6 +30,8 @@ export default function Catcare() {
   const [catInfo, setCatInfo] = useState<Cat | null>(null);
   const [showForm, setShowForm] = useState(false);
 
+  const [staffId] = useState<number>(1); // แก้เป็น user id จริง
+
   const [checklist, setChecklist] = useState<Record<string, boolean>>({
     breakfast: false,
     dinner: false,
@@ -37,61 +41,61 @@ export default function Catcare() {
     toilet: false,
   });
 
-  const [mood, setMood] = useState("😊 ปกติดี");
-  const [activity, setActivity] = useState("🏃 กระฉับกระเฉง");
+  const [mood, setMood] = useState("ปกติดี");
+  const [activity, setActivity] = useState(" กระฉับกระเฉง");
   const [note, setNote] = useState("");
   const [messageToOwner, setMessageToOwner] = useState("");
   const [images, setImages] = useState<{ file: File | null; url: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  //  ฟังก์ชันบันทึก
+  // ฟังก์ชันบันทึก
   const handleSave = async (e?: React.FormEvent) => {
-  e?.preventDefault();
-  if (!catInfo || !selectedCatId) return;
+    e?.preventDefault();
+    if (!catInfo || !selectedCatId) return;
 
-  const payload: DailyUpdate = {
-    cat: { id: selectedCatId },
-    updateDate: new Date().toISOString().slice(0, 10),
-    mood,
-    activity,
-    specialNotes: note,
-    checklist,
-    messageToOwner,
-    imageUrls: images.map((img) => img.url),
-  };
+    const payload: DailyUpdate = {
+      cat: { id: selectedCatId },
+      staff: { id: staffId },
+      updateDate: new Date().toISOString().slice(0, 10),
+      mood,
+      activity,
+      specialNotes: note,
+      checklist: Object.entries(checklist)
+        .filter(([_, v]) => v)
+        .map(([k]) => k),
+      messageToOwner,
+      imageUrls: images.map((img) => img.url),
+    };
 
-  try {
-    const res = await fetch("http://localhost:8081/api/daily-updates", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    alert(JSON.stringify(payload, null, 2));
 
-    if (!res.ok) {
-      const errorBody = await res.text();
-      console.error("Error Response:", res.status, errorBody);
-      alert(`❌ Error ${res.status}: ${errorBody}`);
-      return;
+    try {
+      const res = await fetch("http://localhost:8081/api/daily-updates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const errorBody = await res.text();
+        console.error("Error Response:", res.status, errorBody);
+        alert(`❌ Error ${res.status}: ${errorBody}`);
+        return;
+      }
+      const data = await res.json();
+      console.log("✅ Saved:", data);
+      alert("บันทึกเรียบร้อย!");
+    } catch (err: any) {
+      console.error("Fetch Exception:", err);
+      alert("เกิดข้อผิดพลาด: " + (err.message || JSON.stringify(err)));
     }
-
-    const data = await res.json();
-    console.log("✅ Saved:", data);
-    alert("บันทึกเรียบร้อย!");
-  } catch (err: any) {
-    console.error("Fetch Exception:", err);
-    alert("เกิดข้อผิดพลาด: " + (err.message || JSON.stringify(err)));
-  }
-};
-
+  };
 
   // โหลดรายชื่อแมว
   useEffect(() => {
     fetch("http://localhost:8081/cats")
       .then((res) => res.json())
       .then((data: Cat[]) => setCats(data))
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }, []);
 
   // โหลดข้อมูลอัปเดตของแมว
@@ -113,23 +117,14 @@ export default function Catcare() {
         const todayUpdate = data.find((u) => u.updateDate === today);
 
         if (todayUpdate) {
-          setChecklist(
-            todayUpdate.checklist || {
-              breakfast: false,
-              dinner: false,
-              water: false,
-              play: false,
-              rest: false,
-              toilet: false,
-            }
-          );
+          const checklistObj: Record<string, boolean> = {};
+          todayUpdate.checklist.forEach((item) => (checklistObj[item] = true));
+          setChecklist(checklistObj);
           setMood(todayUpdate.mood);
           setActivity(todayUpdate.activity);
           setNote(todayUpdate.specialNotes);
           setMessageToOwner(todayUpdate.messageToOwner);
-          setImages(
-            todayUpdate.imageUrls.map((url) => ({ file: null, url }))
-          );
+          setImages(todayUpdate.imageUrls.map((url) => ({ file: null, url })));
         } else {
           setChecklist({
             breakfast: false,
@@ -139,22 +134,22 @@ export default function Catcare() {
             rest: false,
             toilet: false,
           });
-          setMood("😊 ปกติดี");
-          setActivity("🏃 กระฉับกระเฉง");
+          setMood("ปกติดี");
+          setActivity("กระฉับกระเฉง");
           setNote("");
           setMessageToOwner("");
           setImages([]);
         }
       })
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }, [selectedCatId, cats]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-8">🐱 ดูแลและอัปเดตข้อมูลแมว</h2>
-
       <form onSubmit={handleSave}>
         <div className="bg-white rounded-lg shadow-lg p-6">
+          {/* เลือกแมว */}
           <div className="mb-6">
             <label className="block text-sm font-medium mb-2">
               เลือกแมวที่ต้องการอัปเดต
@@ -175,7 +170,7 @@ export default function Catcare() {
 
           {showForm && catInfo && (
             <div className="grid md:grid-cols-2 gap-8">
-              {/* ✅ ข้อมูลแมว */}
+              {/* ข้อมูลแมว */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">ข้อมูลแมว</h3>
                 <div className="bg-gray-50 p-4 rounded-lg mb-4">
@@ -199,6 +194,7 @@ export default function Catcare() {
                   </div>
                 </div>
 
+                {/* Checklist */}
                 <h4 className="font-semibold mb-3">✅ เช็กลิสต์ประจำวัน</h4>
                 <div className="space-y-2 mb-4">
                   {Object.entries(checklist).map(([key, val]) => (
@@ -227,15 +223,13 @@ export default function Catcare() {
                 </div>
               </div>
 
-              {/* ✅ อัปเดตประจำวัน */}
+              {/* อัปเดตประจำวัน */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">อัปเดตประจำวัน</h3>
 
                 {/* อัปโหลดรูปภาพ */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium mb-2">
-                    อัปโหลดรูปภาพ
-                  </label>
+                  <label className="block text-sm font-medium mb-2">อัปโหลดรูปภาพ</label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                     <div className="text-4xl mb-2">📷</div>
                     <p className="text-sm text-gray-600">
@@ -265,7 +259,6 @@ export default function Catcare() {
                         เลือกรูป
                       </button>
                     </div>
-
                     {images.length > 0 && (
                       <div className="mt-4 grid grid-cols-3 gap-2">
                         {images.map((im, idx) => (
@@ -278,9 +271,7 @@ export default function Catcare() {
                             <button
                               type="button"
                               onClick={() =>
-                                setImages((prev) =>
-                                  prev.filter((_, i) => i !== idx)
-                                )
+                                setImages((prev) => prev.filter((_, i) => i !== idx))
                               }
                               className="absolute top-1 right-1 bg-white rounded-full p-1 shadow"
                             >
@@ -310,42 +301,36 @@ export default function Catcare() {
                 {/* สุขภาพและพฤติกรรม */}
                 <div className="mb-4 grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">
-                      อารมณ์
-                    </label>
+                    <label className="block text-xs text-gray-600 mb-1">อารมณ์</label>
                     <select
                       className="w-full p-2 border rounded"
                       value={mood}
                       onChange={(e) => setMood(e.target.value)}
                     >
-                      <option>😊 ปกติดี</option>
-                      <option>😴 ง่วงนอน</option>
-                      <option>😸 ร่าเริง</option>
-                      <option>😿 เศร้า</option>
+                      <option> ปกติดี</option>
+                      <option> ง่วงนอน</option>
+                      <option> ร่าเริง</option>
+                      <option> เศร้า</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">
-                      กิจกรรม
-                    </label>
+                    <label className="block text-xs text-gray-600 mb-1">กิจกรรม</label>
                     <select
                       className="w-full p-2 border rounded"
                       value={activity}
                       onChange={(e) => setActivity(e.target.value)}
                     >
-                      <option>🏃 กระฉับกระเฉง</option>
-                      <option>😴 นอนเยอะ</option>
-                      <option>🎾 ชอบเล่น</option>
-                      <option>🍽️ กินเก่ง</option>
+                      <option> กระฉับกระเฉง</option>
+                      <option> นอนเยอะ</option>
+                      <option> ชอบเล่น</option>
+                      <option> กินเก่ง</option>
                     </select>
                   </div>
                 </div>
 
                 {/* หมายเหตุพิเศษ */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium mb-2">
-                    หมายเหตุพิเศษ
-                  </label>
+                  <label className="block text-sm font-medium mb-2">หมายเหตุพิเศษ</label>
                   <textarea
                     className="w-full p-3 border rounded-lg"
                     rows={2}
