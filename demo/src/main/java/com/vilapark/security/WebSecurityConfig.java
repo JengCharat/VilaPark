@@ -99,6 +99,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
             .requestMatchers("/api/test/**").permitAll()
             .requestMatchers("/cats/**").permitAll()
             .requestMatchers( "/api/daily-updates","/api/daily-updates/**").permitAll()
+            .requestMatchers( "/bookings/**").permitAll()
             .requestMatchers("/rooms/**").permitAll()
             
             
