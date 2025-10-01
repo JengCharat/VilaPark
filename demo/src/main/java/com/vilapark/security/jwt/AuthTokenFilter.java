@@ -30,18 +30,29 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
+
+    String path = request.getServletPath();
+
+    // 👇 ข้าม JWT สำหรับ path ที่เปิดฟรี
+    if (path.startsWith("/api/stocks") ||
+        path.startsWith("/api/bookings") ||
+        path.startsWith("/cats") ||
+        path.startsWith("/api/auth") ||
+        path.startsWith("/api/test")) {
+      filterChain.doFilter(request, response);
+      return;
+    }
     try {
       String jwt = parseJwt(request);
       if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
         String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        
-        UsernamePasswordAuthenticationToken authentication = 
-            new UsernamePasswordAuthenticationToken(userDetails,
-                                                    null,
-                                                    userDetails.getAuthorities());
-        
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
+            null,
+            userDetails.getAuthorities());
+
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
