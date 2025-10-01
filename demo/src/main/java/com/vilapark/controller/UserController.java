@@ -83,5 +83,22 @@ public User updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO userDet
     public String deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);
         return "Deleted User with id: " + id;
+
     }
+
+            // --------- ดึง Role ของ User ตาม ID ---------
+            @GetMapping("/{id}/roles")
+            public List<RoleDTO> getUserRoles(@PathVariable Long id) {
+                User user = userRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+                List<RoleDTO> roles = user.getRoles().stream().map(role -> {
+                    RoleDTO r = new RoleDTO();
+                    r.setId(role.getId() != null ? role.getId().longValue() : null);
+                    r.setName(role.getName() != null ? role.getName().name() : null);
+                    return r;
+                }).toList();
+
+                return roles;
+            }
 }
