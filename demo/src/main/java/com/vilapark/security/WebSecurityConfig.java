@@ -98,7 +98,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
         
             .requestMatchers("/api/test/**").permitAll()
-             .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+             // .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+             .requestMatchers( "/users/**").permitAll()
             .requestMatchers("/cats/**").permitAll()
             .requestMatchers( "/api/daily-updates","/api/daily-updates/**").permitAll()
             .requestMatchers( "/bookings/**").permitAll()

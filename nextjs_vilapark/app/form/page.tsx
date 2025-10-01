@@ -166,45 +166,70 @@ useEffect(() => {
   const handlePrevStep4 = () => setStep(3);
 
   // ---------- SUBMIT ----------
-  const handleSubmit = async () => {
-    if (!user) {
-      alert("ไม่พบ User ID");
+const handleSubmit = async () => {
+  if (!user) {
+    alert("ไม่พบ User ID");
+    return;
+  }
+
+  // 1. เตรียมข้อมูล User ที่จะอัปเดต
+  const updatedUser = {
+    ...user,
+    name: contactInfo.firstName,
+    lastname: contactInfo.lastName,
+    phonenumber: contactInfo.phone,
+    email: contactInfo.email,
+    address: contactInfo.address,
+  };
+
+  // 2. Payload booking
+  const bookingPayload = {
+    userId: user.id,
+    catId: selectedCatId,
+    roomId: bookingData.roomId,
+    checkinDate: bookingData.checkinDate,
+    checkoutDate: bookingData.checkoutDate,
+    status: "1",
+  };
+
+  // 🟣 แสดง JSON ที่จะส่งออกไป
+  alert("📌 UpdatedUser\n" + JSON.stringify(updatedUser, null, 2));
+  alert("📌 BookingPayload\n" + JSON.stringify(bookingPayload, null, 2));
+
+  try {
+    // 🔹 PUT update user
+    const putRes = await fetch(`http://localhost:8081/users/${user.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedUser),
+    });
+
+    if (!putRes.ok) {
+      alert("❌ อัปเดตข้อมูลผู้ใช้ไม่สำเร็จ");
       return;
     }
 
-    const payload = {
-      userId: user.id,
-      catId: selectedCatId,
-      roomId: bookingData.roomId,
-      checkinDate: bookingData.checkinDate,
-      checkoutDate: bookingData.checkoutDate,
-      status: "1",
-      owner: contactInfo,
-    };
+    // 🔹 POST booking
+    const postRes = await fetch("http://localhost:8081/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bookingPayload),
+    });
 
-    alert("JSON ที่จะส่ง:\n" + JSON.stringify(payload, null, 2));
-
-    try {
-      const response = await fetch("http://localhost:8081/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        alert("✅ จองห้องและเลือกแมวสำเร็จ!");
-        setBookingData({ checkinDate: "", checkoutDate: "", roomId: 0 });
-        setSelectedCatId(null);
-        setContactInfo({ firstName: "", lastName: "", phone: "", email: "", address: "" });
-        setStep(1);
-      } else {
-        alert("❌ เกิดข้อผิดพลาด");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("⚠️ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์");
+    if (postRes.ok) {
+      alert("✅ จองสำเร็จและอัปเดตข้อมูลผู้ใช้แล้ว!");
+      setBookingData({ checkinDate: "", checkoutDate: "", roomId: 0 });
+      setSelectedCatId(null);
+      setContactInfo({ firstName: "", lastName: "", phone: "", email: "", address: "" });
+      setStep(1);
+    } else {
+      alert("❌ การจองไม่สำเร็จ");
     }
-  };
+  } catch (error) {
+    console.error(error);
+    alert("⚠️ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์");
+  }
+};
 
   if (!user) return <p>Loading...</p>;
 

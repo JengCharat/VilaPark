@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.vilapark.dto.UserDTO;
 import com.vilapark.dto.RoleDTO;
 import java.util.List;
-
+import com.vilapark.dto.UpdateUserDTO;
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
@@ -62,22 +62,21 @@ public class UserController {
             }
 
     // --------- อัปเดต User ---------
-    @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+@PutMapping("/{id}")
+public User updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO userDetails) {
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        user.setUsername(userDetails.getUsername());
-        user.setEmail(userDetails.getEmail());
-        user.setPassword(userDetails.getPassword());
-        user.setEnabled(userDetails.isEnabled());
-        user.setName(userDetails.getName());
-        user.setLastname(userDetails.getLastname());
-        user.setPhonenumber(userDetails.getPhonenumber());
-        user.setAddress(userDetails.getAddress());
+    if(userDetails.getUsername() != null) user.setUsername(userDetails.getUsername());
+    if(userDetails.getEmail() != null) user.setEmail(userDetails.getEmail());
+    user.setEnabled(userDetails.isEnabled());
+    if(userDetails.getName() != null) user.setName(userDetails.getName());
+    if(userDetails.getLastname() != null) user.setLastname(userDetails.getLastname());
+    if(userDetails.getPhonenumber() != null) user.setPhonenumber(userDetails.getPhonenumber());
+    if(userDetails.getAddress() != null) user.setAddress(userDetails.getAddress());
 
-        return userRepository.save(user);
-    }
+    return userRepository.save(user);
+}
 
     // --------- ลบ User ---------
     @DeleteMapping("/{id}")
