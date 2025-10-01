@@ -61,21 +61,26 @@ export default function DashboardBookingPage() {
     }
   }, [router]);
 
-  // โหลดแมว
-  useEffect(() => {
-    if (user) {
-      fetch("http://localhost:8081/cats")
-        .then((res) => res.json())
-        .then((data: Cat[]) => {
-          setCats(data);
-          setLoadingCats(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setLoadingCats(false);
-        });
-    }
-  }, [user]);
+useEffect(() => {
+  if (!user) return;
+  alert("User ID: " + user.id);
+
+  // โหลดแมวของ user คนนี้
+  fetch(`http://localhost:8081/cats/owner/${user.id}`)
+    .then((res) => res.json())
+    .then((myCats: Cat[]) => {
+      console.log("Cats from backend:", myCats); // ✅ ดูใน console
+      alert("My Cats: " + JSON.stringify(myCats, null, 2)); // ✅ แสดงเป็น alert
+      setCats(myCats); // เก็บแมวเฉพาะของ user
+      setLoadingCats(false);
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Error fetching cats: " + err);
+    });
+}, [user]);
+
+
 
   // โหลดห้อง
   useEffect(() => {
