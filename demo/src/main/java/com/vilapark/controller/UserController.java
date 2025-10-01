@@ -4,7 +4,8 @@ import com.vilapark.models.User;
 import com.vilapark.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import com.vilapark.dto.UserDTO;
+import com.vilapark.dto.RoleDTO;
 import java.util.List;
 
 @RestController
@@ -28,11 +29,37 @@ public class UserController {
     }
 
     // --------- ดึง User ตาม ID ---------
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-    }
+            @GetMapping("/{id}")
+            public UserDTO getUserById(@PathVariable Long id) {
+                User user = userRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+                UserDTO dto = new UserDTO();
+                dto.setId(user.getId());
+                dto.setUsername(user.getUsername());
+                dto.setEmail(user.getEmail());
+                dto.setName(user.getName());
+                dto.setLastname(user.getLastname());
+                dto.setPhonenumber(user.getPhonenumber());
+                dto.setAddress(user.getAddress());
+
+                // แปลง role id จาก Integer → Long และ enum → String
+                List<RoleDTO> roles = user.getRoles().stream().map(role -> {
+                    RoleDTO r = new RoleDTO();
+                    
+                    // แปลง Integer → Long
+                    r.setId(role.getId() != null ? role.getId().longValue() : null);
+                    
+                    // แปลง enum → String
+                    r.setName(role.getName() != null ? role.getName().name() : null);
+                    
+                    return r;
+                }).toList();
+
+                dto.setRoles(roles);
+
+                return dto;
+            }
 
     // --------- อัปเดต User ---------
     @PutMapping("/{id}")

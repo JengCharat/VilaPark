@@ -21,6 +21,7 @@ import com.vilapark.security.jwt.AuthEntryPointJwt;
 import com.vilapark.security.jwt.AuthTokenFilter;
 import com.vilapark.security.services.UserDetailsServiceImpl;
 
+import org.springframework.http.HttpMethod;
 @Configuration
 // @EnableWebSecurity
 @EnableMethodSecurity
@@ -97,6 +98,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
         
             .requestMatchers("/api/test/**").permitAll()
+             .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
             .requestMatchers("/cats/**").permitAll()
             .requestMatchers( "/api/daily-updates","/api/daily-updates/**").permitAll()
             .requestMatchers( "/bookings/**").permitAll()

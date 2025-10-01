@@ -61,6 +61,21 @@ export default function DashboardBookingPage() {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (user) {
+            fetch("http://localhost:8081/user")
+                .then(res => res.json())
+                .then((data: Cat[]) => {
+                    setCats(data);
+                    setLoadingCats(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setLoadingCats(false);
+                });
+        }
+    }, [user]);
+
     // โหลดห้อง
     useEffect(() => {
         fetch("http://localhost:8081/rooms")
