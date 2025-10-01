@@ -100,36 +100,42 @@ const [userId, setUserId] = useState<number | null>(null);
     }
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+  if (!storedUser) return;
+
+  const userObj = JSON.parse(storedUser);
+  const userId = userObj.id;
+  setUserId(userId);
+
   // โหลด booking ของ user
-  fetch(`http://localhost:8081/bookings`)
+  fetch("http://localhost:8081/bookings")
     .then(res => res.json())
     .then((bookings: { catId: number; userId: number }[]) => {
-      alert("Bookings: " + JSON.stringify(bookings, null, 2)); // <-- ดู booking ทั้งหมด
-
-      // เอาเฉพาะ booking ของ user นี้
+      // filter booking ของ user
       const myCatIds = bookings
         .filter(b => b.userId === userId)
         .map(b => b.catId);
 
-      alert("Cat IDs from your bookings: " + JSON.stringify(myCatIds, null, 2)); // <-- ดู catId ของ user
+      console.log("Cat IDs from your bookings:", myCatIds);
 
       // โหลดแมวทั้งหมด
       fetch("http://localhost:8081/cats")
         .then(res => res.json())
-        .then((cats: Cat[]) => {
-          alert("All Cats: " + JSON.stringify(cats, null, 2)); // <-- ดูแมวทั้งหมด
+        .then((allCats: Cat[]) => {
+          console.log("All Cats:", allCats);
 
-          // กรองเฉพาะแมวที่อยู่ใน booking
-          const myCats = cats.filter(c => myCatIds.includes(c.id));
-          alert("My Cats from bookings: " + JSON.stringify(myCats, null, 2)); // <-- ดูแมวของ user
+          // filter แมวตาม booking
+          const myCats = allCats.filter(c => myCatIds.includes(c.id));
+          console.log("My Cats from bookings:", myCats);
 
           setCats(myCats);
-        })
-        .catch(console.error);
+        });
     })
     .catch(console.error);
 }, []);
+
+
 
 
 
