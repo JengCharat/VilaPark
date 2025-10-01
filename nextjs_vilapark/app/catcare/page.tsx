@@ -101,39 +101,16 @@ const [userId, setUserId] = useState<number | null>(null);
   }, []);
 
  useEffect(() => {
-  const storedUser = localStorage.getItem("user");
-  if (!storedUser) return;
-
-  const userObj = JSON.parse(storedUser);
-  const userId = userObj.id;
-  setUserId(userId);
-
-  // โหลด booking ของ user
-  fetch("http://localhost:8081/bookings")
+  // โหลดแมวทั้งหมด
+  fetch("http://localhost:8081/cats")
     .then(res => res.json())
-    .then((bookings: { catId: number; userId: number }[]) => {
-      // filter booking ของ user
-      const myCatIds = bookings
-        .filter(b => b.userId === userId)
-        .map(b => b.catId);
-
-      console.log("Cat IDs from your bookings:", myCatIds);
-
-      // โหลดแมวทั้งหมด
-      fetch("http://localhost:8081/cats")
-        .then(res => res.json())
-        .then((allCats: Cat[]) => {
-          console.log("All Cats:", allCats);
-
-          // filter แมวตาม booking
-          const myCats = allCats.filter(c => myCatIds.includes(c.id));
-          console.log("My Cats from bookings:", myCats);
-
-          setCats(myCats);
-        });
+    .then((cats: Cat[]) => {
+      alert("All Cats: " + JSON.stringify(cats, null, 2)); // ดูแมวทั้งหมด
+      setCats(cats); // เก็บแมวทั้งหมด
     })
     .catch(console.error);
 }, []);
+
 
 
 
