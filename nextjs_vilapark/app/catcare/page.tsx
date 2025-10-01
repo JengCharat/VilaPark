@@ -24,12 +24,14 @@ type DailyUpdate = {
   imageUrls: string[];
 };
 
+
+
 export default function Catcare() {
   const [cats, setCats] = useState<Cat[]>([]);
   const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
   const [catInfo, setCatInfo] = useState<Cat | null>(null);
   const [showForm, setShowForm] = useState(false);
-
+const [userId, setUserId] = useState<number | null>(null);
   const [staffId] = useState<number>(1); // แก้เป็น user id จริง
 
   const [checklist, setChecklist] = useState<Record<string, boolean>>({
@@ -90,13 +92,46 @@ export default function Catcare() {
     }
   };
 
-  // โหลดรายชื่อแมว
-  useEffect(() => {
-    fetch("http://localhost:8081/cats")
-      .then((res) => res.json())
-      .then((data: Cat[]) => setCats(data))
-      .catch(console.error);
+   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const userObj = JSON.parse(storedUser);
+      setUserId(userObj.id); // เอา userId มาเก็บใน state
+    }
   }, []);
+
+  useEffect(() => {
+  // โหลด booking ของ user
+  fetch(`http://localhost:8081/bookings`)
+    .then(res => res.json())
+    .then((bookings: { catId: number; userId: number }[]) => {
+      alert("Bookings: " + JSON.stringify(bookings, null, 2)); // <-- ดู booking ทั้งหมด
+
+      // เอาเฉพาะ booking ของ user นี้
+      const myCatIds = bookings
+        .filter(b => b.userId === userId)
+        .map(b => b.catId);
+
+      alert("Cat IDs from your bookings: " + JSON.stringify(myCatIds, null, 2)); // <-- ดู catId ของ user
+
+      // โหลดแมวทั้งหมด
+      fetch("http://localhost:8081/cats")
+        .then(res => res.json())
+        .then((cats: Cat[]) => {
+          alert("All Cats: " + JSON.stringify(cats, null, 2)); // <-- ดูแมวทั้งหมด
+
+          // กรองเฉพาะแมวที่อยู่ใน booking
+          const myCats = cats.filter(c => myCatIds.includes(c.id));
+          alert("My Cats from bookings: " + JSON.stringify(myCats, null, 2)); // <-- ดูแมวของ user
+
+          setCats(myCats);
+        })
+        .catch(console.error);
+    })
+    .catch(console.error);
+}, []);
+
+
 
   // โหลดข้อมูลอัปเดตของแมว
   useEffect(() => {

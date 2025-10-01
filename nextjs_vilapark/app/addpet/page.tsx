@@ -11,9 +11,18 @@ type Cat = {
   habit: string;
   note: string;
   breed: string;
+  ownerId?: number;
+};
+
+type User = {
+  id: number;
+  username: string;
+  email: string;
+  roles: string[];
 };
 
 export default function AddPetPage() {
+  const [user, setUser] = useState<User | null>(null);
   const [form, setForm] = useState<Cat>({
     name: "",
     gender: "",
@@ -38,6 +47,16 @@ export default function AddPetPage() {
     "บอมเบย์",
     "อเมริกันเคิร์ล",
   ];
+
+    // โหลด userId จาก localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser: User = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setForm(prev => ({ ...prev, ownerId: parsedUser.id })); // ใส่ ownerId
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
