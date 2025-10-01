@@ -24,14 +24,19 @@ type DailyUpdate = {
   imageUrls: string[];
 };
 
-
+type RoleDTO = {
+  id: number;
+  name: string;
+};
 
 export default function Catcare() {
   const [cats, setCats] = useState<Cat[]>([]);
   const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
   const [catInfo, setCatInfo] = useState<Cat | null>(null);
   const [showForm, setShowForm] = useState(false);
-const [userId, setUserId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [roles, setRoles] = useState<RoleDTO[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [staffId] = useState<number>(1); // แก้เป็น user id จริง
 
   const [checklist, setChecklist] = useState<Record<string, boolean>>({
@@ -44,77 +49,42 @@ const [userId, setUserId] = useState<number | null>(null);
   });
 
   const [mood, setMood] = useState("ปกติดี");
-  const [activity, setActivity] = useState(" กระฉับกระเฉง");
+  const [activity, setActivity] = useState("กระฉับกระเฉง");
   const [note, setNote] = useState("");
   const [messageToOwner, setMessageToOwner] = useState("");
   const [images, setImages] = useState<{ file: File | null; url: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // ฟังก์ชันบันทึก
-  const handleSave = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!catInfo || !selectedCatId) return;
-
-    const payload: DailyUpdate = {
-      cat: { id: selectedCatId },
-      staff: { id: staffId },
-      updateDate: new Date().toISOString().slice(0, 10),
-      mood,
-      activity,
-      specialNotes: note,
-      checklist: Object.entries(checklist)
-        .filter(([_, v]) => v)
-        .map(([k]) => k),
-      messageToOwner,
-      imageUrls: images.map((img) => img.url),
-    };
-
-    alert(JSON.stringify(payload, null, 2));
-
-    try {
-      const res = await fetch("http://localhost:8081/api/daily-updates", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const errorBody = await res.text();
-        console.error("Error Response:", res.status, errorBody);
-        alert(`❌ Error ${res.status}: ${errorBody}`);
-        return;
-      }
-      const data = await res.json();
-      console.log("✅ Saved:", data);
-      alert("บันทึกเรียบร้อย!");
-    } catch (err: any) {
-      console.error("Fetch Exception:", err);
-      alert("เกิดข้อผิดพลาด: " + (err.message || JSON.stringify(err)));
-    }
-  };
-
-   useEffect(() => {
+  // โหลด userId จาก localStorage
+  useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const userObj = JSON.parse(storedUser);
-      setUserId(userObj.id); // เอา userId มาเก็บใน state
+      setUserId(userObj.id);
     }
   }, []);
 
- useEffect(() => {
+  // Fetch roles ของ user
+  useEffect(() => {
+    if (!userId) return;
+
+    fetch(`http://localhost:8081/users/${userId}/roles`)
+      .then((res) => res.json())
+      .then((data: RoleDTO[]) => {
+        setRoles(data);
+        const admin = data.some((role) => role.name === "ROLE_ADMIN");
+        setIsAdmin(admin);
+      })
+      .catch(console.error);
+  }, [userId]);
+
   // โหลดแมวทั้งหมด
-  fetch("http://localhost:8081/cats")
-    .then(res => res.json())
-    .then((cats: Cat[]) => {
-      alert("All Cats: " + JSON.stringify(cats, null, 2)); // ดูแมวทั้งหมด
-      setCats(cats); // เก็บแมวทั้งหมด
-    })
-    .catch(console.error);
-}, []);
-
-
-
-
-
+  useEffect(() => {
+    fetch("http://localhost:8081/cats")
+      .then((res) => res.json())
+      .then((cats: Cat[]) => setCats(cats))
+      .catch(console.error);
+  }, []);
 
   // โหลดข้อมูลอัปเดตของแมว
   useEffect(() => {
@@ -162,6 +132,51 @@ const [userId, setUserId] = useState<number | null>(null);
       .catch(console.error);
   }, [selectedCatId, cats]);
 
+  // ฟังก์ชันบันทึก
+  const handleSave = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!catInfo || !selectedCatId) return;
+
+    const payload: DailyUpdate = {
+      cat: { id: selectedCatId },
+      staff: { id: staffId },
+      updateDate: new Date().toISOString().slice(0, 10),
+      mood,
+      activity,
+      specialNotes: note,
+      checklist: Object.entries(checklist)
+        .filter(([_, v]) => v)
+        .map(([k]) => k),
+      messageToOwner,
+      imageUrls: images.map((img) => img.url),
+    };
+
+    try {
+      const res = await fetch("http://localhost:8081/api/daily-updates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const errorBody = await res.text();
+        console.error("Error Response:", res.status, errorBody);
+        alert(`❌ Error ${res.status}: ${errorBody}`);
+        return;
+      }
+      const data = await res.json();
+      console.log("✅ Saved:", data);
+      alert("บันทึกเรียบร้อย!");
+    } catch (err: any) {
+      console.error("Fetch Exception:", err);
+      alert("เกิดข้อผิดพลาด: " + (err.message || JSON.stringify(err)));
+    }
+  };
+
+  // ถ้าไม่ใช่ admin
+  if (!isAdmin) {
+    return <p className="text-red-600 font-bold">❌ คุณไม่มีสิทธิ์เข้าถึงหน้านี้</p>;
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-8">🐱 ดูแลและอัปเดตข้อมูลแมว</h2>
@@ -186,6 +201,7 @@ const [userId, setUserId] = useState<number | null>(null);
             </select>
           </div>
 
+          {/* ฟอร์มอัปเดต */}
           {showForm && catInfo && (
             <div className="grid md:grid-cols-2 gap-8">
               {/* ข้อมูลแมว */}
@@ -325,10 +341,10 @@ const [userId, setUserId] = useState<number | null>(null);
                       value={mood}
                       onChange={(e) => setMood(e.target.value)}
                     >
-                      <option> ปกติดี</option>
-                      <option> ง่วงนอน</option>
+                      <option>ปกติดี</option>
+                      <option>ง่วงนอน</option>
                       <option> ร่าเริง</option>
-                      <option> เศร้า</option>
+                      <option>เศร้า</option>
                     </select>
                   </div>
                   <div>
@@ -338,10 +354,10 @@ const [userId, setUserId] = useState<number | null>(null);
                       value={activity}
                       onChange={(e) => setActivity(e.target.value)}
                     >
-                      <option> กระฉับกระเฉง</option>
-                      <option> นอนเยอะ</option>
-                      <option> ชอบเล่น</option>
-                      <option> กินเก่ง</option>
+                      <option>กระฉับกระเฉง</option>
+                      <option>นอนเยอะ</option>
+                      <option>ชอบเล่น</option>
+                      <option>กินเก่ง</option>
                     </select>
                   </div>
                 </div>
