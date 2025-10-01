@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Navbar from "../components/Navbar";
 
 type User = {
   id: number;
@@ -80,6 +81,8 @@ export default function TodayUpdate() {
   if (!user) return <p>Loading...</p>;
 
   return (
+    <>
+    <Navbar/>
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-8">🐱 ข้อมูลอัปเดตวันนี้</h2>
 
@@ -140,5 +143,6 @@ export default function TodayUpdate() {
         ))
       )}
     </div>
+    </>
   );
 }

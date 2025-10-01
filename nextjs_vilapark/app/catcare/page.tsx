@@ -1,6 +1,9 @@
 "use client";
 
+import router from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import Navbar from "../components/Navbar";
 
 type Cat = {
   id: number;
@@ -38,7 +41,7 @@ export default function Catcare() {
   const [roles, setRoles] = useState<RoleDTO[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [staffId] = useState<number>(1); // แก้เป็น user id จริง
-
+const router = useRouter();
   const [checklist, setChecklist] = useState<Record<string, boolean>>({
     breakfast: false,
     dinner: false,
@@ -54,6 +57,7 @@ export default function Catcare() {
   const [messageToOwner, setMessageToOwner] = useState("");
   const [images, setImages] = useState<{ file: File | null; url: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  
 
   // โหลด userId จาก localStorage
   useEffect(() => {
@@ -64,7 +68,7 @@ export default function Catcare() {
     }
   }, []);
 
-  // Fetch roles ของ user
+  // โหลด roles ของ user
   useEffect(() => {
     if (!userId) return;
 
@@ -74,9 +78,14 @@ export default function Catcare() {
         setRoles(data);
         const admin = data.some((role) => role.name === "ROLE_ADMIN");
         setIsAdmin(admin);
+
+        // ✅ redirect ถ้าไม่ใช่ admin
+        if (!admin) {
+          router.push("/dashboard");
+        }
       })
       .catch(console.error);
-  }, [userId]);
+  }, [userId, router]);
 
   // โหลดแมวทั้งหมด
   useEffect(() => {
@@ -170,14 +179,15 @@ export default function Catcare() {
       console.error("Fetch Exception:", err);
       alert("เกิดข้อผิดพลาด: " + (err.message || JSON.stringify(err)));
     }
+
+
   };
 
-  // ถ้าไม่ใช่ admin
-  if (!isAdmin) {
-    return <p className="text-red-600 font-bold">❌ คุณไม่มีสิทธิ์เข้าถึงหน้านี้</p>;
-  }
+  
 
   return (
+    <>
+    <Navbar />
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-8">🐱 ดูแลและอัปเดตข้อมูลแมว</h2>
       <form onSubmit={handleSave}>
@@ -386,5 +396,6 @@ export default function Catcare() {
         </div>
       </form>
     </div>
+    </>
   );
 }

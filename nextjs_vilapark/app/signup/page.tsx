@@ -34,7 +34,7 @@ export default function SignupPage() {
 
       setSuccess("Signup successful! Redirecting to login...");
       setTimeout(() => {
-        router.push("/login");
+        router.push("/signin");
       }, 1500);
     } catch (err: any) {
       setError(err.message || "Signup failed");

@@ -25,10 +25,10 @@ const showPage = (page) => {
             <button onClick={() => showPage('dashboard')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
               หน้าแรก
             </button>
-            <button onClick={() => showPage('booking')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('form')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
               จองห้องพัก
             </button>
-            <button onClick={() => showPage('customer-dashboard')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('todayUpdate')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
               แดชบอร์ดลูกค้า
             </button>
 
