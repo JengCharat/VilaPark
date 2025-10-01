@@ -4,7 +4,6 @@ import com.vilapark.entity.Cat;
 import com.vilapark.repository.CatRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/cats")
@@ -27,4 +26,10 @@ public class CatController {
     public Cat add(@RequestBody Cat student) {
         return repo.save(student); // POST ต้องไม่ส่ง id
     }
+
+    @GetMapping("/owner/{ownerId}")
+public List<Cat> getCatsByOwner(@PathVariable Long ownerId) {
+    return repo.findByOwnerId(ownerId);
+}
+
 }

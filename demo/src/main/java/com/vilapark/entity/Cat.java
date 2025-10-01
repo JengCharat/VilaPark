@@ -22,6 +22,8 @@ public class Cat {
 
     private String breed; // ✅ ฟิลด์สายพันธุ์แมวใหม่
 
+    private Long ownerId;
+
     public Cat() {
     } // default constructor สำคัญ
 
@@ -81,4 +83,6 @@ public class Cat {
     public void setBreed(String breed) {
         this.breed = breed;
     }
+public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
 }
