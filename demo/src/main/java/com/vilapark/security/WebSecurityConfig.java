@@ -104,6 +104,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
             .requestMatchers( "/api/daily-updates","/api/daily-updates/**").permitAll()
             .requestMatchers( "/bookings/**").permitAll()
             .requestMatchers("/rooms/**").permitAll()
+            .requestMatchers("/api/stocks/**").permitAll()
             
             
             .anyRequest().authenticated());
