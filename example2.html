@@ -1,0 +1,1541 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 Meow Palace Hotel - โรงแรมแมวหรู</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Kanit', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .nav-item { transition: all 0.2s ease; }
+        .nav-item:hover { background-color: rgba(255,255,255,0.1); }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🐱</span>
+                    <span class="text-xl font-bold">Meow Palace Hotel</span>
+                </div>
+                <div class="hidden md:flex space-x-4">
+                    <button onclick="showPage('home')" class="nav-item px-3 py-2 rounded-md text-sm font-medium">หน้าแรก</button>
+                    <button onclick="showPage('booking')" class="nav-item px-3 py-2 rounded-md text-sm font-medium">จองห้องพัก</button>
+                    <button onclick="showPage('customer-dashboard')" class="nav-item px-3 py-2 rounded-md text-sm font-medium">แดชบอร์ดลูกค้า</button>
+                    <div class="relative">
+                        <button onclick="toggleUserMenu()" class="nav-item px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                            เข้าสู่ระบบ <span class="ml-1">▼</span>
+                        </button>
+                        <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <button onclick="showPage('staff-dashboard')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">👨‍💼 พนักงาน</button>
+                            <button onclick="showPage('admin-dashboard')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">👑 ผู้จัดการ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="home" class="page">
+        <div class="gradient-bg text-white py-20">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <h1 class="text-5xl font-bold mb-6">🐱 ยินดีต้อนรับสู่ Meow Palace Hotel</h1>
+                <p class="text-xl mb-8">โรงแรมแมวหรูที่ดูแลน้องแมวของคุณด้วยความรักและใส่ใจ</p>
+                <button onclick="showPage('booking')" class="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300">
+                    จองห้องพักเลย! 🏨
+                </button>
+            </div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 py-16">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div class="text-4xl mb-4">🏨</div>
+                    <h3 class="text-xl font-semibold mb-2">ห้องพักหรู</h3>
+                    <p class="text-gray-600">ห้องพักสะอาด ปลอดภัย พร้อมของเล่นและที่นอนนุ่มสบาย</p>
+                </div>
+                <div class="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div class="text-4xl mb-4">📸</div>
+                    <h3 class="text-xl font-semibold mb-2">อัปเดตประจำวัน</h3>
+                    <p class="text-gray-600">รับรูปภาพและข้อความอัปเดตน้องแมวของคุณทุกวัน</p>
+                </div>
+                <div class="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div class="text-4xl mb-4">💝</div>
+                    <h3 class="text-xl font-semibold mb-2">ดูแลด้วยใจ</h3>
+                    <p class="text-gray-600">พนักงานมืออาชีพที่รักแมวและดูแลด้วยความใส่ใจ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Page -->
+    <div id="booking" class="page hidden">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold text-center mb-8">📅 จองห้องพักสำหรับน้องแมว</h2>
+            
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex space-x-4">
+                            <div id="step1" class="step-indicator active">1. เลือกวันและห้อง</div>
+                            <div id="step2" class="step-indicator">2. ข้อมูลแมว</div>
+                            <div id="step3" class="step-indicator">3. ข้อมูลติดต่อ</div>
+                            <div id="step4" class="step-indicator">4. ยืนยันการจอง</div>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progress-bar" class="bg-purple-600 h-2 rounded-full transition-all duration-300" style="width: 25%"></div>
+                    </div>
+                </div>
+
+                <!-- Step 1: Date & Room Selection -->
+                <div id="booking-step-1" class="booking-step">
+                    <h3 class="text-xl font-semibold mb-4">เลือกวันที่และประเภทห้อง</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">วันที่เข้าพัก</label>
+                            <input type="date" class="w-full p-3 border rounded-lg" id="checkin-date">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">วันที่ออก</label>
+                            <input type="date" class="w-full p-3 border rounded-lg" id="checkout-date">
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium mb-2">ประเภทห้อง</label>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="border rounded-lg p-4 cursor-pointer hover:border-purple-500 room-option" data-room="standard">
+                                <h4 class="font-semibold">🏠 Standard Room</h4>
+                                <p class="text-sm text-gray-600">฿300/วัน</p>
+                            </div>
+                            <div class="border rounded-lg p-4 cursor-pointer hover:border-purple-500 room-option" data-room="deluxe">
+                                <h4 class="font-semibold">🏨 Deluxe Room</h4>
+                                <p class="text-sm text-gray-600">฿500/วัน</p>
+                            </div>
+                            <div class="border rounded-lg p-4 cursor-pointer hover:border-purple-500 room-option" data-room="suite">
+                                <h4 class="font-semibold">👑 Suite Room</h4>
+                                <p class="text-sm text-gray-600">฿800/วัน</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="nextStep(2)" class="mt-6 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">ถัดไป</button>
+                </div>
+
+                <!-- Step 2: Cat Information -->
+                <div id="booking-step-2" class="booking-step hidden">
+                    <h3 class="text-xl font-semibold mb-4">ข้อมูลน้องแมว</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">ชื่อน้องแมว</label>
+                            <input type="text" class="w-full p-3 border rounded-lg" placeholder="เช่น มิวมิว">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">สายพันธุ์</label>
+                            <select class="w-full p-3 border rounded-lg">
+                                <option>เลือกสายพันธุ์</option>
+                                <option>แมวไทย</option>
+                                <option>เปอร์เซีย</option>
+                                <option>สก็อตติช โฟลด์</option>
+                                <option>อื่นๆ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">เพศ</label>
+                            <select class="w-full p-3 border rounded-lg">
+                                <option>เลือกเพศ</option>
+                                <option>ผู้</option>
+                                <option>เมีย</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">อายุ</label>
+                            <input type="number" class="w-full p-3 border rounded-lg" placeholder="เดือน">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium mb-2">ลักษณะนิสัย</label>
+                        <textarea class="w-full p-3 border rounded-lg" rows="3" placeholder="เช่น ชอบเล่น กลัวเสียงดัง"></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium mb-2">ข้อควรระวัง/โรคประจำตัว</label>
+                        <textarea class="w-full p-3 border rounded-lg" rows="3" placeholder="เช่น แพ้อาหารทะเล ต้องกินยา"></textarea>
+                    </div>
+                    <div class="flex space-x-4 mt-6">
+                        <button onclick="prevStep(1)" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">ย้อนกลับ</button>
+                        <button onclick="nextStep(3)" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">ถัดไป</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Contact Information -->
+                <div id="booking-step-3" class="booking-step hidden">
+                    <h3 class="text-xl font-semibold mb-4">ข้อมูลเจ้าของ</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">ชื่อ</label>
+                            <input type="text" class="w-full p-3 border rounded-lg" placeholder="ชื่อจริง">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">นามสกุล</label>
+                            <input type="text" class="w-full p-3 border rounded-lg" placeholder="นามสกุล">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">เบอร์โทรศัพท์</label>
+                            <input type="tel" class="w-full p-3 border rounded-lg" placeholder="08X-XXX-XXXX">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">อีเมล</label>
+                            <input type="email" class="w-full p-3 border rounded-lg" placeholder="example@email.com">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium mb-2">ที่อยู่</label>
+                        <textarea class="w-full p-3 border rounded-lg" rows="3" placeholder="ที่อยู่สำหรับติดต่อ"></textarea>
+                    </div>
+                    <div class="flex space-x-4 mt-6">
+                        <button onclick="prevStep(2)" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">ย้อนกลับ</button>
+                        <button onclick="nextStep(4)" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">ถัดไป</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Confirmation -->
+                <div id="booking-step-4" class="booking-step hidden">
+                    <h3 class="text-xl font-semibold mb-4">ยืนยันการจอง</h3>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h4 class="font-semibold mb-4">สรุปการจอง</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span>วันที่เข้าพัก:</span><span id="summary-checkin">-</span></div>
+                            <div class="flex justify-between"><span>วันที่ออก:</span><span id="summary-checkout">-</span></div>
+                            <div class="flex justify-between"><span>ประเภทห้อง:</span><span id="summary-room">-</span></div>
+                            <div class="flex justify-between"><span>จำนวนวัน:</span><span id="summary-days">-</span></div>
+                            <div class="flex justify-between font-semibold text-lg border-t pt-2"><span>ราคารวม:</span><span id="summary-total">-</span></div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4 mt-6">
+                        <button onclick="prevStep(3)" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">ย้อนกลับ</button>
+                        <button onclick="confirmBooking()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">ยืนยันการจอง</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Dashboard -->
+    <div id="customer-dashboard" class="page hidden">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">👤 แดชบอร์ดลูกค้า</h2>
+            
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Current Booking -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">🏨 การจองปัจจุบัน</h3>
+                        <div class="border rounded-lg p-4 bg-green-50">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-semibold">มิวมิว - Deluxe Room</h4>
+                                    <p class="text-sm text-gray-600">15-18 มีนาคม 2024 (3 วัน)</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">กำลังพัก</span>
+                            </div>
+                            <button onclick="showPage('daily-updates')" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">ดูอัปเดตประจำวัน</button>
+                        </div>
+                    </div>
+
+                    <!-- Daily Updates Preview -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-xl font-semibold mb-4">📸 อัปเดตล่าสุด</h3>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-medium">วันที่ 2 - มิวมิวสนุกกับของเล่นใหม่!</h4>
+                                    <span class="text-sm text-gray-500">วันนี้ 14:30</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">มิวมิวชอบลูกบอลสีชมพูมาก เล่นไล่จับทั้งเช้าเลย 😸</p>
+                                <div class="bg-gray-200 rounded-lg h-32 flex items-center justify-center text-gray-500">
+                                    📷 รูปภาพมิวมิวเล่นลูกบอล
+                                </div>
+                            </div>
+                            <div class="border-l-4 border-blue-500 pl-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-medium">วันที่ 1 - เข้าพักแล้ว!</h4>
+                                    <span class="text-sm text-gray-500">เมื่อวาน 16:00</span>
+                                </div>
+                                <p class="text-sm text-gray-600">มิวมิวเข้าพักเรียบร้อย กินอาหารหมดจาน นอนหลับสบาย 💤</p>
+                            </div>
+                        </div>
+                        <button onclick="showPage('daily-updates')" class="mt-4 text-purple-600 hover:text-purple-800">ดูทั้งหมด →</button>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Cat Profile -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4">🐱 โปรไฟล์น้องแมว</h3>
+                        <div class="text-center mb-4">
+                            <div class="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-2 flex items-center justify-center text-2xl">🐱</div>
+                            <h4 class="font-semibold">มิวมิว</h4>
+                            <p class="text-sm text-gray-600">แมวไทย, เมีย, 8 เดือน</p>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            <p><strong>นิสัย:</strong> ชอบเล่น ขี้อ้อน</p>
+                            <p><strong>อาหารที่ชอบ:</strong> ปลาทูน่า</p>
+                        </div>
+                    </div>
+
+                    <!-- Booking History -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4">📋 ประวัติการจอง</h3>
+                        <div class="space-y-3">
+                            <div class="border-l-4 border-green-500 pl-3">
+                                <p class="font-medium text-sm">15-18 มีนาคม 2024</p>
+                                <p class="text-xs text-gray-600">Deluxe Room - กำลังพัก</p>
+                            </div>
+                            <div class="border-l-4 border-gray-400 pl-3">
+                                <p class="font-medium text-sm">1-5 กุมภาพันธ์ 2024</p>
+                                <p class="text-xs text-gray-600">Standard Room - เสร็จสิ้น</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Updates Page -->
+    <div id="daily-updates" class="page hidden">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl font-bold">📸 อัปเดตประจำวัน - มิวมิว</h2>
+                <button onclick="showPage('customer-dashboard')" class="text-purple-600 hover:text-purple-800">← กลับแดชบอร์ด</button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Day 2 Update -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-semibold">วันที่ 2 - วันนี้สนุกมาก! 🎾</h3>
+                        <span class="text-sm text-gray-500">17 มีนาคม 2024, 14:30</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center text-gray-500 mb-4">
+                                📷 มิวมิวเล่นลูกบอลสีชมพู
+                            </div>
+                            <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center text-gray-500">
+                                📷 มิวมิวนอนพักผ่อน
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">กิจกรรมวันนี้:</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li>✅ กินอาหารเช้า - หมดจาน!</li>
+                                <li>✅ เล่นลูกบอลสีชมพู 30 นาที</li>
+                                <li>✅ งีบหลับตอนบ่าย 2 ชั่วโมง</li>
+                                <li>✅ กินอาหารเย็น - กินครึ่งจาน</li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                                <h5 class="font-medium text-blue-800">บันทึกจากพนักงาน:</h5>
+                                <p class="text-sm text-blue-700">มิวมิวดูมีความสุขมาก ชอบของเล่นใหม่ที่เราให้ เล่นไล่จับลูกบอลตลอดเช้า ตอนบ่ายนอนหลับสบายมาก 😊</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 1 Update -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-semibold">วันที่ 1 - ยินดีต้อนรับมิวมิว! 🏨</h3>
+                        <span class="text-sm text-gray-500">16 มีนาคม 2024, 16:00</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center text-gray-500 mb-4">
+                                📷 มิวมิวในห้องพักใหม่
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">การเข้าพัก:</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li>✅ เข้าพักเรียบร้อย เวลา 15:30</li>
+                                <li>✅ ตรวจสุขภาพเบื้องต้น - ปกติดี</li>
+                                <li>✅ ปรับตัวเข้ากับห้องพัก</li>
+                                <li>✅ กินอาหารเย็นหมดจาน</li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                                <h5 class="font-medium text-green-800">บันทึกจากพนักงาน:</h5>
+                                <p class="text-sm text-green-700">มิวมิวเป็นแมวที่น่ารักมาก ไม่กลัวคนแปลกหน้า ปรับตัวเข้ากับสภาพแวดล้อมใหม่ได้ดี กินอาหารดี นอนหลับสบาย 💕</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Dashboard -->
+    <div id="staff-dashboard" class="page hidden">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">👨‍💼 แดชบอร์ดพนักงาน</h2>
+            
+            <div class="grid lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-blue-500 text-white p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold">แมวที่พักอยู่วันนี้</h3>
+                    <p class="text-3xl font-bold">12</p>
+                </div>
+                <div class="bg-green-500 text-white p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold">Check-in วันนี้</h3>
+                    <p class="text-3xl font-bold">3</p>
+                </div>
+                <div class="bg-orange-500 text-white p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold">Check-out วันนี้</h3>
+                    <p class="text-3xl font-bold">2</p>
+                </div>
+                <div class="bg-purple-500 text-white p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold">ต้องอัปเดต</h3>
+                    <p class="text-3xl font-bold">8</p>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Today's Tasks -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">📋 งานวันนี้</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">อัปเดตรูปภาพ - มิวมิว (ห้อง 201)</p>
+                                <p class="text-sm text-gray-600">ยังไม่ได้อัปเดตวันนี้</p>
+                            </div>
+                            <button onclick="showPage('cat-care')" class="bg-yellow-500 text-white px-3 py-1 rounded text-sm">อัปเดต</button>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">Check-in - โซ่ (ห้อง 105)</p>
+                                <p class="text-sm text-gray-600">เวลา 14:00</p>
+                            </div>
+                            <button class="bg-green-500 text-white px-3 py-1 rounded text-sm">เสร็จแล้ว</button>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">Check-out - ขาว (ห้อง 302)</p>
+                                <p class="text-sm text-gray-600">เวลา 10:00</p>
+                            </div>
+                            <button onclick="showPage('billing')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">คิดเงิน</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">⚡ เมนูด่วน</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="showPage('booking-management')" class="p-4 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-center">
+                            <div class="text-2xl mb-2">📅</div>
+                            <div class="text-sm font-medium">จัดการการจอง</div>
+                        </button>
+                        <button onclick="showPage('cat-care')" class="p-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-center">
+                            <div class="text-2xl mb-2">🐱</div>
+                            <div class="text-sm font-medium">ดูแลแมว</div>
+                        </button>
+                        <button onclick="showPage('inventory')" class="p-4 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-center">
+                            <div class="text-2xl mb-2">📦</div>
+                            <div class="text-sm font-medium">เช็กสต็อก</div>
+                        </button>
+                        <button onclick="showPage('billing')" class="p-4 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 text-center">
+                            <div class="text-2xl mb-2">💰</div>
+                            <div class="text-sm font-medium">คิดเงิน</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Management -->
+    <div id="booking-management" class="page hidden">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">📅 จัดการการจอง</h2>
+                <button onclick="showNewBookingForm()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">+ จองให้ลูกค้า</button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ลูกค้า</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">แมว</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ห้อง</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">วันที่</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">สถานะ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="font-medium">สมใจ ใจดี</p>
+                                        <p class="text-sm text-gray-500">081-234-5678</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">มิวมิว</td>
+                                <td class="px-6 py-4">201 (Deluxe)</td>
+                                <td class="px-6 py-4">15-18 มีนาคม</td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">กำลังพัก</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button class="text-blue-600 hover:text-blue-800 mr-2">ดูรายละเอียด</button>
+                                    <button onclick="showPage('cat-care')" class="text-purple-600 hover:text-purple-800">อัปเดต</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="font-medium">มานี รักแมว</p>
+                                        <p class="text-sm text-gray-500">089-876-5432</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">โซ่</td>
+                                <td class="px-6 py-4">105 (Standard)</td>
+                                <td class="px-6 py-4">17-20 มีนาคม</td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">รอ Check-in</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">Check-in</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="font-medium">ปิติ ชอบขน</p>
+                                        <p class="text-sm text-gray-500">092-111-2222</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">ขาว</td>
+                                <td class="px-6 py-4">302 (Suite)</td>
+                                <td class="px-6 py-4">14-17 มีนาคม</td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-sm">รอ Check-out</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="showPage('billing')" class="bg-orange-500 text-white px-3 py-1 rounded text-sm hover:bg-orange-600">Check-out</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cat Care Management -->
+    <div id="cat-care" class="page hidden">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">🐱 ดูแลและอัปเดตข้อมูลแมว</h2>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">เลือกแมวที่ต้องการอัปเดต</label>
+                    <select class="w-full p-3 border rounded-lg" onchange="loadCatInfo(this.value)">
+                        <option value="">เลือกแมว...</option>
+                        <option value="miumiu">มิวมิว - ห้อง 201</option>
+                        <option value="soh">โซ่ - ห้อง 105</option>
+                        <option value="khao">ขาว - ห้อง 302</option>
+                    </select>
+                </div>
+
+                <div id="cat-update-form" class="hidden">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Cat Info -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">ข้อมูลแมว</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl mr-4">🐱</div>
+                                    <div>
+                                        <h4 class="font-semibold" id="cat-name">มิวมิว</h4>
+                                        <p class="text-sm text-gray-600" id="cat-details">แมวไทย, เมีย, 8 เดือน</p>
+                                        <p class="text-sm text-gray-600" id="cat-room">ห้อง 201 (Deluxe)</p>
+                                    </div>
+                                </div>
+                                <div class="text-sm">
+                                    <p><strong>เจ้าของ:</strong> <span id="owner-name">สมใจ ใจดี</span></p>
+                                    <p><strong>เบอร์โทร:</strong> <span id="owner-phone">081-234-5678</span></p>
+                                </div>
+                            </div>
+
+                            <!-- Daily Checklist -->
+                            <h4 class="font-semibold mb-3">✅ เช็กลิสต์ประจำวัน</h4>
+                            <div class="space-y-2 mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2"> กินอาหารเช้า
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2"> กินอาหารเย็น
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2"> ดื่มน้ำ
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2"> เล่นของเล่น
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2"> นอนหลับพักผ่อน
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2"> ใช้ห้องน้ำ
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Update Form -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">อัปเดตประจำวัน</h3>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">อัปโหลดรูปภาพ</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                    <div class="text-4xl mb-2">📷</div>
+                                    <p class="text-sm text-gray-600">คลิกเพื่อเลือกรูปภาพ หรือลากไฟล์มาวาง</p>
+                                    <input type="file" class="hidden" multiple accept="image/*">
+                                    <button class="mt-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">เลือกรูป</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">ข้อความสำหรับเจ้าของ</label>
+                                <textarea class="w-full p-3 border rounded-lg" rows="4" placeholder="เช่น มิวมิวสนุกกับของเล่นใหม่มาก เล่นไล่จับลูกบอลทั้งเช้า ตอนบ่ายนอนหลับสบาย..."></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">สุขภาพและพฤติกรรม</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs text-gray-600 mb-1">อารมณ์</label>
+                                        <select class="w-full p-2 border rounded">
+                                            <option>😊 ปกติดี</option>
+                                            <option>😴 ง่วงนอน</option>
+                                            <option>😸 ร่าเริง</option>
+                                            <option>😿 เศร้า</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-600 mb-1">กิจกรรม</label>
+                                        <select class="w-full p-2 border rounded">
+                                            <option>🏃 กระฉับกระเฉง</option>
+                                            <option>😴 นอนเยอะ</option>
+                                            <option>🎾 ชอบเล่น</option>
+                                            <option>🍽️ กินเก่ง</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2">หมายเหตุพิเศษ</label>
+                                <textarea class="w-full p-3 border rounded-lg" rows="2" placeholder="ข้อสังเกตพิเศษ หรือสิ่งที่ต้องแจ้งเจ้าของ..."></textarea>
+                            </div>
+
+                            <button onclick="saveUpdate()" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-semibold">
+                                💾 บันทึกอัปเดต
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Management -->
+    <div id="inventory" class="page hidden">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">📦 เช็กสต็อกสินค้า</h2>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Food Inventory -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">🍽️ อาหารแมว</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">อาหารเปียกรสปลาทูน่า</p>
+                                <p class="text-sm text-gray-600">กระป๋อง 85g</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-green-600">48 กระป๋อง</p>
+                                <p class="text-xs text-gray-500">เพียงพอ</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">อาหารแห้งสำหรับแมวโต</p>
+                                <p class="text-sm text-gray-600">ถุง 2kg</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-yellow-600">3 ถุง</p>
+                                <p class="text-xs text-yellow-600">ใกล้หมด</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">อาหารแมวลูก</p>
+                                <p class="text-sm text-gray-600">ถุง 1kg</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-red-600">1 ถุง</p>
+                                <p class="text-xs text-red-600">ต้องสั่งเพิ่ม</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">ขนมแมว</p>
+                                <p class="text-sm text-gray-600">ถุง 100g</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-green-600">15 ถุง</p>
+                                <p class="text-xs text-gray-500">เพียงพอ</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supplies Inventory -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">🧸 ของใช้และของเล่น</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">ทรายแมว</p>
+                                <p class="text-sm text-gray-600">ถุง 5kg</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-green-600">8 ถุง</p>
+                                <p class="text-xs text-gray-500">เพียงพอ</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">ลูกบอลของเล่น</p>
+                                <p class="text-sm text-gray-600">ลูก</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-yellow-600">5 ลูก</p>
+                                <p class="text-xs text-yellow-600">ใกล้หมด</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">ที่นอนแมว</p>
+                                <p class="text-sm text-gray-600">ชิ้น</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-green-600">12 ชิ้น</p>
+                                <p class="text-xs text-gray-500">เพียงพอ</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">ชามอาหาร</p>
+                                <p class="text-sm text-gray-600">ใบ</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-red-600">3 ใบ</p>
+                                <p class="text-xs text-red-600">ต้องสั่งเพิ่ม</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shopping List -->
+            <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">🛒 รายการที่ต้องสั่งซื้อ</h3>
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-red-800 mb-2">🚨 ของที่ต้องสั่งด่วน:</h4>
+                    <ul class="space-y-1 text-sm text-red-700">
+                        <li>• อาหารแมวลูก - เหลือ 1 ถุง</li>
+                        <li>• ชามอาหาร - เหลือ 3 ใบ</li>
+                    </ul>
+                </div>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+                    <h4 class="font-semibold text-yellow-800 mb-2">⚠️ ของที่ใกล้หมด:</h4>
+                    <ul class="space-y-1 text-sm text-yellow-700">
+                        <li>• อาหารแห้งสำหรับแมวโต - เหลือ 3 ถุง</li>
+                        <li>• ลูกบอลของเล่น - เหลือ 5 ลูก</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Billing Page -->
+    <div id="billing" class="page hidden">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">💰 คิดเงิน / Check-out</h2>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">เลือกลูกค้าที่ต้องการ Check-out</label>
+                    <select class="w-full p-3 border rounded-lg" onchange="loadBillingInfo(this.value)">
+                        <option value="">เลือกลูกค้า...</option>
+                        <option value="khao">ขาว - ปิติ ชอบขน (ห้อง 302)</option>
+                        <option value="miumiu">มิวมิว - สมใจ ใจดี (ห้อง 201)</option>
+                    </select>
+                </div>
+
+                <div id="billing-details" class="hidden">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Customer & Cat Info -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">ข้อมูลลูกค้า</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl mr-4">🐱</div>
+                                    <div>
+                                        <h4 class="font-semibold" id="billing-cat-name">ขาว</h4>
+                                        <p class="text-sm text-gray-600" id="billing-cat-details">เปอร์เซีย, ผู้, 2 ปี</p>
+                                        <p class="text-sm text-gray-600" id="billing-room">ห้อง 302 (Suite)</p>
+                                    </div>
+                                </div>
+                                <div class="text-sm">
+                                    <p><strong>เจ้าของ:</strong> <span id="billing-owner">ปิติ ชอบขน</span></p>
+                                    <p><strong>เบอร์โทร:</strong> <span id="billing-phone">092-111-2222</span></p>
+                                    <p><strong>วันที่พัก:</strong> <span id="billing-dates">14-17 มีนาคม 2024 (3 วัน)</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Billing Calculation -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">รายการคิดเงิน</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                                    <span>ค่าห้องพัก Suite (3 วัน)</span>
+                                    <span class="font-semibold">฿2,400</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                                    <span>ค่าอาหารพิเศษ</span>
+                                    <span class="font-semibold">฿150</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                                    <span>ค่าบริการดูแลพิเศษ</span>
+                                    <span class="font-semibold">฿300</span>
+                                </div>
+                                <div class="border-t pt-3">
+                                    <div class="flex justify-between items-center text-lg font-bold">
+                                        <span>รวมทั้งสิ้น</span>
+                                        <span class="text-green-600">฿2,850</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <h4 class="font-semibold mb-3">วิธีการชำระเงิน</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="payment" value="cash" class="mr-2"> เงินสด
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="payment" value="transfer" class="mr-2"> โอนเงิน
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="payment" value="card" class="mr-2"> บัตรเครดิต
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 space-y-3">
+                                <button onclick="printReceipt()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+                                    🖨️ พิมพ์ใบเสร็จ
+                                </button>
+                                <button onclick="completeCheckout()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">
+                                    ✅ ยืนยันการชำระเงินและ Check-out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="page hidden">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">👑 แดชบอร์ดผู้จัดการ</h2>
+
+            <!-- Key Metrics -->
+            <div class="grid lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold">รายได้เดือนนี้</h3>
+                    <p class="text-3xl font-bold">฿45,600</p>
+                    <p class="text-sm opacity-80">+12% จากเดือนที่แล้ว</p>
+                </div>
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold">การจองเดือนนี้</h3>
+                    <p class="text-3xl font-bold">28</p>
+                    <p class="text-sm opacity-80">+8% จากเดือนที่แล้ว</p>
+                </div>
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold">อัตราการเข้าพัก</h3>
+                    <p class="text-3xl font-bold">85%</p>
+                    <p class="text-sm opacity-80">เป้าหมาย 80%</p>
+                </div>
+                <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold">ลูกค้าใหม่</h3>
+                    <p class="text-3xl font-bold">12</p>
+                    <p class="text-sm opacity-80">เดือนนี้</p>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Revenue Chart -->
+                <div class="lg:col-span-2 bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">📊 รายได้รายเดือน</h3>
+                    <div class="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <div class="text-center text-gray-500">
+                            <div class="text-4xl mb-2">📈</div>
+                            <p>กราฟแสดงรายได้ 6 เดือนย้อนหลัง</p>
+                            <p class="text-sm">มกราคม: ฿38K, กุมภาพันธ์: ฿42K, มีนาคม: ฿46K</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Admin Actions -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">⚡ เมนูผู้จัดการ</h3>
+                    <div class="space-y-3">
+                        <button onclick="showPage('financial-report')" class="w-full p-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-left">
+                            💰 รายงานการเงิน
+                        </button>
+                        <button onclick="showPage('payments-due')" class="w-full p-3 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 text-left">
+                            💳 รายการค้างชำระ
+                        </button>
+                        <button onclick="showPage('system-settings')" class="w-full p-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-left">
+                            ⚙️ จัดการระบบ
+                        </button>
+                        <button onclick="showPage('staff-dashboard')" class="w-full p-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-left">
+                            👨‍💼 ระบบพนักงาน
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">📋 กิจกรรมล่าสุด</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm mr-3">✓</div>
+                            <div>
+                                <p class="font-medium">การจองใหม่ - น้องมิ้นท์</p>
+                                <p class="text-sm text-gray-600">ลูกค้า: นางสาวมิ้นท์ หวาน | 20-23 มีนาคม</p>
+                            </div>
+                        </div>
+                        <span class="text-sm text-gray-500">5 นาทีที่แล้ว</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm mr-3">💰</div>
+                            <div>
+                                <p class="font-medium">ชำระเงินเสร็จสิ้น - ขาว</p>
+                                <p class="text-sm text-gray-600">จำนวน ฿2,850 | ลูกค้า: ปิติ ชอบขน</p>
+                            </div>
+                        </div>
+                        <span class="text-sm text-gray-500">15 นาทีที่แล้ว</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white text-sm mr-3">⚠️</div>
+                            <div>
+                                <p class="font-medium">สต็อกใกล้หมด - อาหารแมวลูก</p>
+                                <p class="text-sm text-gray-600">เหลือ 1 ถุง | ต้องสั่งเพิ่ม</p>
+                            </div>
+                        </div>
+                        <span class="text-sm text-gray-500">1 ชั่วโมงที่แล้ว</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Report -->
+    <div id="financial-report" class="page hidden">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">💰 รายงานการเงิน</h2>
+
+            <!-- Date Filter -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">จากวันที่</label>
+                        <input type="date" class="p-2 border rounded-lg" value="2024-03-01">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">ถึงวันที่</label>
+                        <input type="date" class="p-2 border rounded-lg" value="2024-03-31">
+                    </div>
+                    <div class="flex items-end">
+                        <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">ค้นหา</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Summary Cards -->
+                <div class="lg:col-span-3 grid md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-green-500 text-white p-6 rounded-lg text-center">
+                        <h3 class="text-lg font-semibold">รายรับรวม</h3>
+                        <p class="text-2xl font-bold">฿45,600</p>
+                    </div>
+                    <div class="bg-red-500 text-white p-6 rounded-lg text-center">
+                        <h3 class="text-lg font-semibold">รายจ่ายรวม</h3>
+                        <p class="text-2xl font-bold">฿18,200</p>
+                    </div>
+                    <div class="bg-blue-500 text-white p-6 rounded-lg text-center">
+                        <h3 class="text-lg font-semibold">กำไรสุทธิ</h3>
+                        <p class="text-2xl font-bold">฿27,400</p>
+                    </div>
+                    <div class="bg-purple-500 text-white p-6 rounded-lg text-center">
+                        <h3 class="text-lg font-semibold">การจองทั้งหมด</h3>
+                        <p class="text-2xl font-bold">28</p>
+                    </div>
+                </div>
+
+                <!-- Revenue Breakdown -->
+                <div class="lg:col-span-2 bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">📊 รายละเอียดรายรับ</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">วันที่</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">ลูกค้า</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">ห้อง</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">จำนวน</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 text-sm">17 มีนาคม</td>
+                                    <td class="px-4 py-2 text-sm">ปิติ ชอบขน</td>
+                                    <td class="px-4 py-2 text-sm">Suite</td>
+                                    <td class="px-4 py-2 text-sm font-semibold text-green-600">฿2,850</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm">15 มีนาคม</td>
+                                    <td class="px-4 py-2 text-sm">สมใจ ใจดี</td>
+                                    <td class="px-4 py-2 text-sm">Deluxe</td>
+                                    <td class="px-4 py-2 text-sm font-semibold text-green-600">฿1,500</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm">12 มีนาคม</td>
+                                    <td class="px-4 py-2 text-sm">มานี รักแมว</td>
+                                    <td class="px-4 py-2 text-sm">Standard</td>
+                                    <td class="px-4 py-2 text-sm font-semibold text-green-600">฿900</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Expenses -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">💸 รายจ่าย</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-red-50 rounded">
+                            <span class="text-sm">อาหารและของใช้</span>
+                            <span class="font-semibold text-red-600">฿8,500</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-red-50 rounded">
+                            <span class="text-sm">เงินเดือนพนักงาน</span>
+                            <span class="font-semibold text-red-600">฿6,000</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-red-50 rounded">
+                            <span class="text-sm">ค่าไฟฟ้า น้ำ</span>
+                            <span class="font-semibold text-red-600">฿2,200</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-red-50 rounded">
+                            <span class="text-sm">อื่นๆ</span>
+                            <span class="font-semibold text-red-600">฿1,500</span>
+                        </div>
+                        <div class="border-t pt-3">
+                            <div class="flex justify-between items-center font-bold">
+                                <span>รวมรายจ่าย</span>
+                                <span class="text-red-600">฿18,200</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments Due -->
+    <div id="payments-due" class="page hidden">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">💳 รายการค้างชำระ</h2>
+
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ลูกค้า</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">แมว</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">วันที่พัก</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">จำนวนเงิน</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ค้างมาแล้ว</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="bg-red-50">
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="font-medium">จิรายุ ลืมจ่าย</p>
+                                        <p class="text-sm text-gray-500">085-999-8888</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">ส้ม</td>
+                                <td class="px-6 py-4">1-5 มีนาคม 2024</td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-red-600">฿1,200</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">12 วัน</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 mr-2">โทรติดตาม</button>
+                                    <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">ส่งแจ้งเตือน</button>
+                                </td>
+                            </tr>
+                            <tr class="bg-yellow-50">
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="font-medium">สุดา ช้าจ่าย</p>
+                                        <p class="text-sm text-gray-500">087-777-6666</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">เหมียว</td>
+                                <td class="px-6 py-4">8-10 มีนาคม 2024</td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-yellow-600">฿600</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">7 วัน</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button class="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 mr-2">โทรติดตาม</button>
+                                    <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">ส่งแจ้งเตือน</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="font-medium">วิชัย ยังไม่จ่าย</p>
+                                        <p class="text-sm text-gray-500">089-555-4444</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">ดำ</td>
+                                <td class="px-6 py-4">12-14 มีนาคม 2024</td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-orange-600">฿900</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-sm">3 วัน</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button class="bg-orange-500 text-white px-3 py-1 rounded text-sm hover:bg-orange-600 mr-2">โทรติดตาม</button>
+                                    <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">ส่งแจ้งเตือน</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="mt-8 grid md:grid-cols-3 gap-6">
+                <div class="bg-red-500 text-white p-6 rounded-lg text-center">
+                    <h3 class="text-lg font-semibold">ยอดค้างชำระรวม</h3>
+                    <p class="text-3xl font-bold">฿2,700</p>
+                </div>
+                <div class="bg-orange-500 text-white p-6 rounded-lg text-center">
+                    <h3 class="text-lg font-semibold">จำนวนลูกค้า</h3>
+                    <p class="text-3xl font-bold">3 ราย</p>
+                </div>
+                <div class="bg-yellow-500 text-white p-6 rounded-lg text-center">
+                    <h3 class="text-lg font-semibold">เฉลี่ยค้างชำระ</h3>
+                    <p class="text-3xl font-bold">7 วัน</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Settings -->
+    <div id="system-settings" class="page hidden">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold mb-8">⚙️ จัดการระบบ</h2>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Room Management -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">🏨 จัดการห้องพัก</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">Standard Room</p>
+                                <p class="text-sm text-gray-600">฿300/วัน</p>
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-800">แก้ไข</button>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">Deluxe Room</p>
+                                <p class="text-sm text-gray-600">฿500/วัน</p>
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-800">แก้ไข</button>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">Suite Room</p>
+                                <p class="text-sm text-gray-600">฿800/วัน</p>
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-800">แก้ไข</button>
+                        </div>
+                        <button class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">+ เพิ่มประเภทห้องใหม่</button>
+                    </div>
+                </div>
+
+                <!-- Staff Management -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">👥 จัดการพนักงาน</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">สมหญิง ใจดี</p>
+                                <p class="text-sm text-gray-600">พนักงานดูแลแมว</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-blue-600 hover:text-blue-800">แก้ไข</button>
+                                <button class="text-red-600 hover:text-red-800">ลบ</button>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <p class="font-medium">สมชาย รักงาน</p>
+                                <p class="text-sm text-gray-600">พนักงานต้อนรับ</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-blue-600 hover:text-blue-800">แก้ไข</button>
+                                <button class="text-red-600 hover:text-red-800">ลบ</button>
+                            </div>
+                        </div>
+                        <button class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">+ เพิ่มพนักงานใหม่</button>
+                    </div>
+                </div>
+
+                <!-- Service Settings -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">🛎️ ตั้งค่าบริการ</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">เวลาเปิด-ปิด</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="time" class="p-2 border rounded-lg" value="08:00">
+                                <input type="time" class="p-2 border rounded-lg" value="18:00">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">จำนวนห้องสูงสุด</label>
+                            <input type="number" class="w-full p-2 border rounded-lg" value="20">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">ค่าบริการพิเศษ</label>
+                            <input type="number" class="w-full p-2 border rounded-lg" value="100" placeholder="บาท/วัน">
+                        </div>
+                        <button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">บันทึกการตั้งค่า</button>
+                    </div>
+                </div>
+
+                <!-- System Info -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">📊 ข้อมูลระบบ</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span>เวอร์ชันระบบ:</span>
+                            <span class="font-semibold">v2.1.0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>อัปเดตล่าสุด:</span>
+                            <span class="font-semibold">15 มีนาคม 2024</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>จำนวนลูกค้าทั้งหมด:</span>
+                            <span class="font-semibold">156 ราย</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>จำนวนแมวที่เคยพัก:</span>
+                            <span class="font-semibold">203 ตัว</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>การจองทั้งหมด:</span>
+                            <span class="font-semibold">89 ครั้ง</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t">
+                        <button class="w-full bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700">สำรองข้อมูล</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentStep = 1;
+        let selectedRoom = '';
+        let roomPrices = { standard: 300, deluxe: 500, suite: 800 };
+
+        // Page navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // Add fade-in animation
+            document.getElementById(pageId).classList.add('fade-in');
+            
+            // Close user menu if open
+            document.getElementById('userMenu').classList.add('hidden');
+        }
+
+        // Toggle user menu
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('userMenu');
+            const button = event.target.closest('button');
+            if (!button || !button.onclick || button.onclick.toString().indexOf('toggleUserMenu') === -1) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Booking form functions
+        function nextStep(step) {
+            // Hide current step
+            document.getElementById(`booking-step-${currentStep}`).classList.add('hidden');
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            
+            // Show next step
+            currentStep = step;
+            document.getElementById(`booking-step-${currentStep}`).classList.remove('hidden');
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            
+            // Update progress bar
+            const progress = (currentStep / 4) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            
+            // Update summary if on step 4
+            if (currentStep === 4) {
+                updateBookingSummary();
+            }
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        // Room selection
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.room-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    document.querySelectorAll('.room-option').forEach(opt => {
+                        opt.classList.remove('border-purple-500', 'bg-purple-50');
+                    });
+                    
+                    // Add active class to selected option
+                    this.classList.add('border-purple-500', 'bg-purple-50');
+                    selectedRoom = this.dataset.room;
+                });
+            });
+        });
+
+        // Step indicators styling
+        const style = document.createElement('style');
+        style.textContent = `
+            .step-indicator {
+                padding: 8px 16px;
+                border-radius: 20px;
+                background-color: #e5e7eb;
+                color: #6b7280;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+            .step-indicator.active {
+                background-color: #7c3aed;
+                color: white;
+            }
+        `;
+        document.head.appendChild(style);
+
+        function updateBookingSummary() {
+            const checkinDate = document.getElementById('checkin-date').value;
+            const checkoutDate = document.getElementById('checkout-date').value;
+            
+            if (checkinDate && checkoutDate && selectedRoom) {
+                const checkin = new Date(checkinDate);
+                const checkout = new Date(checkoutDate);
+                const days = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+                const price = roomPrices[selectedRoom];
+                const total = days * price;
+                
+                document.getElementById('summary-checkin').textContent = checkinDate;
+                document.getElementById('summary-checkout').textContent = checkoutDate;
+                document.getElementById('summary-room').textContent = selectedRoom.charAt(0).toUpperCase() + selectedRoom.slice(1);
+                document.getElementById('summary-days').textContent = days + ' วัน';
+                document.getElementById('summary-total').textContent = '฿' + total.toLocaleString();
+            }
+        }
+
+        function confirmBooking() {
+            alert('🎉 การจองเสร็จสิ้น! ขอบคุณที่ไว้วางใจ Meow Palace Hotel\n\nเราจะติดต่อกลับเพื่อยืนยันรายละเอียดภายใน 24 ชั่วโมง');
+            showPage('customer-dashboard');
+        }
+
+        // Staff functions
+        function loadCatInfo(catId) {
+            const form = document.getElementById('cat-update-form');
+            if (catId) {
+                form.classList.remove('hidden');
+                
+                // Sample data based on selection
+                const catData = {
+                    'miumiu': {
+                        name: 'มิวมิว',
+                        details: 'แมวไทย, เมีย, 8 เดือน',
+                        room: 'ห้อง 201 (Deluxe)',
+                        owner: 'สมใจ ใจดี',
+                        phone: '081-234-5678'
+                    },
+                    'soh': {
+                        name: 'โซ่',
+                        details: 'สก็อตติช โฟลด์, ผู้, 1 ปี',
+                        room: 'ห้อง 105 (Standard)',
+                        owner: 'มานี รักแมว',
+                        phone: '089-876-5432'
+                    },
+                    'khao': {
+                        name: 'ขาว',
+                        details: 'เปอร์เซีย, ผู้, 2 ปี',
+                        room: 'ห้อง 302 (Suite)',
+                        owner: 'ปิติ ชอบขน',
+                        phone: '092-111-2222'
+                    }
+                };
+                
+                const data = catData[catId];
+                if (data) {
+                    document.getElementById('cat-name').textContent = data.name;
+                    document.getElementById('cat-details').textContent = data.details;
+                    document.getElementById('cat-room').textContent = data.room;
+                    document.getElementById('owner-name').textContent = data.owner;
+                    document.getElementById('owner-phone').textContent = data.phone;
+                }
+            } else {
+                form.classList.add('hidden');
+            }
+        }
+
+        function saveUpdate() {
+            alert('✅ บันทึกอัปเดตเรียบร้อย!\n\nข้อมูลและรูปภาพได้ถูกส่งให้เจ้าของแล้ว');
+            showPage('staff-dashboard');
+        }
+
+        // Billing functions
+        function loadBillingInfo(customerId) {
+            const details = document.getElementById('billing-details');
+            if (customerId) {
+                details.classList.remove('hidden');
+                
+                // Sample billing data
+                const billingData = {
+                    'khao': {
+                        catName: 'ขาว',
+                        catDetails: 'เปอร์เซีย, ผู้, 2 ปี',
+                        room: 'ห้อง 302 (Suite)',
+                        owner: 'ปิติ ชอบขน',
+                        phone: '092-111-2222',
+                        dates: '14-17 มีนาคม 2024 (3 วัน)'
+                    },
+                    'miumiu': {
+                        catName: 'มิวมิว',
+                        catDetails: 'แมวไทย, เมีย, 8 เดือน',
+                        room: 'ห้อง 201 (Deluxe)',
+                        owner: 'สมใจ ใจดี',
+                        phone: '081-234-5678',
+                        dates: '15-18 มีนาคม 2024 (3 วัน)'
+                    }
+                };
+                
+                const data = billingData[customerId];
+                if (data) {
+                    document.getElementById('billing-cat-name').textContent = data.catName;
+                    document.getElementById('billing-cat-details').textContent = data.catDetails;
+                    document.getElementById('billing-room').textContent = data.room;
+                    document.getElementById('billing-owner').textContent = data.owner;
+                    document.getElementById('billing-phone').textContent = data.phone;
+                    document.getElementById('billing-dates').textContent = data.dates;
+                }
+            } else {
+                details.classList.add('hidden');
+            }
+        }
+
+        function printReceipt() {
+            alert('🖨️ กำลังพิมพ์ใบเสร็จ...\n\nใบเสร็จได้ถูกส่งไปยังเครื่องพิมพ์แล้ว');
+        }
+
+        function completeCheckout() {
+            alert('✅ Check-out เสร็จสิ้น!\n\nขอบคุณที่ใช้บริการ Meow Palace Hotel\nหวังว่าจะได้ต้อนรับน้องแมวอีกครั้ง');
+            showPage('staff-dashboard');
+        }
+
+        function showNewBookingForm() {
+            alert('📝 เปิดฟอร์มจองใหม่สำหรับพนักงาน\n\nฟีเจอร์นี้จะช่วยให้พนักงานสามารถจองให้ลูกค้าได้โดยตรง');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            showPage('home');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97fdeb907241d033',t:'MTc1ODAwMDA4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
