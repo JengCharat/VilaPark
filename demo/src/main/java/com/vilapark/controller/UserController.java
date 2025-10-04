@@ -17,10 +17,10 @@ public class UserController {
     private UserRepository userRepository;
 
     // --------- สร้าง User ---------
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userRepository.save(user);
-    }
+    // @PostMapping
+    // public User createUser(@RequestBody User user) {
+    //     return userRepository.save(user);
+    // }
 
     // --------- ดึง User ทั้งหมด ---------
     @GetMapping
