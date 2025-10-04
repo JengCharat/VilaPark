@@ -17,6 +17,9 @@ export default function Manager() {
   const [status, setStatus] = useState("");
   const [rooms, setRooms] = useState<Room[]>([]);
   const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
+  const [username,setUsername] = useState("")
+  const [email,setEmail] = useState("")
+  const [password,setPassword] = useState("")
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -113,6 +116,32 @@ const handleDeleteRoom = async (id: number, status: string) => {
     alert(err);
   }
 };
+
+  const handleSubmitCreateEmpUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://127.0.0.1:8081/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+                    username,
+                    email,
+                    password,
+                    role: ["admin"]
+
+        }),
+      });
+      if (!res.ok) throw new Error(`${res.status}`);
+      const data = await res.json();
+           setUsername("") 
+            setEmail("")
+            setPassword("")
+      alert("success");
+      setRooms([...rooms, data]); // อัพเดตรายการห้องใหม่
+    } catch (err) {
+      alert(err);
+    }
+  };
 
   return (
     <>
@@ -218,6 +247,47 @@ const handleDeleteRoom = async (id: number, status: string) => {
           </li>
         ))}
       </ul>
+
+
+
+
+
+            <h1>Create Employee User</h1>
+            <form 
+              onSubmit={handleSubmitCreateEmpUser} 
+              className="flex flex-col space-y-3 border p-4 rounded-md shadow-sm mb-6 w-80"
+            >
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="border px-2 py-1 rounded"
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border px-2 py-1 rounded"
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="border px-2 py-1 rounded"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              >
+                Add User
+              </button>
+            </form>
     </>
   );
 }
