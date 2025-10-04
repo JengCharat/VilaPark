@@ -30,7 +30,7 @@ export default function Manager() {
       }
     };
     fetchRoomData();
-  }, []);
+  }, [rooms]);
 
   const handleSubmitCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,13 +80,39 @@ export default function Manager() {
       });
       if (!res.ok) throw new Error(`${res.status}`);
       const updatedRoom = await res.json();
+
+      setRoomNumber("");
+      setType("");
+      setPrice("");
+      setStatus("");
       alert("success");
       setRooms(rooms.map(r => r.id === id ? updatedRoom : r));
-      setEditingRoomId(null); // ปิด form edit
+      setEditingRoomId(null); 
     } catch (err) {
       alert(err);
     }
   };
+
+const handleDeleteRoom = async (id: number, status: string) => {
+  if (status === "2") {
+    alert("ลบไม่ได้ ห้องนี้ถูกจองอยู่");
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://127.0.0.1:8081/rooms/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" }
+    });
+    if (!res.ok) throw new Error(`${res.status}`);
+    alert("ลบสำเร็จ");
+
+    setRooms(rooms.filter(r => r.id !== id));
+    setEditingRoomId(null);
+  } catch (err) {
+    alert(err);
+  }
+};
 
   return (
     <>
@@ -135,7 +161,14 @@ export default function Manager() {
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mb-2"
               onClick={() => handleEditClick(room)}
             >
-              Edit
+                EDIT
+            </button>
+
+            <button
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 mb-2"
+              onClick={() => handleDeleteRoom(room.id, room.status)}
+            >
+              Delete
             </button>
 
             {editingRoomId === room.id && (
