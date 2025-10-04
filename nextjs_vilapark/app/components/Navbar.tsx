@@ -22,13 +22,13 @@ const showPage = (page) => {
           </div>
 
           <div className="hidden md:flex space-x-4">
-            <button onClick={() => showPage('home')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('dashboard')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
               หน้าแรก
             </button>
-            <button onClick={() => showPage('booking')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('form')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
               จองห้องพัก
             </button>
-            <button onClick={() => showPage('customer-dashboard')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('todayUpdate')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
               แดชบอร์ดลูกค้า
             </button>
 
@@ -41,6 +41,10 @@ const showPage = (page) => {
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                   <button onClick={() => showPage('signin')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                     🔑 Sign In
+                  </button>
+
+                  <button onClick={() => showPage('signup')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                    🔑 Sign Up
                   </button>
                   <button onClick={() => showPage('staff-dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                     👨‍💼 พนักงาน
