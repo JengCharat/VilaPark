@@ -29,11 +29,13 @@ public class BookingController {
         return bookingRepository.findAll();
     }
 
-    // ดึงข้อมูล Booking ตาม ID
     @GetMapping("/{id}")
-    public Optional<Bookings> getBookingById(@PathVariable Long id) {
-        return bookingRepository.findById(id);
-    }
+public ResponseEntity<Bookings> getBookingById(@PathVariable Long id) {
+  return bookingRepository.findById(id)
+    .map(ResponseEntity::ok)
+    .orElse(ResponseEntity.notFound().build());
+}
+
 
     // เพิ่ม Booking ใหม่
     @PostMapping

@@ -15,7 +15,7 @@ public class Bookings {
     private Long userId;
 
     private Long catId;
-
+    
     @Column(name = "room_id", nullable = false)
     private Long roomId;
 
@@ -30,7 +30,10 @@ public class Bookings {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"password","bookings","cats"})
+    private User user;
     public Bookings() {
         // ตั้งค่า createdAt เป็นเวลาปัจจุบัน
         this.createdAt = LocalDateTime.now();

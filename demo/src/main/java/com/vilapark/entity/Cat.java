@@ -23,7 +23,10 @@ public class Cat {
     private String breed; // ✅ ฟิลด์สายพันธุ์แมวใหม่
 
     private Long ownerId;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    @JsonIgnoreProperties({"password","bookings","cats"}) // กันวน
+    private User owner;
     public Cat() {
     } // default constructor สำคัญ
 

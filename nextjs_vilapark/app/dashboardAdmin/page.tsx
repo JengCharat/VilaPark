@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link'; // ใช้ Link จาก Next.js เพื่อการเปลี่ยนหน้าที่เร็วขึ้น
-
+import Navbar from "../components/Navbar";
 // --- Interfaces for type safety ---
 interface SummaryData {
   stayingToday: number;
@@ -92,14 +92,15 @@ export default function DashboardAdmin() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen p-8 font-sans">
-      <h1>test</h1>
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-          <span>🧑‍💼</span>
-          แดชบอร์ดพนักงาน
-        </h1>
-      </header>
+  <>
+    <Navbar />
+
+
+      <div className="p-6 space-y-6 gradient-bg">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold"><span>🧑‍💼</span> แดชบอร์ดพนักงาน</h1>
+        </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -164,11 +165,12 @@ export default function DashboardAdmin() {
                 <MenuButton icon="🐈" title="ดูแมว" href="/cats" color="hover:bg-orange-50 text-orange-600" />
                 {/* ปุ่มที่อัปเดตให้ลิงก์ไปหน้าสต็อก */}
                 <MenuButton icon="📦" title="เช็กสต็อก" href="/stock" color="hover:bg-green-50 text-green-600" />
-                <MenuButton icon="💰" title="คิดเงิน" href="/billing" color="hover:bg-yellow-50 text-yellow-600" />
+                <MenuButton icon="💰" title="คิดเงิน" href="/checkout" color="hover:bg-yellow-50 text-yellow-600" />
             </div>
         </div>
       </div>
     </div>
+   </>
   );
 }
 
