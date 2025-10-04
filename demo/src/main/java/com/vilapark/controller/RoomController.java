@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-// @RequestMapping("/rooms")
+@RequestMapping("/rooms")
 @CrossOrigin(origins = "*")
 public class RoomController {
 
@@ -19,7 +19,7 @@ public class RoomController {
     }
 
     // ดึงข้อมูลห้องทั้งหมด
-    @GetMapping("/rooms")
+    @GetMapping
     public List<Room> getAllRooms() {
         return roomRepository.findAll();
     }

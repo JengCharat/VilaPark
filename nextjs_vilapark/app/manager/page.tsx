@@ -1,0 +1,190 @@
+"use client"
+import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
+
+interface Room {
+  id: number;
+  roomNumber: string;
+  type: string;
+  price: number | null;
+  status: string;
+}
+
+export default function Manager() {
+  const [roomNumber, setRoomNumber] = useState("");
+  const [type, setType] = useState("");
+  const [price, setPrice] = useState("");
+  const [status, setStatus] = useState("");
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      try {
+        const res = await fetch("http://127.0.0.1:8081/rooms");
+        if (!res.ok) throw new Error(`${res.status}`);
+        const room_data: Room[] = await res.json();
+        setRooms(room_data);
+      } catch (error) {
+        alert(error);
+      }
+    };
+    fetchRoomData();
+  }, []);
+
+  const handleSubmitCreateRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://127.0.0.1:8081/rooms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roomNumber,
+          type,
+          price: Number(price),
+          status,
+        }),
+      });
+      if (!res.ok) throw new Error(`${res.status}`);
+      const data = await res.json();
+      setRoomNumber("");
+      setType("");
+      setPrice("");
+      setStatus("");
+      alert("success");
+      setRooms([...rooms, data]); // อัพเดตรายการห้องใหม่
+    } catch (err) {
+      alert(err);
+    }
+  };
+
+  const handleEditClick = (room: Room) => {
+    setEditingRoomId(room.id);
+    setRoomNumber(room.roomNumber);
+    setType(room.type);
+    setPrice(room.price?.toString() || "");
+    setStatus(room.status);
+  };
+
+  const handleSubmitEditRoom = async (id: number) => {
+    try {
+      const res = await fetch(`http://127.0.0.1:8081/rooms/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roomNumber,
+          type,
+          price: Number(price),
+          status,
+        }),
+      });
+      if (!res.ok) throw new Error(`${res.status}`);
+      const updatedRoom = await res.json();
+      alert("success");
+      setRooms(rooms.map(r => r.id === id ? updatedRoom : r));
+      setEditingRoomId(null); // ปิด form edit
+    } catch (err) {
+      alert(err);
+    }
+  };
+
+  return (
+    <>
+      <Navbar />
+      <h1>this is manager page</h1>
+
+      <h1>create room</h1>
+      <form onSubmit={handleSubmitCreateRoom} className="border-b-black mb-4">
+        <input 
+          type="text" 
+          placeholder="roomNumber"
+          value={roomNumber}
+          onChange={(e)=>setRoomNumber(e.target.value)}
+          className="border px-2 py-1 rounded mr-2"
+        />
+        <input type="text"
+          placeholder="type"
+          value={type}
+          onChange={(e)=>setType(e.target.value)}
+          className="border px-2 py-1 rounded mr-2"
+        />
+        <input type="text"
+          placeholder="price"
+          value={price}
+          onChange={(e)=>setPrice(e.target.value)}
+          className="border px-2 py-1 rounded mr-2"
+        />
+        <input type="text"
+          placeholder="status"
+          value={status}
+          onChange={(e)=>setStatus(e.target.value)}
+          className="border px-2 py-1 rounded mr-2"
+        />
+        <button type="submit" className="bg-green-500 text-white px-3 py-1 rounded">create room</button>
+      </form>
+
+      <h1>Room List</h1>
+      <ul className="space-y-4">
+        {rooms.map((room) => (
+          <li key={room.id} className="p-4 border rounded-md shadow-sm">
+            <div className="mb-2 font-semibold">
+              Room {room.roomNumber} - Type: {room.type} - Price: {room.price} - Status: {room.status}
+            </div>
+
+            <button
+              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mb-2"
+              onClick={() => handleEditClick(room)}
+            >
+              Edit
+            </button>
+
+            {editingRoomId === room.id && (
+              <form
+                className="flex flex-col space-y-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmitEditRoom(room.id);
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder="Room Number"
+                  value={roomNumber}
+                  className="border px-2 py-1 rounded"
+                  onChange={(e) => setRoomNumber(e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="Type"
+                  value={type}
+                  className="border px-2 py-1 rounded"
+                  onChange={(e) => setType(e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Price"
+                  value={price}
+                  className="border px-2 py-1 rounded"
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="Status"
+                  value={status}
+                  className="border px-2 py-1 rounded"
+                  onChange={(e) => setStatus(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  Save
+                </button>
+              </form>
+            )}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
