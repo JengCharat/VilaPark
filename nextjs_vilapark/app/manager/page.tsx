@@ -9,13 +9,27 @@ interface Room {
   price: number | null;
   status: string;
 }
-
+interface Role {
+  id: number;
+  name: string;
+}
+interface Employee {
+  id: number;
+  username: string;
+  email: string;
+  name: string 
+  lastname: string;
+  phonenumber: string;
+  address: string;
+  roles:Role[];
+}
 export default function Manager() {
   const [roomNumber, setRoomNumber] = useState("");
   const [type, setType] = useState("");
   const [price, setPrice] = useState("");
   const [status, setStatus] = useState("");
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [employees, setEmployee] = useState<Employee[]>([]);
   const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
   const [username,setUsername] = useState("")
   const [email,setEmail] = useState("")
@@ -28,6 +42,20 @@ export default function Manager() {
         if (!res.ok) throw new Error(`${res.status}`);
         const room_data: Room[] = await res.json();
         setRooms(room_data);
+      } catch (error) {
+        alert(error);
+      }
+    };
+    fetchRoomData();
+  }, [rooms]);
+
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      try {
+        const res = await fetch("http://127.0.0.1:8081/users/employee");
+        if (!res.ok) throw new Error(`${res.status}`);
+        const employee: Employee[] = await res.json();
+        setEmployee(employee);
       } catch (error) {
         alert(error);
       }
@@ -288,6 +316,24 @@ const handleDeleteRoom = async (id: number, status: string) => {
                 Add User
               </button>
             </form>
+            <h1>EMP LIST</h1>
+            <ul>
+
+            {employees.map((emp)=>(
+
+              <li key={emp.id} className="p-4 border rounded-md shadow-sm">
+                        <h1>username:{emp.username}</h1>
+                        <h1>lastname:{emp.email}</h1>
+                        <h1>name:{emp.name}</h1>
+                        <h1>lastname:{emp.lastname}</h1>
+                        <h1>phone:{emp.phonenumber}</h1>
+                        <h1>adress:{emp.address}</h1>
+                    </li>
+            ))}
+
+
+
+            </ul>
     </>
   );
 }

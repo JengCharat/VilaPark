@@ -5,9 +5,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import com.vilapark.models.ERole;
+import java.util.List;
 import com.vilapark.models.User;
-
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByUsername(String username);
@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Boolean existsByUsername(String username);
 
   Boolean existsByEmail(String email);
+     List<User> findByRoles_Name(ERole role);
 }
 
 

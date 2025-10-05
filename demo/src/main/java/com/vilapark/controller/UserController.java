@@ -8,6 +8,8 @@ import com.vilapark.dto.UserDTO;
 import com.vilapark.dto.RoleDTO;
 import java.util.List;
 import com.vilapark.dto.UpdateUserDTO;
+import com.vilapark.models.ERole;
+import java.util.ArrayList; 
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
@@ -107,5 +109,30 @@ public class UserController {
 
         return roles;
     }
+
+                @GetMapping("/employee")
+                public List<UserDTO> getEmployeeByRole() {
+                    List<User> users = userRepository.findByRoles_Name(ERole.ROLE_ADMIN);
+
+                    List<UserDTO> userDTOs = users.stream().map(user -> {
+                        UserDTO dto = new UserDTO();
+                        dto.setId(user.getId());
+                        dto.setUsername(user.getUsername());
+                        dto.setEmail(user.getEmail());
+
+                        List<RoleDTO> roleDTOs = user.getRoles().stream().map(role -> {
+                            RoleDTO r = new RoleDTO();
+                            r.setId(role.getId() != null ? role.getId().longValue() : null);
+                            r.setName(role.getName() != null ? role.getName().name() : null);
+                            return r;
+                        }).toList();
+
+                        dto.setRoles(roleDTOs);
+
+                        return dto;
+                    }).toList();
+
+                    return userDTOs;
+                }
 
 }
