@@ -35,25 +35,38 @@ async function fileUrlToBase64Body(url: string): Promise<string> {
   });
 }
 
+// มีเพียงหนึ่งตัวในไฟล์เท่านั้น!
 async function ensureThaiFont(doc: any) {
-  if (_thaiFontLoaded || (doc as any).__thaiFontLoaded) return;
+  if ((doc as any).__thaiFontLoaded) return;
 
-  // normal
-  const normalB64 = await fileUrlToBase64Body("/fonts/THSarabunNew.ttf");
-  doc.addFileToVFS("THSarabunNew.ttf", normalB64);
-  doc.addFont("THSarabunNew.ttf", "Sarabun", "normal");
+  const res1 = await fetch("/fonts/THSarabunNew.ttf");
+  const b64_Regular = await blobToBase64(res1);
 
-  // bold (มีไฟล์ก็ดี; ถ้าไม่มีจะข้ามตรงนี้ไป)
+  doc.addFileToVFS("THSarabunNew.ttf", b64_Regular);
+  // 👇 ใส่ Identity-H ตรงนี้ สำคัญมาก
+  (doc as any).addFont("THSarabunNew.ttf", "Sarabun", "normal", "Identity-H");
+
+  // ถ้ามีไฟล์ Bold ก็ฝังด้วย (ไม่มีก็ข้ามได้)
   try {
-    const boldB64 = await fileUrlToBase64Body("/fonts/THSarabunNew-Bold.ttf");
-    doc.addFileToVFS("THSarabunNew-Bold.ttf", boldB64);
-    doc.addFont("THSarabunNew-Bold.ttf", "Sarabun", "bold");
-  } catch { /* ignore if bold not found */ }
+    const res2 = await fetch("/fonts/THSarabunNew-Bold.ttf");
+    const b64_Bold = await blobToBase64(res2);
+    doc.addFileToVFS("THSarabunNew-Bold.ttf", b64_Bold);
+    (doc as any).addFont("THSarabunNew-Bold.ttf", "Sarabun", "bold", "Identity-H");
+  } catch {
+    /* ignore */
+  }
 
   doc.setFont("Sarabun", "normal");
-
-  _thaiFontLoaded = true;
   (doc as any).__thaiFontLoaded = true;
+}
+
+function blobToBase64(res: Response): Promise<string> {
+  return res.blob().then(blob => new Promise<string>((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve((r.result as string).split(",")[1]);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  }));
 }
 
 
@@ -222,8 +235,8 @@ export async function generateReceiptPDF(opts: {
     startY,
     head,
     body,
-    styles: { font: "Sarabun", fontStyle: "normal", fontSize: 11 },
-    headStyles: { fillColor: [28, 63, 148], textColor: 255 },
+     styles: { font: "Sarabun", fontStyle: "normal", fontSize: 11 },
+     headStyles: { font: "Sarabun", fontStyle: "bold", fillColor: [28,63,148], textColor: 255 },
     columnStyles: {
       1: { halign: "right" },
       2: { halign: "right" },
