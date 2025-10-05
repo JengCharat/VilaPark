@@ -31,6 +31,12 @@ export default function Manager() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [employees, setEmployee] = useState<Employee[]>([]);
   const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
+    const [editingEmpId, setEditingEmpId] = useState<number | null>(null);
+  const [empId,setEmpId] = useState("")
+  const [EmpFirstName,setEmpFirstName] = useState("")
+  const [EmpLastName,setEmpLasttName] = useState("")
+  const [EmpPhone,setEmpPhone] = useState("")
+  const [EmpAdress,setEmpAdress] = useState("")
   const [username,setUsername] = useState("")
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
@@ -97,6 +103,44 @@ export default function Manager() {
     setStatus(room.status);
   };
 
+            const handleEditEmpClick = (emp: Employee) => {
+              setEditingEmpId(emp.id); // แสดง form เฉพาะตัวนี้
+              setEmpId(emp.id.toString());
+              setUsername(emp.username);
+              setEmail(emp.email);
+              setEmpFirstName(emp.name);
+              setEmpLasttName(emp.lastname);
+              setEmpPhone(emp.phonenumber);
+              setEmpAdress(emp.address);
+            };
+
+  const handleSubmitEditEmp = async (id: number) => {
+    try {
+      const res = await fetch(`http://127.0.0.1:8081/users/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+                username,
+                email,
+                name:EmpFirstName,
+                lastname:EmpLastName,
+                phonenumber:EmpPhone,
+                address:EmpAdress
+        }),
+      });
+      if (!res.ok) throw new Error(`${res.status}`);
+
+          setEmpId("")
+          setUsername("") 
+          setEmail("")
+          setEmpFirstName("")
+          setEmpLasttName("")
+          setEmpPhone("")
+          setEmpAdress("")
+    } catch (err) {
+      alert(err);
+    }
+  };
   const handleSubmitEditRoom = async (id: number) => {
     try {
       const res = await fetch(`http://127.0.0.1:8081/rooms/${id}`, {
@@ -339,25 +383,91 @@ const handleDeleteRoom = async (id: number, status: string) => {
             <h1>EMP LIST</h1>
             <ul>
 
-            {employees.map((emp)=>(
+{employees.map((emp) => (
+  <li key={emp.id} className="p-4 border rounded-md shadow-sm mb-4">
+    <h1>username: {emp.username}</h1>
+    <h1>email: {emp.email}</h1>
+    <h1>name: {emp.name}</h1>
+    <h1>lastname: {emp.lastname}</h1>
+    <h1>phone: {emp.phonenumber}</h1>
+    <h1>address: {emp.address}</h1>
 
-                  <li key={emp.id} className="p-4 border rounded-md shadow-sm">
-                        <h1>username:{emp.username}</h1>
-                        <h1>lastname:{emp.email}</h1>
-                        <h1>name:{emp.name}</h1>
-                        <h1>lastname:{emp.lastname}</h1>
-                        <h1>phone:{emp.phonenumber}</h1>
-                        <h1>adress:{emp.address}</h1>
-                        <button
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 mb-2"
-                          onClick={() => handleDeleteEmp(emp.id)}
-                        >
-                          Delete
-            </button>
-                  </li>
+    <button
+      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mr-2"
+      onClick={() => handleEditEmpClick(emp)}
+    >
+      Edit
+    </button>
+    <button
+      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+      onClick={() => handleDeleteEmp(emp.id)}
+    >
+      Delete
+    </button>
 
-            ))}
-
+    {/* แสดง form เฉพาะ employee ที่กำลังแก้ไข */}
+    {editingEmpId === emp.id && (
+      <form
+        className="flex flex-col space-y-2 mt-2 border p-2 rounded"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmitEditEmp(emp.id);
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="border px-2 py-1 rounded"
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border px-2 py-1 rounded"
+          required
+        />
+        <input
+          type="text"
+          placeholder="First Name"
+          value={EmpFirstName}
+          onChange={(e) => setEmpFirstName(e.target.value)}
+          className="border px-2 py-1 rounded"
+        />
+        <input
+          type="text"
+          placeholder="Last Name"
+          value={EmpLastName}
+          onChange={(e) => setEmpLasttName(e.target.value)}
+          className="border px-2 py-1 rounded"
+        />
+        <input
+          type="text"
+          placeholder="Phone"
+          value={EmpPhone}
+          onChange={(e) => setEmpPhone(e.target.value)}
+          className="border px-2 py-1 rounded"
+        />
+        <input
+          type="text"
+          placeholder="Address"
+          value={EmpAdress}
+          onChange={(e) => setEmpAdress(e.target.value)}
+          className="border px-2 py-1 rounded"
+        />
+        <button
+          type="submit"
+          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+        >
+          Save
+        </button>
+      </form>
+    )}
+  </li>
+))}
 
 
             </ul>

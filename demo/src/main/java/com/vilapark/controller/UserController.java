@@ -8,6 +8,7 @@ import com.vilapark.dto.UserDTO;
 import com.vilapark.dto.RoleDTO;
 import java.util.List;
 import com.vilapark.dto.UpdateUserDTO;
+import com.vilapark.dto.UserResponseDTO;
 import com.vilapark.models.ERole;
 import java.util.ArrayList; 
 @RestController
@@ -63,28 +64,33 @@ public class UserController {
         return dto;
     }
 
-    // --------- อัปเดต User ---------
-    @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO userDetails) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+@PutMapping("/{id}")
+public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO userDetails) {
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        if (userDetails.getUsername() != null)
-            user.setUsername(userDetails.getUsername());
-        if (userDetails.getEmail() != null)
-            user.setEmail(userDetails.getEmail());
-        user.setEnabled(userDetails.isEnabled());
-        if (userDetails.getName() != null)
-            user.setName(userDetails.getName());
-        if (userDetails.getLastname() != null)
-            user.setLastname(userDetails.getLastname());
-        if (userDetails.getPhonenumber() != null)
-            user.setPhonenumber(userDetails.getPhonenumber());
-        if (userDetails.getAddress() != null)
-            user.setAddress(userDetails.getAddress());
+    if (userDetails.getUsername() != null) user.setUsername(userDetails.getUsername());
+    if (userDetails.getEmail() != null) user.setEmail(userDetails.getEmail());
+    user.setEnabled(userDetails.isEnabled());
+    if (userDetails.getName() != null) user.setName(userDetails.getName());
+    if (userDetails.getLastname() != null) user.setLastname(userDetails.getLastname());
+    if (userDetails.getPhonenumber() != null) user.setPhonenumber(userDetails.getPhonenumber());
+    if (userDetails.getAddress() != null) user.setAddress(userDetails.getAddress());
 
-        return userRepository.save(user);
-    }
+    User savedUser = userRepository.save(user);
+
+    // แปลงเป็น DTO ก่อนส่งออก
+    return new UserResponseDTO(
+            savedUser.getId(),
+            savedUser.getUsername(),
+            savedUser.getEmail(),
+            savedUser.isEnabled(),
+            savedUser.getName(),
+            savedUser.getLastname(),
+            savedUser.getPhonenumber(),
+            savedUser.getAddress()
+    );
+}
 
     // --------- ลบ User ---------
     @DeleteMapping("/{id}")
@@ -119,6 +125,10 @@ public class UserController {
                         dto.setId(user.getId());
                         dto.setUsername(user.getUsername());
                         dto.setEmail(user.getEmail());
+                        dto.setName(user.getName());
+                        dto.setLastname(user.getLastname());
+                        dto.setPhonenumber(user.getPhonenumber());
+                        dto.setAddress(user.getAddress());
 
                         List<RoleDTO> roleDTOs = user.getRoles().stream().map(role -> {
                             RoleDTO r = new RoleDTO();
