@@ -4,23 +4,64 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "../components/Navbar";
 
-/* ===== API base ===== */
-const API = "http://localhost:8081"; // ถ้าตั้ง proxy ไว้ ใช้เป็น "/api" ได้
+/* ===== เพิ่มสำหรับ PDF ===== */
+import jsPDF from "jspdf";
+import autoTable, { RowInput } from "jspdf-autotable";
 
-/* ===== fetch helper (คืนข้อมูลที่ parse แล้ว) ===== */
-async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
-  try {
-    const res = await fetch(url, { cache: "no-store", ...init });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`HTTP ${res.status} @ ${url} :: ${text.slice(0, 200)}`);
-    }
-    return res.json() as Promise<T>;
-  } catch (e) {
-    console.error("Fetch failed:", url, e);
-    throw e;
-  }
+/* ========= PDF helpers ========= */
+// ฝังฟอนต์ไทยเพื่อให้แสดงภาษาไทยถูกต้อง
+// ------- helper: โหลดฟอนต์ไทยให้ jsPDF แค่ครั้งเดียว -------
+// วางไว้บนสุดของไฟล์ (นอก component) แล้วมีแค่ตัวเดียวเท่านั้น
+// ---- Thai font loader (keep exactly ONE copy in this file) ----
+// ===== Thai font loader (ONE copy only) =====
+let _thaiFontLoaded = false;
+
+async function fileUrlToBase64Body(url: string): Promise<string> {
+  // ดึงไฟล์ แล้วแปลงเป็น dataURL ด้วย FileReader (ไม่กิน stack)
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Load font failed: ${url}`);
+
+  const blob = await res.blob();
+
+  return await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      // reader.result: "data:font/ttf;base64,AAAA..."
+      const dataUrl = reader.result as string;
+      resolve(dataUrl.split(",")[1]); // เอาเฉพาะส่วน base64 หลัง comma
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 }
+
+async function ensureThaiFont(doc: any) {
+  if (_thaiFontLoaded || (doc as any).__thaiFontLoaded) return;
+
+  // normal
+  const normalB64 = await fileUrlToBase64Body("/fonts/THSarabunNew.ttf");
+  doc.addFileToVFS("THSarabunNew.ttf", normalB64);
+  doc.addFont("THSarabunNew.ttf", "Sarabun", "normal");
+
+  // bold (มีไฟล์ก็ดี; ถ้าไม่มีจะข้ามตรงนี้ไป)
+  try {
+    const boldB64 = await fileUrlToBase64Body("/fonts/THSarabunNew-Bold.ttf");
+    doc.addFileToVFS("THSarabunNew-Bold.ttf", boldB64);
+    doc.addFont("THSarabunNew-Bold.ttf", "Sarabun", "bold");
+  } catch { /* ignore if bold not found */ }
+
+  doc.setFont("Sarabun", "normal");
+
+  _thaiFontLoaded = true;
+  (doc as any).__thaiFontLoaded = true;
+}
+
+
+
+
+
+const bahtCurrency = (n: number) =>
+  n.toLocaleString("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: 2 });
 
 /* ===== Types (ตาม controller ของคุณ) ===== */
 interface BookingUIResponse {
@@ -44,10 +85,28 @@ interface BookingRow {
 }
 interface CatRow { id: number; name: string }
 interface RoomRow { id: number; price: number; roomNumber: string; status?: string; type?: string }
-interface UserDTO { id: number; name?: string; lastname?: string; phonenumber?: string }
+interface UserDTO { id: number; name?: string; lastname?: string; phonenumber?: string; email?: string; address?: string }
 
 type PaymentMethod = "cash" | "transfer" | "credit";
 type Charge = { label: string; amount: number };
+
+/* ===== API base ===== */
+const API = "http://localhost:8081";
+
+/* ===== fetch helper ===== */
+async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
+  try {
+    const res = await fetch(url, { cache: "no-store", ...init });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`HTTP ${res.status} @ ${url} :: ${text.slice(0, 200)}`);
+    }
+    return res.json() as Promise<T>;
+  } catch (e) {
+    console.error("Fetch failed:", url, e);
+    throw e;
+  }
+}
 
 /* ===== utils ===== */
 function todayLocalYMD() {
@@ -65,6 +124,132 @@ const nightsBetween = (d1: string, d2: string) => {
   return Math.max(1, diff || 1);
 };
 
+/* ========= สร้าง PDF ใบเสร็จ ========= */
+// === jsPDF helpers (client only) ===
+async function fileToBase64(url: string): Promise<string> {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Load font failed: ${url}`);
+  const buf = await res.arrayBuffer();
+  // to base64
+  let bin = "";
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
+
+
+// === ปุ่มสร้าง PDF ใบเสร็จ ===
+// ---------- PDF generator (เวอร์ชันแก้) ----------
+export async function generateReceiptPDF(opts: {
+  bookingId: number;
+  catName: string;
+  roomLabel: string;
+  checkin: string;
+  checkout: string;
+  guardian: string;
+  phone?: string;
+  rows: { label: string; qty: number; unit: number; amount: number }[];
+  total: number;
+}) {
+  const { jsPDF } = await import("jspdf");
+  const { default: autoTable } = await import("jspdf-autotable");
+
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+  // สำคัญมาก: ต้องโหลดฟอนต์ก่อนเขียนตัวอักษรใด ๆ
+  await ensureThaiFont(doc);
+  doc.setFont("Sarabun", "normal");
+
+  // Header bar
+  doc.setFillColor(28, 63, 148);
+  doc.rect(0, 0, 210, 26, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(28);
+  doc.text("ใบเสร็จรับเงิน", 14, 17);
+
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(11);
+
+  // Left block (From)
+  let y = 36;
+  doc.setFont("Sarabun", "bold");
+  doc.text("จาก (From):", 14, y);
+  doc.setFont("Sarabun", "normal");
+  doc.text(["VilaPark Cat Hotel", "Phone: 02-000-0000", "Email: hello@vilapark.test"], 14, y + 6);
+
+  // Right block (Receipt info)
+  doc.setFont("Sarabun", "bold");
+  doc.text("ข้อมูลใบเสร็จ (Receipt):", 120, y);
+  doc.setFont("Sarabun", "normal");
+  const rightLines = [
+    `เลขที่ใบเสร็จ: R-${opts.bookingId}`,
+    `วันที่ออกเอกสาร: ${new Date().toLocaleDateString("th-TH")}`,
+    `รหัสลูกค้า: B-${opts.bookingId}`,
+  ];
+  rightLines.forEach((t, i) => doc.text(t, 120, y + 6 + i * 5));
+
+  // Customer block
+  y += 30;
+  doc.setFont("Sarabun", "bold");
+  doc.text("ข้อมูลผู้เข้าพัก:", 14, y);
+  doc.setFont("Sarabun", "normal");
+  y += 6;
+  doc.text(
+    [
+      `แมว: ${opts.catName || "-"}`,
+      `ห้อง: ${opts.roomLabel}`,
+      `เช็คอิน: ${opts.checkin}`,
+      `เช็คเอาต์: ${opts.checkout}`,
+      `ผู้ปกครอง: ${opts.guardian || "-"}`,
+      `เบอร์โทร: ${opts.phone || "-"}`,
+    ],
+    14,
+    y
+  );
+
+  // Table
+  const startY = y + 26;
+  const head = [["รายการ (Description)", "จำนวน (Qty)", "ราคา/หน่วย (Unit)", "จำนวนเงิน (Amount)"]];
+  const body = opts.rows.map((r) => [
+    r.label,
+    String(r.qty),
+    r.unit.toLocaleString("th-TH"),
+    r.amount.toLocaleString("th-TH"),
+  ]);
+
+  autoTable(doc, {
+    startY,
+    head,
+    body,
+    styles: { font: "Sarabun", fontStyle: "normal", fontSize: 11 },
+    headStyles: { fillColor: [28, 63, 148], textColor: 255 },
+    columnStyles: {
+      1: { halign: "right" },
+      2: { halign: "right" },
+      3: { halign: "right" },
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  // Totals
+  const finalY = (doc as any).lastAutoTable?.finalY ?? startY;
+  const endY = finalY + 6;
+
+  doc.setFont("Sarabun", "bold");
+  doc.text("รวมทั้งสิ้น (Total):", 130, endY);
+  doc.setFont("Sarabun", "normal");
+  doc.text(opts.total.toLocaleString("th-TH") + " บาท", 196, endY, { align: "right" });
+
+  // Footer notes
+  doc.setFontSize(10);
+  doc.setTextColor(120);
+  doc.text("หมายเหตุ: ขอบคุณที่ใช้บริการ VilaPark  :)", 14, 285);
+
+  doc.save(`receipt_${opts.bookingId}.pdf`);
+}
+
+
 /* ===== page ===== */
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
@@ -78,7 +263,7 @@ export default function CheckoutPage() {
   const [room, setRoom] = useState<RoomRow | null>(null);
   const [user, setUser] = useState<UserDTO | null>(null);
   const [catNameMap, setCatNameMap] = useState<Record<string, string>>({});
-  
+
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">("");
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -92,7 +277,7 @@ export default function CheckoutPage() {
         setLoading(true);
         setError(null);
 
-        // ชั้น 1: today จาก BE (คิดวัน Asia/Bangkok แล้ว)
+        // ชั้น 1: today จาก BE
         let list = await fetchJSON<BookingUIResponse[]>(`${API}/bookings/today`);
 
         // ชั้น 2: fallback -> /bookings/ui แล้วกรอง <= วันนี้ (local)
@@ -106,13 +291,14 @@ export default function CheckoutPage() {
 
         // โหลดชื่อแมวทั้งหมดครั้งเดียว ทำ map id->name
         try {
-        const cats = await fetchJSON<CatRow[]>(`${API}/cats`);
-        const map: Record<string, string> = {};
-        cats.forEach((c) => (map[String(c.id)] = c.name));
-        setCatNameMap(map);
+          const cats = await fetchJSON<CatRow[]>(`${API}/cats`);
+          const map: Record<string, string> = {};
+          cats.forEach((c) => (map[String(c.id)] = c.name));
+          setCatNameMap(map);
         } catch {
-        setCatNameMap({});
+          setCatNameMap({});
         }
+
         if (queryBookingId) setSelectedId(Number(queryBookingId));
         else setSelectedId(list.length ? list[0].id : "");
       } catch (e: any) {
@@ -137,13 +323,11 @@ export default function CheckoutPage() {
         const bData = await fetchJSON<BookingRow>(`${API}/bookings/${selectedId}`);
         setBooking(bData);
 
-        // user
         try {
           const uData = await fetchJSON<UserDTO>(`${API}/users/${bData.userId}`);
           setUser(uData);
         } catch { setUser(null); }
 
-        // cat (ลอง /cats/{id} → ถ้าไม่มี fallback /cats)
         let c: CatRow | null = null;
         try {
           c = await fetchJSON<CatRow>(`${API}/cats/${bData.catId}`);
@@ -153,7 +337,6 @@ export default function CheckoutPage() {
         }
         setCat(c);
 
-        // room (ลอง /rooms/{id} → ถ้าไม่มี fallback /rooms)
         let r: RoomRow | null = null;
         try {
           r = await fetchJSON<RoomRow>(`${API}/rooms/${bData.roomId}`);
@@ -170,27 +353,24 @@ export default function CheckoutPage() {
     })();
   }, [selectedId]);
 
+  // พัก map ชื่อแมว
   useEffect(() => {
-  if (booking && cat?.name) {
-    // map id -> name
-    setCatNameMap(prev => ({
-      ...prev,
-      [String(booking.catId)]: cat.name,
-    }));
-  }
-}, [booking, cat]);
+    if (booking && cat?.name) {
+      setCatNameMap(prev => ({ ...prev, [String(booking.catId)]: cat.name }));
+    }
+  }, [booking, cat]);
 
-// 4. ถ้า candidates ของรายการที่เลือก catId เป็น "-" ให้แทนที่ด้วย catId จริงจาก booking
-useEffect(() => {
-  if (!booking) return;
-  setCandidates(prev =>
-    prev.map(c =>
-      c.id === booking.id && (c.catId === "-" || !c.catId)
-        ? { ...c, catId: String(booking.catId) }
-        : c
-    )
-  );
-}, [booking]);
+  // อัปเดต candidates ให้ catId ถูกต้อง (ถ้าเคยเป็น "-")
+  useEffect(() => {
+    if (!booking) return;
+    setCandidates(prev =>
+      prev.map(c =>
+        c.id === booking.id && (c.catId === "-" || !c.catId)
+          ? { ...c, catId: String(booking.catId) }
+          : c
+      )
+    );
+  }, [booking]);
 
   /* 3) charges */
   const charges: Charge[] = useMemo(() => {
@@ -224,13 +404,23 @@ useEffect(() => {
     }
   };
 
+  // ชื่อผู้ปกครอง (กันซ้ำ)
+  const displayGuardian = (() => {
+    const first = (user?.name ?? '').trim();
+    const last  = (user?.lastname ?? '').trim();
+    if (!first && !last) return '-';
+    if (!last) return first;
+    if (!first) return last;
+    const f = first.replace(/\s+/g, ' ').trim();
+    const l = last.replace(/\s+/g, ' ').trim();
+    if (f === l || f.includes(l)) return f;
+    if (l.includes(f)) return l;
+    return `${f} ${l}`;
+  })();
+
   /* ===== UI ===== */
-  if (loading) {
-    return (<><Navbar /><div className="max-w-4xl mx-auto px-6 py-10 text-center">กำลังโหลดข้อมูล...</div></>);
-  }
-  if (error) {
-    return (<><Navbar /><div className="max-w-4xl mx-auto px-6 py-10 text-center text-red-500">เกิดข้อผิดพลาด: {error}</div></>);
-  }
+  if (loading) return (<><Navbar /><div className="max-w-4xl mx-auto px-6 py-10 text-center">กำลังโหลดข้อมูล...</div></>);
+  if (error)   return (<><Navbar /><div className="max-w-4xl mx-auto px-6 py-10 text-center text-red-500">เกิดข้อผิดพลาด: {error}</div></>);
 
   return (
     <>
@@ -255,19 +445,16 @@ useEffect(() => {
                 >
                   {candidates.length === 0 ? (
                     <option value="">— ไม่มีรายการที่ต้อง Check-out วันนี้ —</option>
-                ) : (
+                  ) : (
                     candidates.map((c) => {
-                    const name =
-                        c.catId && c.catId !== "-"
-                        ? (catNameMap[c.catId] ?? `แมว #${c.catId}`)
-                        : "ไม่ระบุแมว";
-                    return (
+                      const name = c.catId && c.catId !== "-" ? (catNameMap[c.catId] ?? `แมว #${c.catId}`) : "ไม่ระบุแมว";
+                      return (
                         <option key={c.id} value={c.id}>
-                        {name} – ห้อง {c.roomId}
+                          {name} – ห้อง {c.roomId}
                         </option>
-                    );
+                      );
                     })
-                )}
+                  )}
                 </select>
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">▾</span>
               </div>
@@ -298,7 +485,7 @@ useEffect(() => {
                           </div>
                           <div className="flex gap-2">
                             <dt className="w-20 text-gray-500">ผู้ปกครอง:</dt>
-                            <dd className="flex-1">{(user?.name || "") + (user?.lastname ? ` ${user.lastname}` : "") || "-"}</dd>
+                            <dd className="flex-1">{displayGuardian}</dd>
                           </div>
                           <div className="flex gap-2">
                             <dt className="w-20 text-gray-500">เบอร์โทร:</dt>
@@ -354,10 +541,42 @@ useEffect(() => {
                       </div>
 
                       <div className="mt-5 space-y-3">
-                        <button type="button" onClick={() => window.print()} className="w-full rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2">
-                          🖨 พิมพ์ใบเสร็จ
+                    <button
+                        type="button"
+                        onClick={async () => {
+                            if (!booking || !room) return;
+
+                            // เตรียม rows จาก charges ที่คุณคำนวณไว้
+                            const rows = charges.map(c => ({
+                            label: c.label,
+                            qty: 1,                            // ถ้ามีจำนวนคืน เช่น nights ให้ใส่ qty = nights แล้วปรับ unit ให้เป็นราคาต่อคืน
+                            unit: c.amount,                    // หรือ unit = room.price; amount = room.price * nights
+                            amount: c.amount,
+                            }));
+
+                            await generateReceiptPDF({
+                            bookingId: booking!.id,
+                            catName : cat?.name ?? "-",
+                            roomLabel: `${room?.type ?? "Room"} ห้อง ${room?.roomNumber ?? "-"}`,
+                            checkin: booking!.checkinDate,
+                            checkout: booking!.checkoutDate,
+                            guardian: displayGuardian,         // จากหน้าคุณ
+                            phone: user?.phonenumber ?? "-",
+                            rows,
+                            total,
+                            });
+                        }}
+                        className="w-full rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2"
+                        >
+                        🖨 พิมพ์ใบเสร็จ
                         </button>
-                        <button type="button" onClick={onConfirmCheckout} disabled={!selectedId || !paymentMethod} className="w-full rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-medium px-4 py-2">
+
+                        <button
+                          type="button"
+                          onClick={onConfirmCheckout}
+                          disabled={!selectedId || !paymentMethod}
+                          className="w-full rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-medium px-4 py-2"
+                        >
                           ✅ ยืนยันการชำระเงินและ Check-out
                         </button>
                         {actionMsg && <p className="text-sm text-center text-gray-700">{actionMsg}</p>}
