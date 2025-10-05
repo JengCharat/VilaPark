@@ -124,6 +124,26 @@ export default function Manager() {
     }
   };
 
+const handleDeleteEmp = async (id: number) => {
+  if (status === "2") {
+    alert("ลบไม่ได้ ห้องนี้ถูกจองอยู่");
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://127.0.0.1:8081/users/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" }
+    });
+    if (!res.ok) throw new Error(`${res.status}`);
+    alert("ลบสำเร็จ");
+
+    setEmployee(employees.filter(r => r.id !== id));
+    setEditingRoomId(null);
+  } catch (err) {
+    alert(err);
+  }
+};
 const handleDeleteRoom = async (id: number, status: string) => {
   if (status === "2") {
     alert("ลบไม่ได้ ห้องนี้ถูกจองอยู่");
@@ -321,14 +341,21 @@ const handleDeleteRoom = async (id: number, status: string) => {
 
             {employees.map((emp)=>(
 
-              <li key={emp.id} className="p-4 border rounded-md shadow-sm">
+                  <li key={emp.id} className="p-4 border rounded-md shadow-sm">
                         <h1>username:{emp.username}</h1>
                         <h1>lastname:{emp.email}</h1>
                         <h1>name:{emp.name}</h1>
                         <h1>lastname:{emp.lastname}</h1>
                         <h1>phone:{emp.phonenumber}</h1>
                         <h1>adress:{emp.address}</h1>
-                    </li>
+                        <button
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 mb-2"
+                          onClick={() => handleDeleteEmp(emp.id)}
+                        >
+                          Delete
+            </button>
+                  </li>
+
             ))}
 
 
