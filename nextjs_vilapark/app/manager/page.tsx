@@ -40,6 +40,7 @@ export default function Manager() {
   const [username,setUsername] = useState("")
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
+  const [thismonthBooking,setThisMonthBooking] = useState("")
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -68,6 +69,19 @@ export default function Manager() {
     };
     fetchRoomData();
   }, [rooms]);
+
+  useEffect(() => {
+    const fetcThisMonthBooking = async () => {
+      try {
+        const res = await fetch("http://127.0.0.1:8081/bookings/month");
+        if (!res.ok) throw new Error(`${res.status}`);
+        const text = await res.text();
+        setThisMonthBooking(text)
+      } catch (error) {
+      }
+    };
+      fetcThisMonthBooking()
+  }, []);
 
   const handleSubmitCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -471,6 +485,7 @@ const handleDeleteRoom = async (id: number, status: string) => {
 
 
             </ul>
+            <h1 className="text-4xl">this month booking:{thismonthBooking}</h1>
     </>
   );
 }

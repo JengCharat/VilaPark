@@ -11,7 +11,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import java.time.YearMonth;
 @RestController
 @RequestMapping("/bookings")
 @CrossOrigin(origins = "*") // อนุญาตให้ React เข้าถึง API ได้
@@ -127,4 +127,26 @@ public class BookingController {
             long checkoutToday,
             long needUpdate) {
     }
+            @GetMapping("/month")
+            public long getBookingsThisMonth(
+                    @RequestParam(required = false) Integer year,
+                    @RequestParam(required = false) Integer month) {
+
+                LocalDate now = LocalDate.now(ZoneId.of("Asia/Bangkok"));
+                int y = (year != null) ? year : now.getYear();
+                int m = (month != null) ? month : now.getMonthValue();
+
+                YearMonth targetMonth = YearMonth.of(y, m);
+
+                return bookingRepository.findAll().stream()
+                        .filter(b -> {
+                            LocalDate checkin = b.getCheckinDate();
+                            LocalDate checkout = b.getCheckoutDate();
+                            // เช็คว่า checkin หรือ checkout อยู่ในเดือน target
+                            boolean checkinInMonth = checkin != null && YearMonth.from(checkin).equals(targetMonth);
+                            boolean checkoutInMonth = checkout != null && YearMonth.from(checkout).equals(targetMonth);
+                            return checkinInMonth || checkoutInMonth;
+                        })
+                        .count();
+            }
 }
