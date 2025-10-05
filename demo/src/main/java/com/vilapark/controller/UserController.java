@@ -8,7 +8,10 @@ import com.vilapark.dto.UserDTO;
 import com.vilapark.dto.RoleDTO;
 import java.util.List;
 import com.vilapark.dto.UpdateUserDTO;
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
