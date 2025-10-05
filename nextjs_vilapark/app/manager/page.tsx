@@ -17,11 +17,11 @@ interface Employee {
   id: number;
   username: string;
   email: string;
-  name: string 
+  name: string
   lastname: string;
   phonenumber: string;
   address: string;
-  roles:Role[];
+  roles: Role[];
 }
 export default function Manager() {
   const [roomNumber, setRoomNumber] = useState("");
@@ -31,16 +31,16 @@ export default function Manager() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [employees, setEmployee] = useState<Employee[]>([]);
   const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
-    const [editingEmpId, setEditingEmpId] = useState<number | null>(null);
-  const [empId,setEmpId] = useState("")
-  const [EmpFirstName,setEmpFirstName] = useState("")
-  const [EmpLastName,setEmpLasttName] = useState("")
-  const [EmpPhone,setEmpPhone] = useState("")
-  const [EmpAdress,setEmpAdress] = useState("")
-  const [username,setUsername] = useState("")
-  const [email,setEmail] = useState("")
-  const [password,setPassword] = useState("")
-  const [thismonthBooking,setThisMonthBooking] = useState("")
+  const [editingEmpId, setEditingEmpId] = useState<number | null>(null);
+  const [empId, setEmpId] = useState("")
+  const [EmpFirstName, setEmpFirstName] = useState("")
+  const [EmpLastName, setEmpLasttName] = useState("")
+  const [EmpPhone, setEmpPhone] = useState("")
+  const [EmpAdress, setEmpAdress] = useState("")
+  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [thismonthBooking, setThisMonthBooking] = useState("")
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -80,7 +80,7 @@ export default function Manager() {
       } catch (error) {
       }
     };
-      fetcThisMonthBooking()
+    fetcThisMonthBooking()
   }, []);
 
   const handleSubmitCreateRoom = async (e: React.FormEvent) => {
@@ -117,16 +117,16 @@ export default function Manager() {
     setStatus(room.status);
   };
 
-            const handleEditEmpClick = (emp: Employee) => {
-              setEditingEmpId(emp.id); // แสดง form เฉพาะตัวนี้
-              setEmpId(emp.id.toString());
-              setUsername(emp.username);
-              setEmail(emp.email);
-              setEmpFirstName(emp.name);
-              setEmpLasttName(emp.lastname);
-              setEmpPhone(emp.phonenumber);
-              setEmpAdress(emp.address);
-            };
+  const handleEditEmpClick = (emp: Employee) => {
+    setEditingEmpId(emp.id); // แสดง form เฉพาะตัวนี้
+    setEmpId(emp.id.toString());
+    setUsername(emp.username);
+    setEmail(emp.email);
+    setEmpFirstName(emp.name);
+    setEmpLasttName(emp.lastname);
+    setEmpPhone(emp.phonenumber);
+    setEmpAdress(emp.address);
+  };
 
   const handleSubmitEditEmp = async (id: number) => {
     try {
@@ -134,23 +134,23 @@ export default function Manager() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-                username,
-                email,
-                name:EmpFirstName,
-                lastname:EmpLastName,
-                phonenumber:EmpPhone,
-                address:EmpAdress
+          username,
+          email,
+          name: EmpFirstName,
+          lastname: EmpLastName,
+          phonenumber: EmpPhone,
+          address: EmpAdress
         }),
       });
       if (!res.ok) throw new Error(`${res.status}`);
 
-          setEmpId("")
-          setUsername("") 
-          setEmail("")
-          setEmpFirstName("")
-          setEmpLasttName("")
-          setEmpPhone("")
-          setEmpAdress("")
+      setEmpId("")
+      setUsername("")
+      setEmail("")
+      setEmpFirstName("")
+      setEmpLasttName("")
+      setEmpPhone("")
+      setEmpAdress("")
     } catch (err) {
       alert(err);
     }
@@ -176,52 +176,52 @@ export default function Manager() {
       setStatus("");
       alert("success");
       setRooms(rooms.map(r => r.id === id ? updatedRoom : r));
-      setEditingRoomId(null); 
+      setEditingRoomId(null);
     } catch (err) {
       alert(err);
     }
   };
 
-const handleDeleteEmp = async (id: number) => {
-  if (status === "2") {
-    alert("ลบไม่ได้ ห้องนี้ถูกจองอยู่");
-    return;
-  }
+  const handleDeleteEmp = async (id: number) => {
+    if (status === "2") {
+      alert("ลบไม่ได้ ห้องนี้ถูกจองอยู่");
+      return;
+    }
 
-  try {
-    const res = await fetch(`http://127.0.0.1:8081/users/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" }
-    });
-    if (!res.ok) throw new Error(`${res.status}`);
-    alert("ลบสำเร็จ");
+    try {
+      const res = await fetch(`http://127.0.0.1:8081/users/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (!res.ok) throw new Error(`${res.status}`);
+      alert("ลบสำเร็จ");
 
-    setEmployee(employees.filter(r => r.id !== id));
-    setEditingRoomId(null);
-  } catch (err) {
-    alert(err);
-  }
-};
-const handleDeleteRoom = async (id: number, status: string) => {
-  if (status === "2") {
-    alert("ลบไม่ได้ ห้องนี้ถูกจองอยู่");
-    return;
-  }
+      setEmployee(employees.filter(r => r.id !== id));
+      setEditingRoomId(null);
+    } catch (err) {
+      alert(err);
+    }
+  };
+  const handleDeleteRoom = async (id: number, status: string) => {
+    if (status === "2") {
+      alert("ลบไม่ได้ ห้องนี้ถูกจองอยู่");
+      return;
+    }
 
-  try {
-    const res = await fetch(`http://127.0.0.1:8081/rooms/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" }
-    });
-    if (!res.ok) throw new Error(`${res.status}`);
-    alert("ลบสำเร็จ");
+    try {
+      const res = await fetch(`http://127.0.0.1:8081/rooms/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (!res.ok) throw new Error(`${res.status}`);
+      alert("ลบสำเร็จ");
 
-    setRooms(rooms.filter(r => r.id !== id));
-    setEditingRoomId(null);
-  } catch (err) {
-    alert(err);
-  }
-};
+      setRooms(rooms.filter(r => r.id !== id));
+      setEditingRoomId(null);
+    } catch (err) {
+      alert(err);
+    }
+  };
 
   const handleSubmitCreateEmpUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -230,18 +230,18 @@ const handleDeleteRoom = async (id: number, status: string) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-                    username,
-                    email,
-                    password,
-                    role: ["admin"]
+          username,
+          email,
+          password,
+          role: ["admin"]
 
         }),
       });
       if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json();
-           setUsername("") 
-            setEmail("")
-            setPassword("")
+      setUsername("")
+      setEmail("")
+      setPassword("")
       alert("success");
       setRooms([...rooms, data]); // อัพเดตรายการห้องใหม่
     } catch (err) {
@@ -251,241 +251,290 @@ const handleDeleteRoom = async (id: number, status: string) => {
 
   return (
     <>
-      <Navbar />
-      <h1>this is manager page</h1>
+  <Navbar />
 
-      <h1>create room</h1>
-      <form onSubmit={handleSubmitCreateRoom} className="border-b-black mb-4">
-        <input 
-          type="text" 
-          placeholder="roomNumber"
-          value={roomNumber}
-          onChange={(e)=>setRoomNumber(e.target.value)}
-          className="border px-2 py-1 rounded mr-2"
-        />
-        <input type="text"
-          placeholder="type"
-          value={type}
-          onChange={(e)=>setType(e.target.value)}
-          className="border px-2 py-1 rounded mr-2"
-        />
-        <input type="text"
-          placeholder="price"
-          value={price}
-          onChange={(e)=>setPrice(e.target.value)}
-          className="border px-2 py-1 rounded mr-2"
-        />
-        <input type="text"
-          placeholder="status"
-          value={status}
-          onChange={(e)=>setStatus(e.target.value)}
-          className="border px-2 py-1 rounded mr-2"
-        />
-        <button type="submit" className="bg-green-500 text-white px-3 py-1 rounded">create room</button>
-      </form>
+  <div className="max-w-6xl mx-auto px-4 py-8">
+    <h2 className="text-3xl font-bold mb-8 text-gray-800">⚙️ Manager Dashboard</h2>
+<div className="mt-10 mb-10
+ flex justify-center">
+  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-xl p-6 w-full max-w-md transform hover:scale-[1.02] transition-all duration-300">
+    <div className="flex justify-between">
+      <div>
+        <h3 className="text-xl font-semibold mb-1">📅 การจองเดือนนี้</h3>
+        <p className="text-blue-100 text-sm">จำนวนการจองทั้งหมดประจำเดือน</p>
+      </div>
+      <div className="mt-6 text-8xl font-extrabold text-center">
+      {thismonthBooking}
+    </div>
+    </div>
+  </div>
+</div>
 
-      <h1>Room List</h1>
-      <ul className="space-y-4">
-        {rooms.map((room) => (
-          <li key={room.id} className="p-4 border rounded-md shadow-sm">
-            <div className="mb-2 font-semibold">
-              Room {room.roomNumber} - Type: {room.type} - Price: {room.price} - Status: {room.status}
-            </div>
+    <div className="grid lg:grid-cols-2 gap-8">
+      {/* 🏨 Room Management */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h3 className="text-xl font-semibold mb-4 text-blue-700 flex items-center gap-2">
+          🏨 จัดการห้องพัก
+        </h3>
 
-            <button
-              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mb-2"
-              onClick={() => handleEditClick(room)}
-            >
-                EDIT
-            </button>
-
-            <button
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 mb-2"
-              onClick={() => handleDeleteRoom(room.id, room.status)}
-            >
-              Delete
-            </button>
-
-            {editingRoomId === room.id && (
-              <form
-                className="flex flex-col space-y-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSubmitEditRoom(room.id);
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder="Room Number"
-                  value={roomNumber}
-                  className="border px-2 py-1 rounded"
-                  onChange={(e) => setRoomNumber(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Type"
-                  value={type}
-                  className="border px-2 py-1 rounded"
-                  onChange={(e) => setType(e.target.value)}
-                />
-                <input
-                  type="number"
-                  placeholder="Price"
-                  value={price}
-                  className="border px-2 py-1 rounded"
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Status"
-                  value={status}
-                  className="border px-2 py-1 rounded"
-                  onChange={(e) => setStatus(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                >
-                  Save
-                </button>
-              </form>
-            )}
-          </li>
-        ))}
-      </ul>
-
-
-
-
-
-            <h1>Create Employee User</h1>
-            <form 
-              onSubmit={handleSubmitCreateEmpUser} 
-              className="flex flex-col space-y-3 border p-4 rounded-md shadow-sm mb-6 w-80"
-            >
-              <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="border px-2 py-1 rounded"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border px-2 py-1 rounded"
-                required
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="border px-2 py-1 rounded"
-                required
-              />
-              <button
-                type="submit"
-                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-              >
-                Add User
-              </button>
-            </form>
-            <h1>EMP LIST</h1>
-            <ul>
-
-{employees.map((emp) => (
-  <li key={emp.id} className="p-4 border rounded-md shadow-sm mb-4">
-    <h1>username: {emp.username}</h1>
-    <h1>email: {emp.email}</h1>
-    <h1>name: {emp.name}</h1>
-    <h1>lastname: {emp.lastname}</h1>
-    <h1>phone: {emp.phonenumber}</h1>
-    <h1>address: {emp.address}</h1>
-
-    <button
-      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mr-2"
-      onClick={() => handleEditEmpClick(emp)}
-    >
-      Edit
-    </button>
-    <button
-      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-      onClick={() => handleDeleteEmp(emp.id)}
-    >
-      Delete
-    </button>
-
-    {/* แสดง form เฉพาะ employee ที่กำลังแก้ไข */}
-    {editingEmpId === emp.id && (
-      <form
-        className="flex flex-col space-y-2 mt-2 border p-2 rounded"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmitEditEmp(emp.id);
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border px-2 py-1 rounded"
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border px-2 py-1 rounded"
-          required
-        />
-        <input
-          type="text"
-          placeholder="First Name"
-          value={EmpFirstName}
-          onChange={(e) => setEmpFirstName(e.target.value)}
-          className="border px-2 py-1 rounded"
-        />
-        <input
-          type="text"
-          placeholder="Last Name"
-          value={EmpLastName}
-          onChange={(e) => setEmpLasttName(e.target.value)}
-          className="border px-2 py-1 rounded"
-        />
-        <input
-          type="text"
-          placeholder="Phone"
-          value={EmpPhone}
-          onChange={(e) => setEmpPhone(e.target.value)}
-          className="border px-2 py-1 rounded"
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          value={EmpAdress}
-          onChange={(e) => setEmpAdress(e.target.value)}
-          className="border px-2 py-1 rounded"
-        />
-        <button
-          type="submit"
-          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+        {/* Create Room */}
+        <form
+          onSubmit={handleSubmitCreateRoom}
+          className="space-y-3 border border-gray-200 rounded-lg p-4 mb-6"
         >
-          Save
-        </button>
-      </form>
-    )}
-  </li>
-))}
+          <h4 className="font-semibold text-gray-700">➕ เพิ่มห้องใหม่</h4>
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="text"
+              placeholder="หมายเลขห้อง"
+              value={roomNumber}
+              onChange={(e) => setRoomNumber(e.target.value)}
+              className="border px-3 py-2 rounded-lg w-full"
+            />
+            <input
+              type="text"
+              placeholder="ประเภท"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="border px-3 py-2 rounded-lg w-full"
+            />
+            <input
+              type="text"
+              placeholder="ราคา"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="border px-3 py-2 rounded-lg w-full"
+            />
+            <input
+              type="text"
+              placeholder="สถานะ"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="border px-3 py-2 rounded-lg w-full"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            ➕ สร้างห้อง
+          </button>
+        </form>
 
+        {/* Room List */}
+        <h4 className="font-semibold text-gray-700 mb-2">📋 รายการห้องพัก</h4>
+        <ul className="space-y-4">
+          {rooms.map((room) => (
+            <li key={room.id} className="p-4 border rounded-lg shadow-sm bg-gray-50">
+              <div className="mb-2 font-semibold text-gray-700">
+                ห้อง {room.roomNumber} | {room.type} | ฿{room.price} | {room.status}
+              </div>
 
-            </ul>
-            <h1 className="text-4xl">this month booking:{thismonthBooking}</h1>
-    </>
+              <div className="flex gap-2">
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
+                  onClick={() => handleEditClick(room)}
+                >
+                  แก้ไข
+                </button>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+                  onClick={() => handleDeleteRoom(room.id, room.status)}
+                >
+                  ลบ
+                </button>
+              </div>
+
+              {editingRoomId === room.id && (
+                <form
+                  className="flex flex-col space-y-2 mt-3 border-t pt-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmitEditRoom(room.id);
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="หมายเลขห้อง"
+                    value={roomNumber}
+                    className="border px-2 py-1 rounded"
+                    onChange={(e) => setRoomNumber(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    placeholder="ประเภท"
+                    value={type}
+                    className="border px-2 py-1 rounded"
+                    onChange={(e) => setType(e.target.value)}
+                  />
+                  <input
+                    type="number"
+                    placeholder="ราคา"
+                    value={price}
+                    className="border px-2 py-1 rounded"
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    placeholder="สถานะ"
+                    value={status}
+                    className="border px-2 py-1 rounded"
+                    onChange={(e) => setStatus(e.target.value)}
+                  />
+                  <button
+                    type="submit"
+                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                  >
+                    💾 บันทึก
+                  </button>
+                </form>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 👥 Employee Management */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h3 className="text-xl font-semibold mb-4 text-green-700 flex items-center gap-2">
+          👥 จัดการพนักงาน
+        </h3>
+
+        {/* Create Employee */}
+        <form
+          onSubmit={handleSubmitCreateEmpUser}
+          className="flex flex-col space-y-3 border border-gray-200 p-4 rounded-lg shadow-sm mb-6"
+        >
+          <h4 className="font-semibold text-gray-700">➕ เพิ่มพนักงานใหม่</h4>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="border px-3 py-2 rounded-lg"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="border px-3 py-2 rounded-lg"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="border px-3 py-2 rounded-lg"
+            required
+          />
+          <button
+            type="submit"
+            className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+          >
+            ➕ เพิ่มผู้ใช้
+          </button>
+        </form>
+
+        {/* Employee List */}
+        <h4 className="font-semibold text-gray-700 mb-2">📋 รายชื่อพนักงาน</h4>
+        <ul className="space-y-4">
+          {employees.map((emp) => (
+            <li key={emp.id} className="p-4 border rounded-lg shadow-sm bg-gray-50">
+              <div className="font-semibold text-gray-700">
+                {emp.username} ({emp.email})
+              </div>
+              <p className="text-sm text-gray-600">
+                {emp.name} {emp.lastname} • {emp.phonenumber}
+              </p>
+              <p className="text-sm text-gray-600 mb-2">{emp.address}</p>
+
+              <div className="flex gap-2">
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
+                  onClick={() => handleEditEmpClick(emp)}
+                >
+                  แก้ไข
+                </button>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+                  onClick={() => handleDeleteEmp(emp.id)}
+                >
+                  ลบ
+                </button>
+              </div>
+
+              {editingEmpId === emp.id && (
+                <form
+                  className="flex flex-col space-y-2 mt-3 border-t pt-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmitEditEmp(emp.id);
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="border px-2 py-1 rounded"
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="border px-2 py-1 rounded"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="First Name"
+                    value={EmpFirstName}
+                    onChange={(e) => setEmpFirstName(e.target.value)}
+                    className="border px-2 py-1 rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Last Name"
+                    value={EmpLastName}
+                    onChange={(e) => setEmpLasttName(e.target.value)}
+                    className="border px-2 py-1 rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Phone"
+                    value={EmpPhone}
+                    onChange={(e) => setEmpPhone(e.target.value)}
+                    className="border px-2 py-1 rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Address"
+                    value={EmpAdress}
+                    onChange={(e) => setEmpAdress(e.target.value)}
+                    className="border px-2 py-1 rounded"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700"
+                  >
+                    💾 บันทึก
+                  </button>
+                </form>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    
+  </div>
+</>
+
   );
 }
