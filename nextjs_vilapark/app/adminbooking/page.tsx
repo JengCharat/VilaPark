@@ -1,4 +1,5 @@
 "use client";
+import Navbar from "../components/Navbar";
 
 import { useState, useEffect } from "react";
 
@@ -113,6 +114,7 @@ export default function AdminBooking() {
 
     return (
         <div className="min-h-screen bg-white text-black">
+            <Navbar/>
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <h2 className="text-3xl font-bold text-center mb-8">
                     📅 จองห้องพักสำหรับน้องแมว (Admin)
