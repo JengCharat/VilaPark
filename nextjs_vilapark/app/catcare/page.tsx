@@ -76,7 +76,7 @@ const router = useRouter();
       .then((res) => res.json())
       .then((data: RoleDTO[]) => {
         setRoles(data);
-        const admin = data.some((role) => role.name === "ROLE_ADMIN");
+        const admin = data.some((role) => role.name === "ROLE_ADMIN" || role.name === "ROLE_MANAGER");
         setIsAdmin(admin);
 
         // ✅ redirect ถ้าไม่ใช่ admin
