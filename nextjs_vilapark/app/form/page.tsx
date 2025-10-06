@@ -71,9 +71,9 @@ const checkAvailability = async () => {
     checkoutDate: bookingData.checkoutDate,
   };
 
-            alert(payload.roomId)
-            alert(payload.checkinDate)
-            alert(payload.checkoutDate)
+            // alert(payload.roomId)
+            // alert(payload.checkinDate)
+            // alert(payload.checkoutDate)
   try {
     const res = await fetch("http://localhost:8081/bookings/check-availability", {
       method: "POST",
