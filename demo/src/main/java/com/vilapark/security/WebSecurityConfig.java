@@ -105,6 +105,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
             .requestMatchers("/rooms/**").permitAll()
             .requestMatchers("/api/stocks/**").permitAll()
 
+            .requestMatchers("/api/daily-updates/upload").permitAll()
+            .requestMatchers("/uploads/**").permitAll()
+
             .anyRequest().authenticated());
 
     http.authenticationProvider(authenticationProvider());
@@ -114,3 +117,4 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return http.build();
   }
 }
+

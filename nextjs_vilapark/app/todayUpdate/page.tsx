@@ -132,7 +132,7 @@ export default function TodayUpdate() {
                 {update.imageUrls.map((url, idx) => (
                   <img
                     key={idx}
-                    src={url}
+                    src={`http://localhost:8081${url}`}
                     alt={`update-${update.id}-${idx}`}
                     className="w-full h-24 object-cover rounded"
                   />

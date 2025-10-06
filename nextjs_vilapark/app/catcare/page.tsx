@@ -141,10 +141,31 @@ const router = useRouter();
       .catch(console.error);
   }, [selectedCatId, cats]);
 
+  
+  const uploadImages = async (): Promise<string[]> => {
+  const formData = new FormData();
+  images.forEach(img => {
+    if (img.file) formData.append("files", img.file);
+  });
+  if (formData.has("files")) {
+    const res = await fetch("http://localhost:8081/api/daily-updates/upload", {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) throw new Error("Upload failed");
+    return await res.json(); // จะได้ array ของ URLs จริง
+  }
+  return images.map(img => img.url); // ถ้าไม่มีไฟล์ใหม่ ใช้ URL เดิม
+};
+
+  // ฟังก์ชันบันทึก
   // ฟังก์ชันบันทึก
   const handleSave = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!catInfo || !selectedCatId) return;
+  e?.preventDefault();
+  if (!catInfo || !selectedCatId) return;
+
+  try {
+    const uploadedUrls = await uploadImages();
 
     const payload: DailyUpdate = {
       cat: { id: selectedCatId },
@@ -157,31 +178,30 @@ const router = useRouter();
         .filter(([_, v]) => v)
         .map(([k]) => k),
       messageToOwner,
-      imageUrls: images.map((img) => img.url),
+      imageUrls: uploadedUrls,
     };
 
-    try {
-      const res = await fetch("http://localhost:8081/api/daily-updates", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const errorBody = await res.text();
-        console.error("Error Response:", res.status, errorBody);
-        alert(`❌ Error ${res.status}: ${errorBody}`);
-        return;
-      }
-      const data = await res.json();
-      console.log("✅ Saved:", data);
-      alert("บันทึกเรียบร้อย!");
-    } catch (err: any) {
-      console.error("Fetch Exception:", err);
-      alert("เกิดข้อผิดพลาด: " + (err.message || JSON.stringify(err)));
+    const res = await fetch("http://localhost:8081/api/daily-updates", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorBody = await res.text();
+      console.error("Error Response:", res.status, errorBody);
+      alert(`❌ Error ${res.status}: ${errorBody}`);
+      return;
     }
 
-
-  };
+    const data = await res.json();
+    console.log("✅ Saved:", data);
+    alert("บันทึกเรียบร้อย!");
+  } catch (err: any) {
+    console.error("Exception:", err);
+    alert("เกิดข้อผิดพลาด: " + (err.message || JSON.stringify(err)));
+  }
+};
 
   
 
