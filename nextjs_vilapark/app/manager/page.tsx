@@ -41,6 +41,8 @@ export default function Manager() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [thismonthBooking, setThisMonthBooking] = useState("")
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -251,194 +253,151 @@ export default function Manager() {
 
   return (
     <>
-  <Navbar />
-
-  <div className="max-w-6xl mx-auto px-4 py-8">
-    <h2 className="text-3xl font-bold mb-8 text-gray-800">⚙️ Manager Dashboard</h2>
-<div className="mt-10 mb-10
- flex justify-center">
-  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-xl p-6 w-full max-w-md transform hover:scale-[1.02] transition-all duration-300">
-    <div className="flex justify-between">
-      <div>
-        <h3 className="text-xl font-semibold mb-1">📅 การจองเดือนนี้</h3>
-        <p className="text-blue-100 text-sm">จำนวนการจองทั้งหมดประจำเดือน</p>
-      </div>
-      <div className="mt-6 text-8xl font-extrabold text-center">
-      {thismonthBooking}
-    </div>
-    </div>
-  </div>
-</div>
-
-    <div className="grid lg:grid-cols-2 gap-8">
-      {/* 🏨 Room Management */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-4 text-blue-700 flex items-center gap-2">
-          🏨 จัดการห้องพัก
-        </h3>
-
-        {/* Create Room */}
-        <form
-          onSubmit={handleSubmitCreateRoom}
-          className="space-y-3 border border-gray-200 rounded-lg p-4 mb-6"
-        >
-          <h4 className="font-semibold text-gray-700">➕ เพิ่มห้องใหม่</h4>
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              type="text"
-              placeholder="หมายเลขห้อง"
-              value={roomNumber}
-              onChange={(e) => setRoomNumber(e.target.value)}
-              className="border px-3 py-2 rounded-lg w-full"
-            />
-            <input
-              type="text"
-              placeholder="ประเภท"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="border px-3 py-2 rounded-lg w-full"
-            />
-            <input
-              type="text"
-              placeholder="ราคา"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="border px-3 py-2 rounded-lg w-full"
-            />
-            <input
-              type="text"
-              placeholder="สถานะ"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="border px-3 py-2 rounded-lg w-full"
-            />
+      <Navbar />
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <h2 className="text-3xl font-bold mb-8 text-gray-800">⚙️ Manager Dashboard</h2>
+        <div className="mt-10 mb-10flex justify-center">
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-xl p-6 w-full max-w-md transform hover:scale-[1.02] transition-all duration-300">
+            <div className="flex justify-between">
+              <div>
+                <h3 className="text-xl font-semibold mb-1">📅 การจองเดือนนี้</h3>
+                <p className="text-blue-100 text-sm">จำนวนการจองทั้งหมดประจำเดือน</p>
+              </div>
+              <div className="mt-6 text-8xl font-extrabold text-center">
+                {thismonthBooking}
+              </div>
+            </div>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            ➕ สร้างห้อง
-          </button>
-        </form>
+        </div>
 
-        {/* Room List */}
-        <h4 className="font-semibold text-gray-700 mb-2">📋 รายการห้องพัก</h4>
-        <ul className="space-y-4">
-          {rooms.map((room) => (
-            <li key={room.id} className="p-4 border rounded-lg shadow-sm bg-gray-50">
-              <div className="mb-2 font-semibold text-gray-700">
-                ห้อง {room.roomNumber} | {room.type} | ฿{room.price} | {room.status}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* 🏨 Room Management */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-4 text-blue-700 flex items-center gap-2">
+              🏨 จัดการห้องพัก
+            </h3>
+
+            {/* Create Room */}
+            <form
+              onSubmit={handleSubmitCreateRoom}
+              className="space-y-3 border border-gray-200 rounded-lg p-4 mb-6"
+            >
+              <h4 className="font-semibold text-gray-700">➕ เพิ่มห้องใหม่</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  placeholder="หมายเลขห้อง"
+                  value={roomNumber}
+                  onChange={(e) => setRoomNumber(e.target.value)}
+                  className="border px-3 py-2 rounded-lg w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="ประเภท"
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  className="border px-3 py-2 rounded-lg w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="ราคา"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="border px-3 py-2 rounded-lg w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="สถานะ"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="border px-3 py-2 rounded-lg w-full"
+                />
               </div>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+              >
+                ➕ สร้างห้อง
+              </button>
+            </form>
 
-              <div className="flex gap-2">
-                <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
-                  onClick={() => handleEditClick(room)}
+            {/* Room List */}
+            <h4 className="font-semibold text-gray-700 mb-2">📋 รายการห้องพัก</h4>
+            <ul className="space-y-4">
+              {rooms.map((room) => (
+                <li
+                  key={room.id}
+                  className="p-4 border rounded-lg shadow-sm bg-gray-50 flex justify-between items-center"
                 >
-                  แก้ไข
-                </button>
-                <button
-                  className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
-                  onClick={() => handleDeleteRoom(room.id, room.status)}
-                >
-                  ลบ
-                </button>
-              </div>
+                  <div>
+                    <div className="font-semibold text-gray-700">
+                      ห้อง {room.roomNumber} | {room.type} | ฿{room.price} | {room.status}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
+                      onClick={() => setEditingRoom(room)}
+                    >
+                      แก้ไข
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+                      onClick={() => handleDeleteRoom(room.id, room.status)}
+                    >
+                      ลบ
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-              {editingRoomId === room.id && (
-                <form
-                  className="flex flex-col space-y-2 mt-3 border-t pt-3"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSubmitEditRoom(room.id);
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="หมายเลขห้อง"
-                    value={roomNumber}
-                    className="border px-2 py-1 rounded"
-                    onChange={(e) => setRoomNumber(e.target.value)}
-                  />
-                  <input
-                    type="text"
-                    placeholder="ประเภท"
-                    value={type}
-                    className="border px-2 py-1 rounded"
-                    onChange={(e) => setType(e.target.value)}
-                  />
-                  <input
-                    type="number"
-                    placeholder="ราคา"
-                    value={price}
-                    className="border px-2 py-1 rounded"
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
-                  <input
-                    type="text"
-                    placeholder="สถานะ"
-                    value={status}
-                    className="border px-2 py-1 rounded"
-                    onChange={(e) => setStatus(e.target.value)}
-                  />
-                  <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                  >
-                    💾 บันทึก
-                  </button>
-                </form>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+          {/* 👥 Employee Management */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-4 text-green-700 flex items-center gap-2">
+              👥 จัดการพนักงาน
+            </h3>
 
-      {/* 👥 Employee Management */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-4 text-green-700 flex items-center gap-2">
-          👥 จัดการพนักงาน
-        </h3>
+            {/* Create Employee */}
+            <form
+              onSubmit={handleSubmitCreateEmpUser}
+              className="flex flex-col space-y-3 border border-gray-200 p-4 rounded-lg shadow-sm mb-6"
+            >
+              <h4 className="font-semibold text-gray-700">➕ เพิ่มพนักงานใหม่</h4>
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="border px-3 py-2 rounded-lg"
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border px-3 py-2 rounded-lg"
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="border px-3 py-2 rounded-lg"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+              >
+                ➕ เพิ่มผู้ใช้
+              </button>
+            </form>
 
-        {/* Create Employee */}
-        <form
-          onSubmit={handleSubmitCreateEmpUser}
-          className="flex flex-col space-y-3 border border-gray-200 p-4 rounded-lg shadow-sm mb-6"
-        >
-          <h4 className="font-semibold text-gray-700">➕ เพิ่มพนักงานใหม่</h4>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="border px-3 py-2 rounded-lg"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border px-3 py-2 rounded-lg"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="border px-3 py-2 rounded-lg"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-          >
-            ➕ เพิ่มผู้ใช้
-          </button>
-        </form>
-
-        {/* Employee List */}
+            {/* Employee List */}
         <h4 className="font-semibold text-gray-700 mb-2">📋 รายชื่อพนักงาน</h4>
         <ul className="space-y-4">
           {employees.map((emp) => (
@@ -529,12 +488,74 @@ export default function Manager() {
             </li>
           ))}
         </ul>
+          </div>
+        </div>
       </div>
-    </div>
 
-    
-  </div>
-</>
+
+
+      {editingRoom && (
+        <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+            <h3 className="text-lg font-semibold text-blue-700 mb-4">
+              ✏️ แก้ไขห้อง {editingRoom.roomNumber}
+            </h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmitEditRoom(editingRoom.id);
+              }}
+              className="space-y-3"
+            >
+              <input
+                type="text"
+                placeholder="หมายเลขห้อง"
+                value={roomNumber}
+                onChange={(e) => setRoomNumber(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+              />
+              <input
+                type="text"
+                placeholder="ประเภท"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+              />
+              <input
+                type="text"
+                placeholder="ราคา"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+              />
+              <input
+                type="text"
+                placeholder="สถานะ"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+              />
+              <div className="flex justify-end gap-2 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setEditingRoom(null)}
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  💾 บันทึก
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+
 
   );
 }
