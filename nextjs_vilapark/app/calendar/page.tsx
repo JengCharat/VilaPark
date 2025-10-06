@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,7 +9,8 @@ type Booking = {
   id: number;
   roomId: number;
   catName: string;
-  checkinDate: string;
+  roomNumber: string; 
+    checkinDate: string;
   checkoutDate: string;
   status: string;
   createdAt: string;
@@ -29,8 +29,7 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [unavailableRooms, setUnavailableRooms] = useState<number[]>([]);
-
+  const [unavailableRooms, setUnavailableRooms] = useState<string[]>([]);
   useEffect(() => {
     async function fetchData() {
       try {
@@ -48,9 +47,9 @@ export default function BookingsPage() {
 
   const events: CalendarEvent[] = bookings.map((b) => ({
     id: b.id.toString(),
-    title: `ห้อง ${b.roomId} (${b.catName})`,
+    title: `ห้อง ${b.roomNumber}`, 
     start: b.checkinDate,
-    end: addOneDay(b.checkoutDate), 
+    end: addOneDay(b.checkoutDate),
     backgroundColor: "#ef4444",
     borderColor: "#b91c1c",
   }));
@@ -59,7 +58,7 @@ export default function BookingsPage() {
     setSelectedDate(info.dateStr);
     const rooms = bookings
       .filter((b) => isDateBetween(info.dateStr, b.checkinDate, b.checkoutDate))
-      .map((b) => b.roomId);
+      .map((b) => b.roomNumber); 
     setUnavailableRooms(rooms);
   };
 
@@ -92,12 +91,12 @@ export default function BookingsPage() {
               </h2>
               {unavailableRooms.length > 0 ? (
                 <ul className="list-disc list-inside">
-                  {unavailableRooms.map((roomId) => (
-                    <li key={roomId}>ห้อง {roomId}</li>
+                  {unavailableRooms.map((roomNumber) => (
+                    <li key={roomNumber}>ห้อง {roomNumber}</li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-green-600 font-medium">✅ ไม่มีการจองในวันนี้</p>
+                <p className="text-green-600 font-medium"> ไม่มีการจองในวันนี้</p>
               )}
             </div>
           )}
@@ -114,7 +113,6 @@ function isDateBetween(dateStr: string, startStr: string, endStr: string): boole
   return date >= start && date <= end;
 }
 
-// FullCalendar ต้องการ end-exclusive (เพิ่ม 1 วัน)
 function addOneDay(dateStr: string): string {
   const date = new Date(dateStr);
   date.setDate(date.getDate() + 1);
