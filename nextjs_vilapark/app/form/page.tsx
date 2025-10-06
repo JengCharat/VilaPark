@@ -32,7 +32,7 @@ export default function DashboardBookingPage() {
 
 
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 const [isRoomAvailable, setIsRoomAvailable] = useState<boolean | null>(null);
 const checkAvailability = async () => {
   const payload = {
@@ -76,7 +76,7 @@ useEffect(() => {
 
   checkAvailability();
 }, [bookingData.checkinDate, bookingData.checkoutDate, bookingData.roomId]);
-
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
