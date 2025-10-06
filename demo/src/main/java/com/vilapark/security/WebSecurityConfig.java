@@ -22,6 +22,7 @@ import com.vilapark.security.jwt.AuthTokenFilter;
 import com.vilapark.security.services.UserDetailsServiceImpl;
 
 import org.springframework.http.HttpMethod;
+
 @Configuration
 // @EnableWebSecurity
 @EnableMethodSecurity
@@ -31,8 +32,6 @@ import org.springframework.http.HttpMethod;
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   @Autowired
   UserDetailsServiceImpl userDetailsService;
-
-  
 
   @Autowired
   private AuthEntryPointJwt unauthorizedHandler;
@@ -74,39 +73,38 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
-  /* 
-   @Override
-    protected void configure(HttpSecurity http) throws Exception {
-    http.cors().and().csrf().disable()
-    .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-    .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-    .antMatchers("/api/test/**").permitAll()
-    .anyRequest().authenticated();
-    
-    http.addFilterBefore(authenticationJwtTokenFilter(),
-    UsernamePasswordAuthenticationFilter.class);
-    }*/
+  /*
+   * @Override
+   * protected void configure(HttpSecurity http) throws Exception {
+   * http.cors().and().csrf().disable()
+   * .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+   * .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
+   * and()
+   * .authorizeRequests().antMatchers("/api/auth/**").permitAll()
+   * .antMatchers("/api/test/**").permitAll()
+   * .anyRequest().authenticated();
+   * 
+   * http.addFilterBefore(authenticationJwtTokenFilter(),
+   * UsernamePasswordAuthenticationFilter.class);
+   * }
+   */
 
-
-  
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
-        
+
             .requestMatchers("/api/test/**").permitAll()
-             // .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
-             .requestMatchers( "/users/**").permitAll()
+            // .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+            .requestMatchers("/users/**").permitAll()
             .requestMatchers("/cats/**").permitAll()
-            .requestMatchers( "/api/daily-updates","/api/daily-updates/**").permitAll()
-            .requestMatchers( "/bookings/**").permitAll()
+            .requestMatchers("/api/daily-updates", "/api/daily-updates/**").permitAll()
+            .requestMatchers("/bookings/**").permitAll()
             .requestMatchers("/rooms/**").permitAll()
             .requestMatchers("/api/stocks/**").permitAll()
-            
-            
+
             .anyRequest().authenticated());
 
     http.authenticationProvider(authenticationProvider());

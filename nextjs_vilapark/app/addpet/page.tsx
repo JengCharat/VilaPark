@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import "../globals.css";
 
@@ -22,6 +23,7 @@ type User = {
 };
 
 export default function AddPetPage() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [form, setForm] = useState<Cat>({
     name: "",
@@ -48,17 +50,20 @@ export default function AddPetPage() {
     "อเมริกันเคิร์ล",
   ];
 
-    // โหลด userId จาก localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const parsedUser: User = JSON.parse(storedUser);
       setUser(parsedUser);
-      setForm(prev => ({ ...prev, ownerId: parsedUser.id })); // ใส่ ownerId
+      setForm((prev) => ({ ...prev, ownerId: parsedUser.id }));
     }
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
@@ -67,7 +72,7 @@ export default function AddPetPage() {
 
     if (name === "breed" && value === "อื่นๆ") {
       setCustomBreed(true);
-      setForm(prev => ({ ...prev, breed: "" }));
+      setForm((prev) => ({ ...prev, breed: "" }));
     } else if (name === "breed") {
       setCustomBreed(false);
     }
@@ -85,8 +90,11 @@ export default function AddPetPage() {
 
       if (res.ok) {
         setMessage("✅ เพิ่มแมวสำเร็จแล้ว");
-        setForm({ name: "", gender: "", age: "", habit: "", note: "", breed: "" });
-        setCustomBreed(false);
+
+        // ✅ เปลี่ยนให้ไปหน้า /form
+        setTimeout(() => {
+          router.push("/form");
+        }, 500);
       } else {
         setMessage("❌ เกิดข้อผิดพลาดในการเพิ่มแมว");
       }
@@ -129,7 +137,9 @@ export default function AddPetPage() {
               >
                 <option value="">-- เลือกเพศ --</option>
                 {genders.map((g) => (
-                  <option key={g} value={g}>{g}</option>
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
                 ))}
               </select>
             </div>
@@ -170,7 +180,9 @@ export default function AddPetPage() {
                 >
                   <option value="">-- เลือกสายพันธุ์ --</option>
                   {breeds.map((b) => (
-                    <option key={b} value={b}>{b}</option>
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
                   ))}
                   <option value="อื่นๆ">อื่นๆ</option>
                 </select>
