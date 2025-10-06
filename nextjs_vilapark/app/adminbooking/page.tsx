@@ -236,8 +236,161 @@ export default function AdminBooking() {
                         </div>
                     )}
 
-                    {/* ส่วน Step 2 - Step 4 เหมือนเดิม ไม่เปลี่ยน */}
-                    {/* ... */}
+                    {/* Step 2 */}
+                    {step === 2 && (
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4">ข้อมูลน้องแมว</h3>
+                            {cats.length === 0 ? (
+                                <p className="text-gray-500">ไม่มีข้อมูลแมวของผู้ใช้นี้</p>
+                            ) : (
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    {cats.map((cat) => (
+                                        <div
+                                            key={cat.id}
+                                            onClick={() => setSelectedCatId(cat.id)}
+                                            className={`border p-4 rounded-lg cursor-pointer ${selectedCatId === cat.id
+                                                    ? "border-purple-600 bg-purple-50"
+                                                    : "hover:border-purple-400"
+                                                }`}
+                                        >
+                                            <h4 className="font-semibold">{cat.name}</h4>
+                                            <p className="text-sm text-gray-600">
+                                                {cat.breed} | {cat.gender} | {cat.age} เดือน
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <div className="flex space-x-4 mt-6">
+                                <button
+                                    onClick={prevStep}
+                                    className="bg-gray-500 text-white px-6 py-3 rounded-lg"
+                                >
+                                    ย้อนกลับ
+                                </button>
+                                <button
+                                    onClick={nextStep}
+                                    className="bg-purple-600 text-white px-6 py-3 rounded-lg"
+                                >
+                                    ถัดไป
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 3 */}
+                    {step === 3 && user && (
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4">ข้อมูลเจ้าของ</h3>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">ชื่อ</label>
+                                    <input
+                                        type="text"
+                                        value={user.name || ""}
+                                        className="w-full p-3 border rounded-lg bg-gray-100 text-black"
+                                        readOnly
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">นามสกุล</label>
+                                    <input
+                                        type="text"
+                                        value={user.lastname || ""}
+                                        className="w-full p-3 border rounded-lg bg-gray-100 text-black"
+                                        readOnly
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">เบอร์โทรศัพท์</label>
+                                    <input
+                                        type="text"
+                                        value={user.phonenumber || ""}
+                                        className="w-full p-3 border rounded-lg bg-gray-100 text-black"
+                                        readOnly
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">อีเมล</label>
+                                    <input
+                                        type="email"
+                                        value={user.email}
+                                        className="w-full p-3 border rounded-lg bg-gray-100 text-black"
+                                        readOnly
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <label className="block text-sm font-medium mb-2">ที่อยู่</label>
+                                <textarea
+                                    className="w-full p-3 border rounded-lg bg-gray-100 text-black"
+                                    rows={3}
+                                    value={user.address || ""}
+                                    readOnly
+                                />
+                            </div>
+                            <div className="flex space-x-4 mt-6">
+                                <button
+                                    onClick={prevStep}
+                                    className="bg-gray-500 text-white px-6 py-3 rounded-lg"
+                                >
+                                    ย้อนกลับ
+                                </button>
+                                <button
+                                    onClick={nextStep}
+                                    className="bg-purple-600 text-white px-6 py-3 rounded-lg"
+                                >
+                                    ถัดไป
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 4 */}
+                    {step === 4 && (
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4">ยืนยันการจอง</h3>
+                            <div className="bg-gray-50 p-6 rounded-lg text-black">
+                                <h4 className="font-semibold mb-4">สรุปการจอง</h4>
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <span>วันที่เข้าพัก:</span>
+                                        <span>{checkinDate}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>วันที่ออก:</span>
+                                        <span>{checkoutDate}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>ประเภทห้อง:</span>
+                                        <span>{selectedRoom?.name}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>จำนวนวัน:</span>
+                                        <span>{calcDays()}</span>
+                                    </div>
+                                    <div className="flex justify-between font-semibold text-lg border-t pt-2">
+                                        <span>ราคารวม:</span>
+                                        <span>฿{totalPrice}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex space-x-4 mt-6">
+                                <button
+                                    onClick={prevStep}
+                                    className="bg-gray-500 text-white px-6 py-3 rounded-lg"
+                                >
+                                    ย้อนกลับ
+                                </button>
+                                <button
+                                    onClick={confirmBooking}
+                                    className="bg-green-600 text-white px-6 py-3 rounded-lg"
+                                >
+                                    ยืนยันการจอง
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
