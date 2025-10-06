@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { useRouter } from "next/navigation";
 
 interface Room {
   id: number;
@@ -23,7 +24,12 @@ interface Employee {
   address: string;
   roles: Role[];
 }
+type RoleDTO = {
+  id: number;
+  name: string;
+};
 export default function Manager() {
+    const router = useRouter();
   const [roomNumber, setRoomNumber] = useState("");
   const [type, setType] = useState("");
   const [price, setPrice] = useState("");
@@ -44,6 +50,37 @@ export default function Manager() {
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+          const [userId, setUserId] = useState<number | null>(null);
+          const [roles, setRoles] = useState<RoleDTO[]>([]);
+          const [isManager, setIsManager] = useState(false);
+
+              useEffect(() => {
+                const storedUser = localStorage.getItem("user");
+                if (storedUser) {
+                  const userObj = JSON.parse(storedUser);
+                  setUserId(userObj.id);
+                }
+              }, []);
+              useEffect(() => {
+                if (!userId) return;
+
+                fetch(`http://localhost:8081/users/${userId}/roles`)
+                  .then((res) => res.json())
+                  .then((data: RoleDTO[]) => {
+                    setRoles(data);
+                    const manager = data.some((role) => role.name === "ROLE_MANAGER");
+                    setIsManager(manager);
+
+                    if (!manager) {
+                      router.push("/dashboard");
+                    }
+                  })
+                  .catch(console.error);
+              }, [userId, router]);
+///////////////////////////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
     const fetchRoomData = async () => {
       try {
