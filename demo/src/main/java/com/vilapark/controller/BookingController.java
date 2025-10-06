@@ -107,17 +107,17 @@ public class BookingController {
     }
 
     // ---------- Helpers ----------
-    private List<BookingUIResponse> toUI(List<Bookings> list) {
-        return list.stream().map(b -> new BookingUIResponse(
-                b.getId(),
-                b.getRoomId(),
-                b.getCatId() == null ? "-" : b.getCatId().toString(),
-                b.getCheckinDate() == null ? null : b.getCheckinDate().toString(),
-                b.getCheckoutDate() == null ? null : b.getCheckoutDate().toString(),
-                b.getStatus(),
-                b.getCreatedAt() == null ? null : b.getCreatedAt().toString()
-        )).collect(Collectors.toList());
-    }
+    // private List<BookingUIResponse> toUI(List<Bookings> list) {
+    //     return list.stream().map(b -> new BookingUIResponse(
+    //             b.getId(),
+    //             b.getRoomId(),
+    //             b.getCatId() == null ? "-" : b.getCatId().toString(),
+    //             b.getCheckinDate() == null ? null : b.getCheckinDate().toString(),
+    //             b.getCheckoutDate() == null ? null : b.getCheckoutDate().toString(),
+    //             b.getStatus(),
+    //             b.getCreatedAt() == null ? null : b.getCreatedAt().toString()
+    //     )).collect(Collectors.toList());
+    // }
 
     // Payload สำหรับสรุปตัวเลข Dashboard
     public record SummaryResponse(
@@ -149,26 +149,38 @@ public class BookingController {
                         .count();
             }
 
-            // ดึงรายการ Booking ตั้งแต่วันนี้เป็นต้นไป
-            @GetMapping("/future")
-            public List<BookingUIResponse> getFutureBookings(
-                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate) {
+ @GetMapping("/future")
+    public List<BookingUIResponse> getFutureBookings(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate) {
 
-                LocalDate start = (fromDate != null) ? fromDate : LocalDate.now(ZoneId.of("Asia/Bangkok"));
+        LocalDate start = (fromDate != null) ? fromDate : LocalDate.now(ZoneId.of("Asia/Bangkok"));
 
-                var futureBookings = bookingRepository.findAll().stream()
-                        .filter(b -> {
-                            LocalDate checkin = b.getCheckinDate();
-                            LocalDate checkout = b.getCheckoutDate();
-                            boolean futureCheckin = checkin != null && !checkin.isBefore(start);
-                            boolean futureCheckout = checkout != null && !checkout.isBefore(start);
-                            return futureCheckin || futureCheckout;
-                        })
-                        .collect(Collectors.toList());
+        var futureBookings = bookingRepository.findAll().stream()
+                .filter(b -> {
+                    LocalDate checkin = b.getCheckinDate();
+                    LocalDate checkout = b.getCheckoutDate();
+                    boolean futureCheckin = checkin != null && !checkin.isBefore(start);
+                    boolean futureCheckout = checkout != null && !checkout.isBefore(start);
+                    return futureCheckin || futureCheckout;
+                })
+                .collect(Collectors.toList());
 
-                return toUI(futureBookings);
-            }
+        return toUI(futureBookings);
+    }
 
+    // แปลงเป็น DTO สำหรับ UI
+private List<BookingUIResponse> toUI(List<Bookings> list) {
+    return list.stream().map(b -> new BookingUIResponse(
+            b.getId(),
+            b.getRoomId(),
+            b.getRoom() != null ? b.getRoom().getRoomNumber() : "-", //  roomNumber
+            b.getCatId() == null ? "-" : b.getCatId().toString(),
+            b.getCheckinDate() == null ? null : b.getCheckinDate().toString(),
+            b.getCheckoutDate() == null ? null : b.getCheckoutDate().toString(),
+            b.getStatus(),
+            b.getCreatedAt() == null ? null : b.getCreatedAt().toString()
+    )).collect(Collectors.toList());
+}
 // POST: เช็คว่าห้องว่างหรือไม่
 @PostMapping("/check-availability")
 public boolean checkRoomAvailability(@RequestBody Bookings bookingRequest) {

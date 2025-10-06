@@ -4,6 +4,7 @@ public record BookingUIResponse(
         Long id,
         Long roomId,
         String catName,
+         String roomNumber,
         String checkinDate,
         String checkoutDate,
         String status,
