@@ -16,6 +16,18 @@ type UserDTO = {
   address: string;
   roles: RoleDTO[];
 };
+
+import Calendar from "../components/Calendar";
+
+type Booking = {
+  id: number;
+  roomId: number;
+  roomNumber: string;
+  checkinDate: string;
+  checkoutDate: string;
+  status: string;
+  createdAt: string;
+};
 type Cat = { id: number; name: string };
 type Room = { id: number; roomNumber: string; type: string; price: number };
 
@@ -29,6 +41,24 @@ export default function DashboardBookingPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
   const [step, setStep] = useState(stepFromQuery); // ✅ เริ่มที่ step จาก query
+
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch("http://localhost:8081/bookings/future");
+        const data = await res.json();
+        setBookings(data);
+      } catch (e) {
+        console.error("Failed to fetch bookings:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
 
 
@@ -469,8 +499,12 @@ useEffect(() => {
               </div>
             </div>
           )}
+
+      <Calendar bookings={bookings} loading={loading} />
         </div>
+
       </div>
+
     </>
   );
 }
