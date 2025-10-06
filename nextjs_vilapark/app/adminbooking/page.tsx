@@ -30,6 +30,17 @@ type RoomOption = {
     price: number;
 };
 
+import Calendar from "../components/Calendar";
+
+type Booking = {
+  id: number;
+  roomId: number;
+  roomNumber: string;
+  checkinDate: string;
+  checkoutDate: string;
+  status: string;
+  createdAt: string;
+};
 export default function AdminBooking() {
     const [step, setStep] = useState(1);
     const [userId, setUserId] = useState("");
@@ -43,6 +54,17 @@ export default function AdminBooking() {
     // ✅ ดึงห้องจาก DB
     const [rooms, setRooms] = useState<RoomOption[]>([]);
     const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(null);
+
+const [bookings, setBookings] = useState<Booking[]>([]);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  fetch("http://localhost:8081/bookings/future") // endpoint ตาม backend ของคุณ
+    .then((res) => res.json())
+    .then((data) => setBookings(data))
+    .catch((err) => console.error(err))
+    .finally(() => setLoading(false));
+}, []);
 
 
 
@@ -471,6 +493,8 @@ useEffect(() => {
                         </div>
                     )}
                 </div>
+
+                  <Calendar bookings={bookings} loading={loading} />
             </div>
         </div>
     );
