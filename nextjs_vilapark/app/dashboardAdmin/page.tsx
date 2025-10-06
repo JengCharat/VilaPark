@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link'; // ใช้ Link จาก Next.js เพื่อการเปลี่ยนหน้าที่เร็วขึ้น
+import Navbar from '../components/Navbar';
 
 // --- Interfaces for type safety ---
 interface SummaryData {
@@ -92,8 +93,10 @@ export default function DashboardAdmin() {
   };
 
   return (
+    <>
+  <Navbar />
     <div className="bg-gray-50 min-h-screen p-8 font-sans">
-      <h1>test</h1>
+      
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
           <span>🧑‍💼</span>
@@ -169,6 +172,7 @@ export default function DashboardAdmin() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

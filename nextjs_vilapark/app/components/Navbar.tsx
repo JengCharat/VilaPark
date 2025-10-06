@@ -67,10 +67,10 @@ export default function Navbar() {
                     </>
                   )}
 
-                  <button onClick={() => showPage('staff-dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                  <button onClick={() => showPage('dashboardAdmin')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                     พนักงาน
                   </button>
-                  <button onClick={() => showPage('admin-dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                  <button onClick={() => showPage('manager')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                     ผู้จัดการ
                   </button>
 
