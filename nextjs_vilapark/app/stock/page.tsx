@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
 
 // ... (ส่วน type Stock และ LOW_STOCK_THRESHOLD เหมือนเดิม) ...
 type Stock = {
@@ -72,7 +73,10 @@ export default function StockPage() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen space-y-8">
+
+    <div >
+
+            <Navbar/>
         <h1 className="text-3xl font-bold text-gray-800">📦 เช็กสต็อกสินค้า</h1>
         
         {/* เพิ่มเงื่อนไข: ถ้าไม่มีสินค้าเลย ให้แสดงข้อความ */}
