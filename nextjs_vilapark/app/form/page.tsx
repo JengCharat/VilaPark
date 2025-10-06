@@ -30,11 +30,63 @@ export default function DashboardBookingPage() {
   const [loadingCats, setLoadingCats] = useState(true);
   const [step, setStep] = useState(stepFromQuery); // ✅ เริ่มที่ step จาก query
 
+
+
+
+const [isRoomAvailable, setIsRoomAvailable] = useState<boolean | null>(null);
+const checkAvailability = async () => {
+  const payload = {
+    roomId: bookingData.roomId,
+    checkinDate: bookingData.checkinDate,
+    checkoutDate: bookingData.checkoutDate,
+  };
+
+            alert(payload.roomId)
+            alert(payload.checkinDate)
+            alert(payload.checkoutDate)
+  try {
+    const res = await fetch("http://localhost:8081/bookings/check-availability", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const available = await res.json();
+    setIsRoomAvailable(available);
+
+    if (!available) {
+      alert("ห้องนี้ไม่ว่างในช่วงวันที่เลือก");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("ไม่สามารถเช็คสถานะห้องได้");
+  }
+};
+
   const [bookingData, setBookingData] = useState({
     checkinDate: "",
     checkoutDate: "",
     roomId: 0,
   });
+useEffect(() => {
+  if (!bookingData.checkinDate || !bookingData.checkoutDate || bookingData.roomId === 0) {
+    setIsRoomAvailable(null); 
+    return;
+  }
+
+  checkAvailability();
+}, [bookingData.checkinDate, bookingData.checkoutDate, bookingData.roomId]);
+
+
+
+
+
+
+
+
+
+
+
 
   const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
 

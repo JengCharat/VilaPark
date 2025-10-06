@@ -36,8 +36,7 @@ public class BookingController {
     }
 
     // เพิ่ม Booking ใหม่
-    @PostMapping
-    public Bookings createBooking(@RequestBody Bookings booking) {
+    @PostMapping public Bookings createBooking(@RequestBody Bookings booking) {
         return bookingRepository.save(booking);
     }
 
@@ -149,4 +148,48 @@ public class BookingController {
                         })
                         .count();
             }
+
+            // ดึงรายการ Booking ตั้งแต่วันนี้เป็นต้นไป
+            @GetMapping("/future")
+            public List<BookingUIResponse> getFutureBookings(
+                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate) {
+
+                LocalDate start = (fromDate != null) ? fromDate : LocalDate.now(ZoneId.of("Asia/Bangkok"));
+
+                var futureBookings = bookingRepository.findAll().stream()
+                        .filter(b -> {
+                            LocalDate checkin = b.getCheckinDate();
+                            LocalDate checkout = b.getCheckoutDate();
+                            boolean futureCheckin = checkin != null && !checkin.isBefore(start);
+                            boolean futureCheckout = checkout != null && !checkout.isBefore(start);
+                            return futureCheckin || futureCheckout;
+                        })
+                        .collect(Collectors.toList());
+
+                return toUI(futureBookings);
+            }
+
+// POST: เช็คว่าห้องว่างหรือไม่
+@PostMapping("/check-availability")
+public boolean checkRoomAvailability(@RequestBody Bookings bookingRequest) {
+    LocalDate checkin = bookingRequest.getCheckinDate();
+    LocalDate checkout = bookingRequest.getCheckoutDate();
+    Long roomId = bookingRequest.getRoomId();
+
+    if (checkin == null || checkout == null || roomId == null) {
+        throw new RuntimeException("กรุณาระบุข้อมูลให้ครบ (roomId, checkinDate, checkoutDate)");
+    }
+
+    boolean isOverlap = bookingRepository.findAll().stream()
+            .filter(b -> b.getRoomId().equals(roomId))
+            .anyMatch(b -> isDateRangeOverlap(checkin, checkout, b.getCheckinDate(), b.getCheckoutDate()));
+
+    return !isOverlap; // true = ว่าง, false = ไม่ว่าง
+}
+
+// Helper function
+private boolean isDateRangeOverlap(LocalDate start1, LocalDate end1, LocalDate start2, LocalDate end2) {
+    return (start1.isBefore(end2) || start1.equals(end2)) &&
+           (end1.isAfter(start2) || end1.equals(start2));
+}
 }
