@@ -149,4 +149,24 @@ public class BookingController {
                         })
                         .count();
             }
+
+            // ดึงรายการ Booking ตั้งแต่วันนี้เป็นต้นไป
+            @GetMapping("/future")
+            public List<BookingUIResponse> getFutureBookings(
+                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate) {
+
+                LocalDate start = (fromDate != null) ? fromDate : LocalDate.now(ZoneId.of("Asia/Bangkok"));
+
+                var futureBookings = bookingRepository.findAll().stream()
+                        .filter(b -> {
+                            LocalDate checkin = b.getCheckinDate();
+                            LocalDate checkout = b.getCheckoutDate();
+                            boolean futureCheckin = checkin != null && !checkin.isBefore(start);
+                            boolean futureCheckout = checkout != null && !checkout.isBefore(start);
+                            return futureCheckin || futureCheckout;
+                        })
+                        .collect(Collectors.toList());
+
+                return toUI(futureBookings);
+            }
 }
