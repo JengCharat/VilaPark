@@ -163,8 +163,8 @@ export default function DashboardAdmin() {
         <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-bold text-gray-700 mb-4">⚡️ เมนูด่วน</h2>
             <div className="grid grid-cols-2 gap-4">
-                <MenuButton icon="📅" title="จัดการการจอง" href="/bookings" color="hover:bg-blue-50 text-blue-600" />
-                <MenuButton icon="🐈" title="ดูแมว" href="/cats" color="hover:bg-orange-50 text-orange-600" />
+                <MenuButton icon="📅" title="จัดการการจอง" href="/adminbooking" color="hover:bg-blue-50 text-blue-600" />
+                <MenuButton icon="🐈" title="ดูแมว" href="/catcare" color="hover:bg-orange-50 text-orange-600" />
                 {/* ปุ่มที่อัปเดตให้ลิงก์ไปหน้าสต็อก */}
                 <MenuButton icon="📦" title="เช็กสต็อก" href="/stock" color="hover:bg-green-50 text-green-600" />
                 <MenuButton icon="💰" title="คิดเงิน" href="/billing" color="hover:bg-yellow-50 text-yellow-600" />
