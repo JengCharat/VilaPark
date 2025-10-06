@@ -64,6 +64,7 @@ export default function Manager() {
                   setUserId(userObj.id);
                 }
               }, []);
+
               useEffect(() => {
                 if (!userId) return;
 
@@ -121,6 +122,16 @@ export default function Manager() {
     };
     fetcThisMonthBooking()
   }, []);
+
+  useEffect(() => {
+  if (editingRoom) {
+    setRoomNumber(editingRoom.roomNumber);
+    setType(editingRoom.type);
+    setPrice(editingRoom.price?.toString() || "");
+    setStatus(editingRoom.status);
+  }
+}, [editingRoom]);
+
 
   const handleSubmitCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,6 +205,7 @@ export default function Manager() {
       alert(err);
     }
   };
+  
   const handleSubmitEditRoom = async (id: number) => {
     try {
       const res = await fetch(`http://127.0.0.1:8081/rooms/${id}`, {
