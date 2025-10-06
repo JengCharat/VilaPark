@@ -44,6 +44,83 @@ export default function AdminBooking() {
     const [rooms, setRooms] = useState<RoomOption[]>([]);
     const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(null);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+const [isRoomAvailable, setIsRoomAvailable] = useState<boolean | null>(null);
+const checkAvailability = async () => {
+  if (!selectedRoom || !checkinDate || !checkoutDate) return;
+
+  const payload = {
+    roomId: selectedRoom.id,
+    checkinDate,
+    checkoutDate,
+  };
+
+  try {
+    const res = await fetch("http://localhost:8081/bookings/check-availability", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const available = await res.json();
+    setIsRoomAvailable(available);
+
+    if (!available) {
+      alert("ห้องนี้ไม่ว่างในช่วงวันที่เลือก");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("ไม่สามารถเช็คสถานะห้องได้");
+  }
+};
+
+  const [bookingData, setBookingData] = useState({
+    checkinDate: "",
+    checkoutDate: "",
+    roomId: 0,
+  });
+useEffect(() => {
+  if (!selectedRoom || !checkinDate || !checkoutDate) {
+    setIsRoomAvailable(null);
+    return;
+  }
+
+  checkAvailability();
+}, [selectedRoom, checkinDate, checkoutDate]);
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // ✅ โหลดข้อมูลห้องทั้งหมด
     useEffect(() => {
         fetch("http://localhost:8081/rooms")
