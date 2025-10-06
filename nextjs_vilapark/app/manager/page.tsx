@@ -201,6 +201,7 @@ export default function Manager() {
       setEmpLasttName("")
       setEmpPhone("")
       setEmpAdress("")
+      alert("success");
     } catch (err) {
       alert(err);
     }
@@ -293,6 +294,7 @@ export default function Manager() {
       setUsername("")
       setEmail("")
       setPassword("")
+      
       alert("success");
       setRooms([...rooms, data]); // อัพเดตรายการห้องใหม่
     } catch (err) {
@@ -449,94 +451,20 @@ export default function Manager() {
             {/* Employee List */}
         <h4 className="font-semibold text-gray-700 mb-2">📋 รายชื่อพนักงาน</h4>
         <ul className="space-y-4">
-          {employees.map((emp) => (
-            <li key={emp.id} className="p-4 border rounded-lg shadow-sm bg-gray-50">
-              <div className="font-semibold text-gray-700">
-                {emp.username} ({emp.email})
-              </div>
-              <p className="text-sm text-gray-600">
-                {emp.name} {emp.lastname} • {emp.phonenumber}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">{emp.address}</p>
-
-              <div className="flex gap-2">
-                <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
-                  onClick={() => handleEditEmpClick(emp)}
-                >
-                  แก้ไข
-                </button>
-                <button
-                  className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
-                  onClick={() => handleDeleteEmp(emp.id)}
-                >
-                  ลบ
-                </button>
-              </div>
-
-              {editingEmpId === emp.id && (
-                <form
-                  className="flex flex-col space-y-2 mt-3 border-t pt-3"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSubmitEditEmp(emp.id);
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="border px-2 py-1 rounded"
-                    required
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="border px-2 py-1 rounded"
-                    required
-                  />
-                  <input
-                    type="text"
-                    placeholder="First Name"
-                    value={EmpFirstName}
-                    onChange={(e) => setEmpFirstName(e.target.value)}
-                    className="border px-2 py-1 rounded"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Last Name"
-                    value={EmpLastName}
-                    onChange={(e) => setEmpLasttName(e.target.value)}
-                    className="border px-2 py-1 rounded"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Phone"
-                    value={EmpPhone}
-                    onChange={(e) => setEmpPhone(e.target.value)}
-                    className="border px-2 py-1 rounded"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Address"
-                    value={EmpAdress}
-                    onChange={(e) => setEmpAdress(e.target.value)}
-                    className="border px-2 py-1 rounded"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700"
-                  >
-                    💾 บันทึก
-                  </button>
-                </form>
-              )}
-            </li>
-          ))}
-        </ul>
+              {employees.map(emp => (
+                <li key={emp.id} className="p-4 border rounded-lg shadow-sm bg-gray-50 flex justify-between items-center">
+                  <div>
+                    <div className="font-semibold text-gray-700">{emp.username} ({emp.email})</div>
+                    <p className="text-sm text-gray-600">{emp.name} {emp.lastname} • {emp.phonenumber}</p>
+                    <p className="text-sm text-gray-600">{emp.address}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600" onClick={() => handleEditEmpClick(emp)}>แก้ไข</button>
+                    <button className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" onClick={() => handleDeleteEmp(emp.id)}>ลบ</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
@@ -603,6 +531,85 @@ export default function Manager() {
           </div>
         </div>
       )}
+
+
+      {editingEmpId && (
+  <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+      <h3 className="text-lg font-semibold text-blue-700 mb-4">
+        ✏️ แก้ไขข้อมูลพนักงาน
+      </h3>
+      <form
+        className="space-y-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmitEditEmp(editingEmpId);
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="border px-3 py-2 rounded-lg w-full"
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border px-3 py-2 rounded-lg w-full"
+          required
+        />
+        <input
+          type="text"
+          placeholder="First Name"
+          value={EmpFirstName}
+          onChange={(e) => setEmpFirstName(e.target.value)}
+          className="border px-3 py-2 rounded-lg w-full"
+        />
+        <input
+          type="text"
+          placeholder="Last Name"
+          value={EmpLastName}
+          onChange={(e) => setEmpLasttName(e.target.value)}
+          className="border px-3 py-2 rounded-lg w-full"
+        />
+        <input
+          type="text"
+          placeholder="Phone"
+          value={EmpPhone}
+          onChange={(e) => setEmpPhone(e.target.value)}
+          className="border px-3 py-2 rounded-lg w-full"
+        />
+        <input
+          type="text"
+          placeholder="Address"
+          value={EmpAdress}
+          onChange={(e) => setEmpAdress(e.target.value)}
+          className="border px-3 py-2 rounded-lg w-full"
+        />
+        <div className="flex justify-end gap-2 pt-3 border-t">
+          <button
+            type="button"
+            onClick={() => setEditingEmpId(null)}
+            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+          >
+            ยกเลิก
+          </button>
+          <button
+            type="submit"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
+            💾 บันทึก
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
     </>
 
 
