@@ -93,6 +93,39 @@ const checkAvailability = async () => {
   }
 };
 
+
+
+
+const [isRoomAvailable, setIsRoomAvailable] = useState<boolean | null>(null);
+const checkAvailability = async () => {
+  const payload = {
+    roomId: bookingData.roomId,
+    checkinDate: bookingData.checkinDate,
+    checkoutDate: bookingData.checkoutDate,
+  };
+
+            alert(payload.roomId)
+            alert(payload.checkinDate)
+            alert(payload.checkoutDate)
+  try {
+    const res = await fetch("http://localhost:8081/bookings/check-availability", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const available = await res.json();
+    setIsRoomAvailable(available);
+
+    if (!available) {
+      alert("ห้องนี้ไม่ว่างในช่วงวันที่เลือก");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("ไม่สามารถเช็คสถานะห้องได้");
+  }
+};
+
   const [bookingData, setBookingData] = useState({
     checkinDate: "",
     checkoutDate: "",
