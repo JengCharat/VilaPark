@@ -1,16 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+
 export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const router = useRouter();
 
-const showPage = (page) => {
+  useEffect(() => {
+    // อ่าน user จาก localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const showPage = (page) => {
     router.push(`/${page}`);
     setUserMenuOpen(false);
   };
+
   const toggleUserMenu = () => {
     setUserMenuOpen(!userMenuOpen);
   };
+
+  function handleLogout() {
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/signin");
+  }
 
   return (
     <nav className="gradient-bg text-white shadow-lg">
@@ -34,24 +51,37 @@ const showPage = (page) => {
 
             <div className="relative">
               <button onClick={toggleUserMenu} className="nav-item px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                เข้าสู่ระบบ <span className="ml-1">▼</span>
+                {user ? user.username : 'เข้าสู่ระบบ'} <span className="ml-1">▼</span>
               </button>
 
               {userMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  <button onClick={() => showPage('signin')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                    🔑 Sign In
-                  </button>
+                  {!user && (
+                    <>
+                      <button onClick={() => showPage('signin')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                        Sign In
+                      </button>
+                      <button onClick={() => showPage('signup')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                        Sign Up
+                      </button>
+                    </>
+                  )}
 
-                  <button onClick={() => showPage('signup')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                    🔑 Sign Up
-                  </button>
                   <button onClick={() => showPage('staff-dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                    👨‍💼 พนักงาน
+                    พนักงาน
                   </button>
                   <button onClick={() => showPage('admin-dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                    👑 ผู้จัดการ
+                    ผู้จัดการ
                   </button>
+
+                  {user && (
+                    <button
+                      onClick={handleLogout}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                    >
+                      Logout
+                    </button>
+                  )}
                 </div>
               )}
             </div>
