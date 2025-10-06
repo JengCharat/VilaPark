@@ -1,7 +1,8 @@
 package com.vilapark.entity;
 
 import jakarta.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.vilapark.entity.Users;
 @Entity
 @Table(name = "cat")
 public class Cat {
@@ -21,12 +22,14 @@ public class Cat {
     private String note;
 
     private String breed; // ✅ ฟิลด์สายพันธุ์แมวใหม่
-
+    
+    @Column(name = "owner_id", nullable = false)
     private Long ownerId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id",insertable = false, updatable = false)
     @JsonIgnoreProperties({"password","bookings","cats"}) // กันวน
-    private User owner;
+    private Users owner;
     public Cat() {
     } // default constructor สำคัญ
 
