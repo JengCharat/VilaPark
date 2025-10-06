@@ -50,7 +50,6 @@ export default function Manager() {
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     //
           const [userId, setUserId] = useState<number | null>(null);
@@ -64,7 +63,6 @@ export default function Manager() {
                   setUserId(userObj.id);
                 }
               }, []);
-
               useEffect(() => {
                 if (!userId) return;
 
