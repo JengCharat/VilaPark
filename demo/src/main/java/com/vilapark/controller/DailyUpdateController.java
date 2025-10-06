@@ -7,10 +7,17 @@ import com.vilapark.repository.CatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/daily-updates")
@@ -94,4 +101,23 @@ public class DailyUpdateController {
         dailyUpdateRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/upload")
+public ResponseEntity<List<String>> uploadImages(@RequestParam("files") MultipartFile[] files) {
+    List<String> urls = new ArrayList<>();
+    try {
+        for (MultipartFile file : files) {
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path path = Paths.get("uploads/" + fileName);
+            Files.createDirectories(path.getParent()); // สร้าง folder ถ้ายังไม่มี
+            Files.write(path, file.getBytes());
+            urls.add("/uploads/" + fileName);
+        }
+        return ResponseEntity.ok(urls);
+    } catch (IOException e) {
+        e.printStackTrace(); // log error
+        return ResponseEntity.status(500).build();
+    }
+
+}
 }
