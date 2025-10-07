@@ -56,7 +56,7 @@ function BookingFormContent() {
     };
 
     try {
-      const res = await fetch("https://www.vilapark.app/api/bookings/check-availability", {
+      const res = await fetch("https://vilapark.app/api/bookings/check-availability", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -106,7 +106,7 @@ function BookingFormContent() {
     if (!storedUser) router.push("/signin");
     else {
       const basicUser = JSON.parse(storedUser);
-      fetch(`https://www.vilapark.app/api/users/${basicUser.id}`)
+      fetch(`https://vilapark.app/api/users/${basicUser.id}`)
         .then((res) => {
           if (!res.ok) throw new Error("Unauthorized");
           return res.json();
@@ -128,7 +128,7 @@ function BookingFormContent() {
   // ✅ โหลดแมวของ user
   useEffect(() => {
     if (!user) return;
-    fetch(`https://www.vilapark.app/api/cats/owner/${user.id}`)
+    fetch(`https://vilapark.app/api/cats/owner/${user.id}`)
       .then((res) => res.json())
       .then((data) => {
         setCats(data);
@@ -139,7 +139,7 @@ function BookingFormContent() {
 
   // ✅ โหลดห้อง
   useEffect(() => {
-    fetch("https://www.vilapark.app/api/rooms")
+    fetch("https://vilapark.app/api/rooms")
       .then((res) => res.json())
       .then((data) => setRooms(data))
       .catch(() => setRooms([]));
@@ -149,7 +149,7 @@ function BookingFormContent() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("https://www.vilapark.app/api/bookings/future");
+        const res = await fetch("https://vilapark.app/api/bookings/future");
         const data = await res.json();
         setBookings(data);
       } catch (e) {
@@ -213,7 +213,7 @@ function BookingFormContent() {
 
     try {
       // PUT update user
-      const putRes = await fetch(`https://www.vilapark.app/api/users/${user.id}`, {
+      const putRes = await fetch(`https://vilapark.app/api/users/${user.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUser),
@@ -221,7 +221,7 @@ function BookingFormContent() {
       if (!putRes.ok) throw new Error("อัปเดตข้อมูลผู้ใช้ไม่สำเร็จ");
 
       // POST booking
-      const postRes = await fetch("https://www.vilapark.app/api/bookings", {
+      const postRes = await fetch("https://vilapark.app/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingPayload),

@@ -60,7 +60,7 @@ const [bookings, setBookings] = useState<Booking[]>([]);
 const [loading, setLoading] = useState(true);
 
 useEffect(() => {
-  fetch("https://www.vilapark.app/api/bookings/future") // endpoint ตาม backend ของคุณ
+  fetch("https://vilapark.app/api/bookings/future") // endpoint ตาม backend ของคุณ
     .then((res) => res.json())
     .then((data) => setBookings(data))
     .catch((err) => console.error(err))
@@ -92,7 +92,7 @@ const checkAvailability = async () => {
   };
 
   try {
-    const res = await fetch("https://www.vilapark.app/api/bookings/check-availability", {
+    const res = await fetch("https://vilapark.app/api/bookings/check-availability", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -146,7 +146,7 @@ useEffect(() => {
 
     // ✅ โหลดข้อมูลห้องทั้งหมด
     useEffect(() => {
-        fetch("https://www.vilapark.app/api/rooms")
+        fetch("https://vilapark.app/api/rooms")
             .then((res) => res.json())
             .then((data) => setRooms(data))
             .catch(() => setRooms([]));
@@ -155,12 +155,12 @@ useEffect(() => {
     // ✅ โหลดข้อมูล user + cats เมื่อกรอก userId
     useEffect(() => {
         if (!userId) return;
-        fetch(`https://www.vilapark.app/api/users/${userId}`)
+        fetch(`https://vilapark.app/api/users/${userId}`)
             .then((res) => res.json())
             .then((data) => setUser(data))
             .catch(() => setUser(null));
 
-        fetch(`https://www.vilapark.app/api/cats/by-owner/${userId}`)
+        fetch(`https://vilapark.app/api/cats/by-owner/${userId}`)
             .then((res) => res.json())
             .then((data) => setCats(data))
             .catch(() => setCats([]));
@@ -191,7 +191,7 @@ useEffect(() => {
             status: "Pending",
         };
 
-        const res = await fetch("https://www.vilapark.app/api/bookings", {
+        const res = await fetch("https://vilapark.app/api/bookings", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(bookingData),

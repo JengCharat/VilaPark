@@ -19,7 +19,7 @@ export default function SignupPage() {
     setSuccess("");
 
     try {
-      const res = await fetch("https://www.vilapark.app/api/api/auth/signup", {
+      const res = await fetch("https://vilapark.app/api/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

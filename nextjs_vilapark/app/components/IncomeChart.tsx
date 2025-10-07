@@ -35,7 +35,7 @@ export default function MonthlyIncomeChart() {
   useEffect(() => {
     const fetchIncome = async () => {
       try {
-        const res = await fetch("https://www.vilapark.app/api/income");
+        const res = await fetch("https://vilapark.app/api/income");
         const data: Income[] = await res.json();
         setIncomeData(data);
       } catch (err) {

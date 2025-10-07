@@ -69,7 +69,7 @@ export default function Manager() {
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`https://www.vilapark.app/api/users/${userId}/roles`)
+    fetch(`https://vilapark.app/api/users/${userId}/roles`)
       .then((res) => res.json())
       .then((data: RoleDTO[]) => {
         setRoles(data);
@@ -86,7 +86,7 @@ export default function Manager() {
   useEffect(() => {
     const fetchRoomData = async () => {
       try {
-        const res = await fetch("https://www.vilapark.app/api/rooms");
+        const res = await fetch("https://vilapark.app/api/rooms");
         if (!res.ok) throw new Error(`${res.status}`);
         const room_data: Room[] = await res.json();
         setRooms(room_data);
@@ -100,7 +100,7 @@ export default function Manager() {
   useEffect(() => {
     const fetchRoomData = async () => {
       try {
-        const res = await fetch("https://www.vilapark.app/api/users/employee");
+        const res = await fetch("https://vilapark.app/api/users/employee");
         if (!res.ok) throw new Error(`${res.status}`);
         const employee: Employee[] = await res.json();
         setEmployee(employee);
@@ -114,7 +114,7 @@ export default function Manager() {
   useEffect(() => {
     const fetcThisMonthBooking = async () => {
       try {
-        const res = await fetch("https://www.vilapark.app/api/bookings/month");
+        const res = await fetch("https://vilapark.app/api/bookings/month");
         if (!res.ok) throw new Error(`${res.status}`);
         const text = await res.text();
         setThisMonthBooking(text)
@@ -127,7 +127,7 @@ export default function Manager() {
   useEffect(() => {
     const fetcRevenue = async () => {
       try {
-        const res = await fetch("https://www.vilapark.app/api/income/total");
+        const res = await fetch("https://vilapark.app/api/income/total");
         if (!res.ok) throw new Error(`${res.status}`);
         const data = await res.json();
         setRevenue(data.totalRevenue);
@@ -150,7 +150,7 @@ export default function Manager() {
   const handleSubmitCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("https://www.vilapark.app/api/rooms", {
+      const res = await fetch("https://vilapark.app/api/rooms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -194,7 +194,7 @@ export default function Manager() {
 
   const handleSubmitEditEmp = async (id: number) => {
     try {
-      const res = await fetch(`https://www.vilapark.app/api/users/${id}`, {
+      const res = await fetch(`https://vilapark.app/api/users/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -223,7 +223,7 @@ export default function Manager() {
 
   const handleSubmitEditRoom = async (id: number) => {
     try {
-      const res = await fetch(`https://www.vilapark.app/api/rooms/${id}`, {
+      const res = await fetch(`https://vilapark.app/api/rooms/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -255,7 +255,7 @@ export default function Manager() {
     }
 
     try {
-      const res = await fetch(`https://www.vilapark.app/api/users/${id}`, {
+      const res = await fetch(`https://vilapark.app/api/users/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       });
@@ -275,7 +275,7 @@ export default function Manager() {
     }
 
     try {
-      const res = await fetch(`https://www.vilapark.app/api/rooms/${id}`, {
+      const res = await fetch(`https://vilapark.app/api/rooms/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       });
@@ -292,7 +292,7 @@ export default function Manager() {
   const handleSubmitCreateEmpUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("https://www.vilapark.app/api/api/auth/signup", {
+      const res = await fetch("https://vilapark.app/api/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

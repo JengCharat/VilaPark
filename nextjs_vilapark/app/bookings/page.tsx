@@ -18,7 +18,7 @@ export default function Bookings() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://www.vilapark.app/api/api/bookings")
+    fetch("https://vilapark.app/api/api/bookings")
       .then((res) => res.json())
       .then((data: Booking[]) => {
         setBookings(data);

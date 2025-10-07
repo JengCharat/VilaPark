@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user) {
-      fetch("https://www.vilapark.app/api/cats")
+      fetch("https://vilapark.app/api/cats")
         .then((res) => res.json())
         .then((data: Cat[]) => {
           setCats(data);
