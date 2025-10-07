@@ -47,6 +47,7 @@ export default function Manager() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [thismonthBooking, setThisMonthBooking] = useState("")
+  const [revenue, setRevenue] = useState("")
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
 
@@ -119,6 +120,19 @@ export default function Manager() {
       }
     };
     fetcThisMonthBooking()
+  }, []);
+
+  useEffect(() => {
+    const fetcRevenue = async () => {
+      try {
+        const res = await fetch("http://127.0.0.1:8081/income/total");
+        if (!res.ok) throw new Error(`${res.status}`);
+         const data = await res.json();   
+                setRevenue(data.totalRevenue); 
+      } catch (error) {
+      }
+    };
+    fetcRevenue()
   }, []);
 
   useEffect(() => {
@@ -314,6 +328,15 @@ export default function Manager() {
               </div>
               <div className="mt-6 text-8xl font-extrabold text-center">
                 {thismonthBooking}
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <div>
+                <h3 className="text-xl font-semibold mb-1">รายได้ทั้งหมด</h3>
+                {/* <p className="text-blue-100 text-sm">จำนวนการจองทั้งหมดประจำเดือน</p> */}
+              </div>
+              <div className="mt-6 text-8xl font-extrabold text-center">
+                                {revenue}
               </div>
             </div>
           </div>
