@@ -52,6 +52,8 @@ export default function Manager() {
   const [revenue, setRevenue] = useState("")
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
+const [isAdmin, setIsAdmin] = useState(false);
+
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -59,6 +61,23 @@ export default function Manager() {
   const [roles, setRoles] = useState<RoleDTO[]>([]);
   const [isManager, setIsManager] = useState(false);
 
+ useEffect(() => {
+    if (!userId) return;
+
+    fetch(`https://vilapark.app/api/users/${userId}/roles`)
+      .then((res) => res.json())
+      .then((data: RoleDTO[]) => {
+        setRoles(data);
+        const admin = data.some((role) => role.name === "ROLE_MANAGER");
+        setIsAdmin(admin);
+
+        // ✅ redirect ถ้าไม่ใช่ admin
+        if (!admin) {
+          router.push("/dashboard");
+        }
+      })
+      .catch(console.error);
+  }, [userId, router]);
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -66,22 +85,6 @@ export default function Manager() {
       setUserId(userObj.id);
     }
   }, []);
-  useEffect(() => {
-    if (!userId) return;
-
-    fetch(`https://vilapark.app/api/users/${userId}/roles`)
-      .then((res) => res.json())
-      .then((data: RoleDTO[]) => {
-        setRoles(data);
-        const manager = data.some((role) => role.name === "ROLE_MANAGER");
-        setIsManager(manager);
-
-        if (!manager) {
-          router.push("/dashboard");
-        }
-      })
-      .catch(console.error);
-  }, [userId, router]);
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
     const fetchRoomData = async () => {

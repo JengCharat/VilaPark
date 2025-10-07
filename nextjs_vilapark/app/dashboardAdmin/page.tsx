@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link'; // ใช้ Link จาก Next.js เพื่อการเปลี่ยนหน้าที่เร็วขึ้น
 import Navbar from '../components/Navbar';
-
+import router from "next/router";
+import { useRouter } from "next/navigation";
 // --- Interfaces for type safety ---
 interface SummaryData {
   stayingToday: number;
@@ -21,6 +22,13 @@ interface BookingTask {
   status: string;
 }
 
+type RoleDTO = {
+  id: number;
+  name: string;
+};
+
+
+
 // --- API Base URL (แก้ที่นี่ที่เดียวถ้ามีการเปลี่ยนแปลง) ---
 const API_BASE_URL = 'https://vilapark.app/api/bookings';
 
@@ -28,8 +36,29 @@ export default function DashboardAdmin() {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [tasks, setTasks] = useState<BookingTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+const [roles, setRoles] = useState<RoleDTO[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+const router = useRouter();
 
+useEffect(() => {
+    if (!userId) return;
+
+    fetch(`https://vilapark.app/api/users/${userId}/roles`)
+      .then((res) => res.json())
+      .then((data: RoleDTO[]) => {
+        setRoles(data);
+        const admin = data.some((role) => role.name === "ROLE_ADMIN" || role.name === "ROLE_MANAGER" );
+        setIsAdmin(admin);
+
+        // ✅ redirect ถ้าไม่ใช่ admin
+        if (!admin) {
+          router.push("/dashboard");
+        }
+      })
+      .catch(console.error);
+  }, [userId, router]);
   useEffect(() => {
     const fetchData = async () => {
       try {

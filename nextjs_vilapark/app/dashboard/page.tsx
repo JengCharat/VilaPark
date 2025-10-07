@@ -75,7 +75,7 @@ export default function DashboardPage() {
 
             <div className="relative mt-10">
           {/* Background ครึ่งล่าง */}
-<div className="absolute top-1/15 left-0 w-full h-14/15 bg-[#4691D3] -z-10"></div>
+<div className="absolute top-1/15 left-0 w-full h-14/15  -z-10"></div>
 
           {/* Section Feature */}
           <div className="max-w-7xl mx-auto px-6 py-16 relative z-10">
