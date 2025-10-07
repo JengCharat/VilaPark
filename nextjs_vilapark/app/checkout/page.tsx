@@ -489,14 +489,14 @@ const onConfirmCheckout = async () => {
       <div className="bg-gray-50 min-h-screen">
         <div className="max-w-4xl mx-auto px-6 pt-10">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 flex items-center gap-2">
-            <span>💰</span> คิดเงิน / Check-out
+             คิดเงิน / Check-out
           </h1>
         </div>
 
         <main className="max-w-4xl mx-auto px-6 py-6">
           <div className="bg-white rounded-lg shadow-md border border-gray-100">
             {/* เลือก booking */}
-            <div className="p-5 border-b">
+            <div className="p-5">
               <label className="block text-sm text-gray-600 mb-2">เลือกลูกค้าที่ต้องการ Check-out</label>
               <div className="relative">
                 <select
@@ -627,18 +627,18 @@ const onConfirmCheckout = async () => {
                             total,
                             });
                         }}
-                        className="w-full rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2"
+                        className="w-full rounded-md bg-[#4691D3] hover:bg-blue-500 text-white font-medium px-4 py-2"
                         >
-                        🖨 พิมพ์ใบเสร็จ
+                         พิมพ์ใบเสร็จ
                         </button>
 
                         <button
                           type="button"
                           onClick={onConfirmCheckout}
                           disabled={!selectedId || !paymentMethod}
-                          className="w-full rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-medium px-4 py-2"
+                          className="w-full rounded-md bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white font-medium px-4 py-2"
                         >
-                          ✅ ยืนยันการชำระเงินและ Check-out
+                           ยืนยันการชำระเงินและ Check-out
                         </button>
                         {actionMsg && <p className="text-sm text-center text-gray-700">{actionMsg}</p>}
                       </div>

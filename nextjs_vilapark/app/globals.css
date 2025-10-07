@@ -53,3 +53,40 @@ body {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ปุ่ม toolbar ปกติทั้งหมด */
+.fc .fc-toolbar .fc-button {
+  background-color: #e5e7eb; /* เทาอ่อน */
+  color: #111827; /* ตัวอักษรสีเข้ม */
+  border-radius: 0.5rem;
+  border: none;
+}
+
+/* hover ปุ่ม Month/Week */
+.fc .fc-toolbar .fc-button:hover {
+  background-color: #d1d5db; /* เทาเข้มขึ้นเล็กน้อย */
+}
+
+/* ปุ่ม Today */
+.fc .fc-toolbar .fc-today-button {
+  background-color: #6b7280; /* เทาเข้ม */
+  color: white;
+}
+
+/* hover ปุ่ม Today */
+.fc .fc-toolbar .fc-today-button:hover {
+  background-color: #52525b;
+}
+
+/* ปุ่ม Today active (กดเลือก) */
+.fc .fc-toolbar .fc-today-button.fc-button-active {
+  background-color: #225EC4; /* น้ำเงิน */
+  color: white;
+}
+
+/* Month/Week active */
+.fc .fc-toolbar .fc-button:not(.fc-today-button).fc-button-active {
+  background-color: #9ca3af; /* เทาเข้มขึ้นเวลากดเลือก */
+  color: white;
+}
+

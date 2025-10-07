@@ -38,8 +38,8 @@ export default function Calendar({ bookings, loading }: CalendarProps) {
     title: `ห้อง ${b.roomNumber}`,
     start: b.checkinDate,
     end: addOneDay(b.checkoutDate),
-    backgroundColor: "#ef4444",
-    borderColor: "#b91c1c",
+    backgroundColor: "#4195cc",
+    borderColor: "#4195cc",
   }));
 
   const handleDateClick = (info: any) => {
@@ -73,16 +73,16 @@ export default function Calendar({ bookings, loading }: CalendarProps) {
       {selectedDate && (
         <div className="mt-6 bg-gray-100 p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-2">
-            🗓️ ห้องที่ไม่ว่างวันที่ {selectedDate}
+            ห้องที่ไม่ว่างวันที่ {selectedDate}
           </h2>
           {unavailableRooms.length > 0 ? (
-            <ul className="list-disc list-inside">
+            <ul className="list-disc list-inside ml-16 ">
               {unavailableRooms.map((roomNumber) => (
                 <li key={roomNumber}>ห้อง {roomNumber}</li>
               ))}
             </ul>
           ) : (
-            <p className="text-green-600 font-medium"> ไม่มีการจองในวันนี้</p>
+            <p className="text-green-600 font-medium ml-16 "> ไม่มีการจองในวันนี้</p>
           )}
         </div>
       )}

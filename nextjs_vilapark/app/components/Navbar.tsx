@@ -30,28 +30,32 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="gradient-bg text-white shadow-lg">
+    <nav className="bg-[#4691D3] text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
-            <span className="text-2xl">🐱</span>
-            <span className="text-xl font-bold">VilaPark</span>
+            <img
+              src="/Logovilapark4.png"
+              alt="VilaPark Logo"
+              className="w-40 h-auto object-cover"
+            />
+
           </div>
 
           <div className="hidden md:flex space-x-4">
-            <button onClick={() => showPage('dashboard')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('dashboard')} className="nav-item px-3 py-2 rounded-md text-l font-medium">
               หน้าแรก
             </button>
-            <button onClick={() => showPage('form')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('form')} className="nav-item px-3 py-2 rounded-md text-l font-medium">
               จองห้องพัก
             </button>
-            <button onClick={() => showPage('todayUpdate')} className="nav-item px-3 py-2 rounded-md text-sm font-medium">
+            <button onClick={() => showPage('todayUpdate')} className="nav-item px-3 py-2 rounded-md text-l font-medium">
               แดชบอร์ดลูกค้า
             </button>
 
             <div className="relative">
-              <button onClick={toggleUserMenu} className="nav-item px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                {user ? user.username : 'เข้าสู่ระบบ'} <span className="ml-1">▼</span>
+              <button onClick={toggleUserMenu} className="nav-item px-3 py-2 rounded-md text-l font-medium flex items-center">
+                {user ? user.username : 'เข้าสู่ระบบ'} <span className="m-1">▼</span>
               </button>
 
               {userMenuOpen && (

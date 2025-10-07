@@ -60,35 +60,47 @@ export default function DashboardPage() {
       <Navbar />
 
       <div id="home" className="page">
-        <div className="gradient-bg text-white py-20">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <h1 className="text-5xl font-bold mb-6">ยินดีต้อนรับ {user.username}</h1>
-            <p className="text-xl mb-8">โรงแรมแมวหรูที่ดูแลน้องแมวของคุณด้วยความรักและใส่ใจ</p>
+        <div className=" text-white mt-22 ">
+          <div className="max-w-7xl mx-auto px-4 text-center ">
+            <h1 className="text-5xl text-[#4691D3] font-bold mb-6">ยินดีต้อนรับ {user.username}</h1>
+            <p className="text-xl text-[#225ec4] mb-8">โรงแรมแมวหรูที่ดูแลน้องแมวของคุณด้วยความรักและใส่ใจ</p>
             <button
               onClick={goToBookingPage}
-              className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300"
+              className="card-hover bg-[#4691D3] hover:bg-[#225ec4] text-white px-8 py-4 rounded-full text-lg font-semibold  transition duration-300"
             >
-              จองห้องพักเลย! 🏨
+              จองห้องพักเลย !
             </button>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
-              <div className="text-4xl mb-4">🏨</div>
-              <h3 className="text-xl font-semibold mb-2">ห้องพักหรู</h3>
-              <p className="text-gray-600">ห้องพักสะอาด ปลอดภัย พร้อมของเล่นและที่นอนนุ่มสบาย</p>
-            </div>
-            <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
-              <div className="text-4xl mb-4">📸</div>
-              <h3 className="text-xl font-semibold mb-2">อัปเดตประจำวัน</h3>
-              <p className="text-gray-600">รับรูปภาพและข้อความอัปเดตน้องแมวของคุณทุกวัน</p>
-            </div>
-            <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
-              <div className="text-4xl mb-4">💝</div>
-              <h3 className="text-xl font-semibold mb-2">ดูแลด้วยใจ</h3>
-              <p className="text-gray-600">พนักงานมืออาชีพที่รักแมวและดูแลด้วยความใส่ใจ</p>
+            <div className="relative mt-10">
+          {/* Background ครึ่งล่าง */}
+<div className="absolute top-1/15 left-0 w-full h-14/15 bg-[#4691D3] -z-10"></div>
+
+          {/* Section Feature */}
+          <div className="max-w-7xl mx-auto px-6 py-16 relative z-10">
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                <div className="text-4xl mb-4">🏨</div>
+                <h3 className="text-xl font-semibold mb-2">ห้องพักหรู</h3>
+                <p className="text-gray-600">
+                  ห้องพักสะอาด ปลอดภัย พร้อมของเล่นและที่นอนนุ่มสบาย
+                </p>
+              </div>
+              <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                <div className="text-4xl mb-4">📸</div>
+                <h3 className="text-xl font-semibold mb-2">อัปเดตประจำวัน</h3>
+                <p className="text-gray-600">
+                  รับรูปภาพและข้อความอัปเดตน้องแมวของคุณทุกวัน
+                </p>
+              </div>
+              <div className="card-hover bg-white p-6 rounded-lg shadow-lg text-center">
+                <div className="text-4xl mb-4">💝</div>
+                <h3 className="text-xl font-semibold mb-2">ดูแลด้วยใจ</h3>
+                <p className="text-gray-600">
+                  พนักงานมืออาชีพที่รักแมวและดูแลด้วยความใส่ใจ
+                </p>
+              </div>
             </div>
           </div>
         </div>

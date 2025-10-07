@@ -99,36 +99,26 @@ export default function DashboardAdmin() {
       
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-          <span>🧑‍💼</span>
           แดชบอร์ดพนักงาน
         </h1>
       </header>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <StatCard
           title="แมวที่พักอยู่ตอนนี้"
           value={summary?.stayingToday ?? 0}
-          icon="👥"
-          color="text-white bg-blue-500"
+          color="text-white bg-[#4195cc] "
         />
         <StatCard
           title="Check-in วันนี้"
           value={summary?.checkinToday ?? 0}
-          icon="➡️"
-          color="text-white bg-green-500"
+          color="text-white bg-[#63bac4]"
         />
         <StatCard
           title="Check-out วันนี้"
           value={summary?.checkoutToday ?? 0}
-          icon="⬅️"
-          color="text-white bg-orange-500"
-        />
-        <StatCard
-          title="ห้องที่ต้องอัปเดต"
-          value={summary?.needUpdate ?? 0}
-          icon="⚠️"
-          color="text-white bg-purple-500"
+          color="text-white bg-[#9d9aef]"
         />
       </div>
 
@@ -136,7 +126,7 @@ export default function DashboardAdmin() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Today's Tasks */}
         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-gray-700 mb-4">🗓️ งานวันนี้</h2>
+          <h2 className="text-xl font-bold text-gray-700 mb-4">งานวันนี้</h2>
           <div className="space-y-4">
             {tasks.length > 0 ? (
                 tasks.map((task) => {
@@ -161,7 +151,7 @@ export default function DashboardAdmin() {
 
         {/* Quick Menu */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-700 mb-4">⚡️ เมนูด่วน</h2>
+            <h2 className="text-xl font-bold text-gray-700 mb-4">เมนูด่วน</h2>
             <div className="grid grid-cols-2 gap-4">
                 <MenuButton icon="📅" title="จัดการการจอง" href="/adminbooking" color="hover:bg-blue-50 text-blue-600" />
                 <MenuButton icon="🐈" title="ดูแมว" href="/catcare" color="hover:bg-orange-50 text-orange-600" />
@@ -181,21 +171,16 @@ export default function DashboardAdmin() {
 interface StatCardProps {
   title: string;
   value: number;
-  icon: string; // Changed to string for emoji
+  
   color: string;
 }
 
-function StatCard({ title, value, icon, color }: StatCardProps) {
+function StatCard({ title, value, color }: StatCardProps) {
   return (
-    <div className={`p-6 rounded-lg shadow-lg flex items-center justify-between ${color}`}>
-      <div>
-        <p className="text-lg font-medium opacity-90">{title}</p>
-        <p className="text-4xl font-bold">{value}</p>
+    <div className={`px-6 rounded-lg shadow-lg flex justify-between items-center ${color}`}>
+        <p className="text-lg font-medium opacity-90 mb-20">{title}</p>
+        <p className="text-8xl font-bold mt-10 ">{value}</p>
       </div>
-      <div className="text-4xl opacity-80">
-        {icon}
-      </div>
-    </div>
   );
 }
 

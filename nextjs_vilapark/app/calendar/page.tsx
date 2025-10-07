@@ -34,7 +34,7 @@ export default function BookingsPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">📅 ปฏิทินการจองห้อง</h1>
+      <h1 className="text-2xl font-bold mb-4">ปฏิทินการจองห้อง</h1>
       <Calendar bookings={bookings} loading={loading} />
     </div>
   );

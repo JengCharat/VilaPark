@@ -212,45 +212,49 @@ useEffect(() => {
     };
 
     return (
+        <>
         <div className="min-h-screen bg-white text-black">
             <Navbar/>
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <h2 className="text-3xl font-bold text-center mb-8">
-                    📅 จองห้องพักสำหรับน้องแมว (Admin)
+                    จองห้องพักสำหรับน้องแมว (Admin)
                 </h2>
 
                 <div className="bg-white rounded-lg shadow-lg p-8">
                     {/* Step Indicator */}
-                    <div className="mb-8">
-                        <div className="flex justify-between items-center mb-4">
-                            <div className="flex space-x-4">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div
-                                        key={i}
-                                        className={`step-indicator ${step === i
-                                                ? "text-purple-600 font-semibold"
-                                                : "text-gray-400"
-                                            }`}
-                                    >
-                                        {i}.{" "}
-                                        {i === 1
-                                            ? "เลือกวันและห้อง"
-                                            : i === 2
-                                                ? "ข้อมูลแมว"
-                                                : i === 3
-                                                    ? "ข้อมูลติดต่อ"
-                                                    : "ยืนยันการจอง"}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                                className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${step * 25}%` }}
-                            ></div>
-                        </div>
-                    </div>
+                    <div className="mb-10">
+  {/* ส่วนแสดง Step */}
+  <div className="flex justify-between text-sm font-medium mb-3">
+    {[1, 2, 3, 4].map((i) => (
+      <div
+        key={i}
+        className={`step-indicator transition-colors duration-300 ${
+          step === i
+            ? "text-[#225EC4] font-semibold"
+            : "text-gray-400"
+        }`}
+      >
+        {i}.{" "}
+        {i === 1
+          ? "เลือกวันและห้อง"
+          : i === 2
+          ? "ข้อมูลแมว"
+          : i === 3
+          ? "ข้อมูลติดต่อ"
+          : "ยืนยันการจอง"}
+      </div>
+    ))}
+  </div>
+
+  {/* Progress Bar */}
+  <div className="relative w-full bg-gray-200 rounded-full h-2">
+    <div
+      className="absolute top-0 left-0 bg-[#225EC4] h-2 rounded-full transition-all duration-500 ease-in-out"
+      style={{ width: `${step * 25}%` }}
+    ></div>
+  </div>
+</div>
+
 
                     {/* Step 1 */}
                     {step === 1 && (
@@ -313,8 +317,8 @@ useEffect(() => {
                                             <div
                                                 key={room.id}
                                                 onClick={() => setSelectedRoom(room)}
-                                                className={`border rounded-lg p-4 cursor-pointer hover:border-purple-500 ${selectedRoom?.id === room.id
-                                                        ? "border-purple-600 bg-purple-50"
+                                                className={`border rounded-lg p-4 cursor-pointer hover:border-[#225EC4] ${selectedRoom?.id === room.id
+                                                        ? "border-[#225EC4]"
                                                         : ""
                                                     }`}
                                             >
@@ -327,13 +331,15 @@ useEffect(() => {
                                     )}
                                 </div>
                             </div>
-
-                            <button
+<div className="flex justify-end mt-6" >
+    <button
                                 onClick={nextStep}
-                                className="mt-6 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+                  className="mt-6 bg-[#225EC4] text-white px-6 py-3 rounded-lg hover:bg-[#063d8c]"
                             >
                                 ถัดไป
                             </button>
+</div>
+                            
                         </div>
                     )}
 
@@ -362,16 +368,16 @@ useEffect(() => {
                                     ))}
                                 </div>
                             )}
-                            <div className="flex space-x-4 mt-6">
+                            <div className="flex justify-between mt-6">
                                 <button
                                     onClick={prevStep}
-                                    className="bg-gray-500 text-white px-6 py-3 rounded-lg"
+                                    className="bg-gray-500 hover:bg-gray-400 text-white px-6 py-3 rounded-lg"
                                 >
                                     ย้อนกลับ
                                 </button>
                                 <button
                                     onClick={nextStep}
-                                    className="bg-purple-600 text-white px-6 py-3 rounded-lg"
+                                    className="bg-[#225EC4] hover:bg-[#063d8c] text-white px-6 py-3 rounded-lg"
                                 >
                                     ถัดไป
                                 </button>
@@ -430,16 +436,16 @@ useEffect(() => {
                                     readOnly
                                 />
                             </div>
-                            <div className="flex space-x-4 mt-6">
+                            <div className="flex justify-between mt-6">
                                 <button
                                     onClick={prevStep}
-                                    className="bg-gray-500 text-white px-6 py-3 rounded-lg"
+                                    className="bg-gray-500 hover:bg-gray-400 text-white px-6 py-3 rounded-lg"
                                 >
                                     ย้อนกลับ
                                 </button>
                                 <button
                                     onClick={nextStep}
-                                    className="bg-purple-600 text-white px-6 py-3 rounded-lg"
+                                    className="bg-[#225EC4] hover:bg-[#063d8c] text-white px-6 py-3 rounded-lg"
                                 >
                                     ถัดไป
                                 </button>
@@ -455,37 +461,33 @@ useEffect(() => {
                                 <h4 className="font-semibold mb-4">สรุปการจอง</h4>
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
-                                        <span>วันที่เข้าพัก:</span>
+                                        <span>วันที่เข้าพัก :</span>
                                         <span>{checkinDate}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span>วันที่ออก:</span>
+                                        <span>วันที่ออก :</span>
                                         <span>{checkoutDate}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span>ประเภทห้อง:</span>
+                                        <span>ประเภทห้อง :</span>
                                         <span>{selectedRoom?.name}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span>จำนวนวัน:</span>
+                                        <span>จำนวนวัน :</span>
                                         <span>{calcDays()}</span>
-                                    </div>
-                                    <div className="flex justify-between font-semibold text-lg border-t pt-2">
-                                        <span>ราคารวม:</span>
-                                        <span>฿{totalPrice}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex space-x-4 mt-6">
+                            <div className="flex justify-between mt-6">
                                 <button
                                     onClick={prevStep}
-                                    className="bg-gray-500 text-white px-6 py-3 rounded-lg"
+                                    className="bg-gray-500 hover:bg-gray-400 text-white px-6 py-3 rounded-lg"
                                 >
                                     ย้อนกลับ
                                 </button>
                                 <button
                                     onClick={confirmBooking}
-                                    className="bg-green-600 text-white px-6 py-3 rounded-lg"
+                                    className="bg-[#225EC4] hover:bg-[#063d8c] text-white px-6 py-3 rounded-lg"
                                 >
                                     ยืนยันการจอง
                                 </button>
@@ -493,9 +495,13 @@ useEffect(() => {
                         </div>
                     )}
                 </div>
+ </div>
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 mt-10 mb-15">
 
                   <Calendar bookings={bookings} loading={loading} />
-            </div>
+             
         </div>
+        </div>
+        </>
     );
 }

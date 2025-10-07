@@ -74,10 +74,10 @@ export default function StockPage() {
 
   return (
 
-    <div >
-
-            <Navbar/>
-        <h1 className="text-3xl font-bold text-gray-800">📦 เช็กสต็อกสินค้า</h1>
+    <div ><Navbar/>
+      <div className="bg-white min-h-screen p-8 font-sans">
+            
+        <h1 className="text-3xl font-bold text-gray-800"> เช็กสต็อกสินค้า</h1>
         
         {/* เพิ่มเงื่อนไข: ถ้าไม่มีสินค้าเลย ให้แสดงข้อความ */}
         {stocks.length === 0 && !isLoading && (
@@ -88,11 +88,11 @@ export default function StockPage() {
 
         {/* ส่วนแสดงรายการสินค้าในสต็อก (จะแสดงเมื่อมีสินค้า) */}
         {stocks.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 m-10">
             {/* ... โค้ด map เหมือนเดิม ... */}
             {groupedStock.map((group) => (
               <div key={group.category} className="bg-white rounded-xl shadow p-5">
-                <h2 className="font-bold text-xl mb-4">{group.category}</h2>
+                <h2 className="font-bold text-xl mb-4">ประเภท : {group.category}</h2>
                 <ul className="space-y-4">
                   {group.items.map((item) => {
                     let statusColor = "text-green-600";
@@ -107,9 +107,9 @@ export default function StockPage() {
                     }
 
                     return (
-                      <li key={item.id} className="flex justify-between items-center border-b pb-3">
+                      <li key={item.id} className="flex justify-between items-center border-b pb-3 ">
                         <div>
-                          <div className="font-medium">{item.name}</div>
+                          <div className="font-medium">ชื่อ : {item.name}</div>
                           <div className={`text-sm ${statusColor}`}>
                             {item.quantity} {item.unit}
                           </div>
@@ -118,8 +118,8 @@ export default function StockPage() {
                           <span className={`text-sm font-semibold ${statusColor}`}>
                             {statusText}
                           </span>
-                          <button onClick={() => updateStock(item.id, "decrement")} className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">-</button>
-                          <button onClick={() => updateStock(item.id, "increment")} className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">+</button>
+                          <button onClick={() => updateStock(item.id, "decrement")} className="px-3 py-1 bg-red-400 text-white rounded-md hover:bg-red-500 transition-colors">-</button>
+                          <button onClick={() => updateStock(item.id, "increment")} className="px-3 py-1 bg-emerald-500 hover:bg-emerald-600  text-white rounded-md  transition-colors">+</button>
                         </div>
                       </li>
                     );
@@ -132,12 +132,12 @@ export default function StockPage() {
 
         {/* ส่วนแสดงรายการที่ต้องสั่งซื้อ */}
         {(needToOrder.length > 0 || lowStock.length > 0) && (
-            <div className="bg-white rounded-xl shadow p-5 space-y-4">
-                <h2 className="font-bold text-xl">🛒 รายการที่ต้องสั่งซื้อ</h2>
+            <div className="bg-white rounded-xl shadow p-5 space-y-4 m-10">
+                <h2 className="font-bold text-xl">รายการที่ต้องสั่งซื้อ</h2>
                 {/* ... โค้ดแสดง needToOrder และ lowStock เหมือนเดิม ... */}
                 {needToOrder.length > 0 && (
                   <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                    <h3 className="font-bold text-red-800 mb-2">❗ ของที่ต้องสั่งด่วน:</h3>
+                    <h3 className="font-bold text-red-800 mb-2"> ของที่ต้องสั่งด่วน:</h3>
                     <ul className="list-disc list-inside text-red-700">
                       {needToOrder.map((s) => (<li key={s.id}>{s.name} - เหลือ {s.quantity} {s.unit}</li>))}
                     </ul>
@@ -145,7 +145,7 @@ export default function StockPage() {
                 )}
                 {lowStock.length > 0 && (
                   <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
-                    <h3 className="font-bold text-yellow-800 mb-2">⚠️ ของที่ใกล้หมด:</h3>
+                    <h3 className="font-bold text-yellow-800 mb-2"> ของที่ใกล้หมด:</h3>
                     <ul className="list-disc list-inside text-yellow-700">
                       {lowStock.map((s) => (<li key={s.id}>{s.name} - เหลือ {s.quantity} {s.unit}</li>))}
                     </ul>
@@ -153,6 +153,7 @@ export default function StockPage() {
                 )}
             </div>
         )}
+    </div>
     </div>
   );
 }

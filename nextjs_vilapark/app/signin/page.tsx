@@ -41,42 +41,58 @@ export default function Signin() {
 
   return (
         <>
-            <Navbar/>
+        
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-6 rounded-xl shadow-md w-80 space-y-4"
-      >
-        <h1 className="text-blue-500 text-2xl font-bold text-center">Login</h1>
-
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="text-blue-500 w-full p-2 border rounded"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="text-blue-500 w-full p-2 border rounded"
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-        >
-          Login
-        </button>
-      </form>
+  <div className="bg-white rounded-xl shadow-md flex max-w-2xl overflow-hidden">
+    {/* ซ้าย: รูป */}
+    <div className=" bg-blue-100 flex items-center justify-center">
+      <img
+        src="/Logovilaparksquare.png"
+        alt="Login Illustration"
+        className="object-cover h-full w-full"
+      />
     </div>
+
+    {/* ขวา: ฟอร์ม */}
+    <div className="flex items-center justify-center bg-[#4691D3]">
+    <form
+      onSubmit={handleLogin}
+      className=" p-6 space-y-4"
+    >
+      <h1 className="text-white text-2xl font-bold text-center">Login</h1>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className="text-white w-full p-2 border rounded"
+        required
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="text-white w-full p-2 border rounded"
+        required
+      />
+
+      <button
+        type="submit"
+        className="w-full bg-white text-[#4691D3] py-2 rounded hover:bg-white-600"
+      >
+        Login
+      </button>
+    </form>
+    </div>
+  </div>
+</div>
+
+
     </>
   );
 }

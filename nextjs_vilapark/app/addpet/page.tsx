@@ -108,8 +108,9 @@ export default function AddPetPage() {
     <>
       <Navbar />
       <div className="bg-white min-h-screen py-10 text-black">
-        <div className="max-w-lg mx-auto mt-10 p-6 bg-white rounded-2xl shadow">
-          <h2 className="text-2xl font-bold mb-6 text-center">เพิ่มข้อมูลแมว 🐱</h2>
+        <h2 className="text-3xl font-bold  text-center">เพิ่มข้อมูลแมว </h2>
+        <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow">
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* ชื่อแมว */}
             <div>
@@ -217,7 +218,7 @@ export default function AddPetPage() {
 
             <button
               type="submit"
-              className="w-full bg-purple-600 text-white p-3 rounded-md hover:bg-purple-700"
+              className="w-full bg-[#4691D3] hover:bg-blue-500 text-white p-3 rounded-md "
             >
               บันทึก
             </button>

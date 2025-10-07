@@ -31,7 +31,7 @@ type RoleDTO = {
 
 import MonthlyIncomeChart from "../components/IncomeChart";
 export default function Manager() {
-    const router = useRouter();
+  const router = useRouter();
   const [roomNumber, setRoomNumber] = useState("");
   const [type, setType] = useState("");
   const [price, setPrice] = useState("");
@@ -53,36 +53,36 @@ export default function Manager() {
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-          const [userId, setUserId] = useState<number | null>(null);
-          const [roles, setRoles] = useState<RoleDTO[]>([]);
-          const [isManager, setIsManager] = useState(false);
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  const [userId, setUserId] = useState<number | null>(null);
+  const [roles, setRoles] = useState<RoleDTO[]>([]);
+  const [isManager, setIsManager] = useState(false);
 
-              useEffect(() => {
-                const storedUser = localStorage.getItem("user");
-                if (storedUser) {
-                  const userObj = JSON.parse(storedUser);
-                  setUserId(userObj.id);
-                }
-              }, []);
-              useEffect(() => {
-                if (!userId) return;
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const userObj = JSON.parse(storedUser);
+      setUserId(userObj.id);
+    }
+  }, []);
+  useEffect(() => {
+    if (!userId) return;
 
-                fetch(`http://localhost:8081/users/${userId}/roles`)
-                  .then((res) => res.json())
-                  .then((data: RoleDTO[]) => {
-                    setRoles(data);
-                    const manager = data.some((role) => role.name === "ROLE_MANAGER");
-                    setIsManager(manager);
+    fetch(`http://localhost:8081/users/${userId}/roles`)
+      .then((res) => res.json())
+      .then((data: RoleDTO[]) => {
+        setRoles(data);
+        const manager = data.some((role) => role.name === "ROLE_MANAGER");
+        setIsManager(manager);
 
-                    if (!manager) {
-                      router.push("/dashboard");
-                    }
-                  })
-                  .catch(console.error);
-              }, [userId, router]);
-///////////////////////////////////////////////////////////////////////////////////////////////////
+        if (!manager) {
+          router.push("/dashboard");
+        }
+      })
+      .catch(console.error);
+  }, [userId, router]);
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
     const fetchRoomData = async () => {
       try {
@@ -129,8 +129,8 @@ export default function Manager() {
       try {
         const res = await fetch("http://127.0.0.1:8081/income/total");
         if (!res.ok) throw new Error(`${res.status}`);
-         const data = await res.json();   
-                setRevenue(data.totalRevenue); 
+        const data = await res.json();
+        setRevenue(data.totalRevenue);
       } catch (error) {
       }
     };
@@ -138,13 +138,13 @@ export default function Manager() {
   }, []);
 
   useEffect(() => {
-  if (editingRoom) {
-    setRoomNumber(editingRoom.roomNumber);
-    setType(editingRoom.type);
-    setPrice(editingRoom.price?.toString() || "");
-    setStatus(editingRoom.status);
-  }
-}, [editingRoom]);
+    if (editingRoom) {
+      setRoomNumber(editingRoom.roomNumber);
+      setType(editingRoom.type);
+      setPrice(editingRoom.price?.toString() || "");
+      setStatus(editingRoom.status);
+    }
+  }, [editingRoom]);
 
 
   const handleSubmitCreateRoom = async (e: React.FormEvent) => {
@@ -220,7 +220,7 @@ export default function Manager() {
       alert(err);
     }
   };
-  
+
   const handleSubmitEditRoom = async (id: number) => {
     try {
       const res = await fetch(`http://127.0.0.1:8081/rooms/${id}`, {
@@ -308,7 +308,7 @@ export default function Manager() {
       setUsername("")
       setEmail("")
       setPassword("")
-      
+
       alert("success");
       setRooms([...rooms, data]); // อัพเดตรายการห้องใหม่
     } catch (err) {
@@ -319,36 +319,47 @@ export default function Manager() {
   return (
     <>
       <Navbar />
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold mb-8 text-gray-800">⚙️ Manager Dashboard</h2>
-        <div className="mt-10 mb-10flex justify-center">
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-xl p-6 w-full max-w-md transform hover:scale-[1.02] transition-all duration-300">
-            <div className="flex justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-1">📅 การจองเดือนนี้</h3>
-                <p className="text-blue-100 text-sm">จำนวนการจองทั้งหมดประจำเดือน</p>
-              </div>
-              <div className="mt-6 text-8xl font-extrabold text-center">
-                {thismonthBooking}
-              </div>
+      <div className="bg-white min-h-screen p-8 font-sans">
+        <header >
+          <h3 className="text-3xl font-bold text-gray-800 flex items-center gap-3">แดชบอร์ดผู้จัดการ</h3>
+        </header>
+
+        <div className="m-4 grid grid-cols-3 grid-rows-2 gap-6 max-w-7xl mx-auto">
+          {/* กราฟ: col 1-2, row span 2 */}
+          <div className="col-span-2 row-span-2 bg-white rounded-lg shadow-lg p-4">
+            <MonthlyIncomeChart />
+          </div>
+
+          {/* การจองเดือนนี้: col 3, row 1 */}
+          <div className="bg-[#4195cc] text-white rounded-2xl shadow-xl p-6 transform hover:scale-[1.02] transition-all duration-300 ">
+            <div>
+              <h3 className="text-xl font-semibold mb-1">การจองเดือนนี้</h3>
+              <p className="text-blue-100 text-sm">จำนวนการจองทั้งหมดประจำเดือน</p>
             </div>
-            <div className="flex justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-1">รายได้ทั้งหมด</h3>
-                {/* <p className="text-blue-100 text-sm">จำนวนการจองทั้งหมดประจำเดือน</p> */}
-              </div>
-              <div className="mt-6 text-8xl font-extrabold text-center">
-                                {revenue}
-              </div>
+            <div className="mt-6 text-7xl font-extrabold text-end">
+              {thismonthBooking}
+            </div>
+          </div>
+
+          {/* รายได้ทั้งหมด: col 3, row 2 */}
+          <div className="bg-[#63bac4] text-white rounded-2xl shadow-xl p-6 transform hover:scale-[1.02] transition-all duration-300 ">
+            <div>
+              <h3 className="text-xl font-semibold mb-1">รายได้ทั้งหมด</h3>
+              <p className="text-blue-100 text-sm">รายทั้งหมดภายในเดือนนี้</p>
+            </div>
+            <div className="mt-6 text-7xl font-extrabold text-end">
+              {revenue}
             </div>
           </div>
         </div>
 
+
+
         <div className="grid lg:grid-cols-2 gap-8">
           {/* 🏨 Room Management */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-semibold mb-4 text-blue-700 flex items-center gap-2">
-              🏨 จัดการห้องพัก
+            <h3 className="text-xl font-semibold mb-4 text-black flex items-center gap-2">
+              จัดการห้องพัก
             </h3>
 
             {/* Create Room */}
@@ -389,14 +400,14 @@ export default function Manager() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                className="w-full  bg-[#4691D3] hover:bg-blue-500 text-white py-2 rounded-lg  transition"
               >
                 ➕ สร้างห้อง
               </button>
             </form>
 
             {/* Room List */}
-            <h4 className="font-semibold text-gray-700 mb-2">📋 รายการห้องพัก</h4>
+            <h4 className="font-semibold text-gray-700 mb-2"> รายการห้องพัก</h4>
             <ul className="space-y-4">
               {rooms.map((room) => (
                 <li
@@ -410,7 +421,7 @@ export default function Manager() {
                   </div>
                   <div className="flex gap-2">
                     <button
-                      className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg "
                       onClick={() => setEditingRoom(room)}
                     >
                       แก้ไข
@@ -429,8 +440,8 @@ export default function Manager() {
 
           {/* 👥 Employee Management */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-semibold mb-4 text-green-700 flex items-center gap-2">
-              👥 จัดการพนักงาน
+            <h3 className="text-xl font-semibold mb-4 text-black flex items-center gap-2">
+              จัดการพนักงาน
             </h3>
 
             {/* Create Employee */}
@@ -465,15 +476,15 @@ export default function Manager() {
               />
               <button
                 type="submit"
-                className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+                className="bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg  transition"
               >
                 ➕ เพิ่มผู้ใช้
               </button>
             </form>
 
             {/* Employee List */}
-        <h4 className="font-semibold text-gray-700 mb-2">📋 รายชื่อพนักงาน</h4>
-        <ul className="space-y-4">
+            <h4 className="font-semibold text-gray-700 mb-2"> รายชื่อพนักงาน</h4>
+            <ul className="space-y-4">
               {employees.map(emp => (
                 <li key={emp.id} className="p-4 border rounded-lg shadow-sm bg-gray-50 flex justify-between items-center">
                   <div>
@@ -498,7 +509,7 @@ export default function Manager() {
         <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
             <h3 className="text-lg font-semibold text-blue-700 mb-4">
-              ✏️ แก้ไขห้อง {editingRoom.roomNumber}
+              แก้ไขห้อง {editingRoom.roomNumber}
             </h3>
             <form
               onSubmit={(e) => {
@@ -535,7 +546,7 @@ export default function Manager() {
                 onChange={(e) => setStatus(e.target.value)}
                 className="border px-3 py-2 rounded-lg w-full"
               />
-              <div className="flex justify-end gap-2 pt-3 border-t">
+              <div className="flex justify-end gap-2 pt-3 ">
                 <button
                   type="button"
                   onClick={() => setEditingRoom(null)}
@@ -547,7 +558,7 @@ export default function Manager() {
                   type="submit"
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
-                  💾 บันทึก
+                   บันทึก
                 </button>
               </div>
             </form>
@@ -557,83 +568,83 @@ export default function Manager() {
 
 
       {editingEmpId && (
-  <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-      <h3 className="text-lg font-semibold text-blue-700 mb-4">
-        ✏️ แก้ไขข้อมูลพนักงาน
-      </h3>
-      <form
-        className="space-y-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmitEditEmp(editingEmpId);
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-          required
-        />
-        <input
-          type="text"
-          placeholder="First Name"
-          value={EmpFirstName}
-          onChange={(e) => setEmpFirstName(e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-        />
-        <input
-          type="text"
-          placeholder="Last Name"
-          value={EmpLastName}
-          onChange={(e) => setEmpLasttName(e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-        />
-        <input
-          type="text"
-          placeholder="Phone"
-          value={EmpPhone}
-          onChange={(e) => setEmpPhone(e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          value={EmpAdress}
-          onChange={(e) => setEmpAdress(e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-        />
-        <div className="flex justify-end gap-2 pt-3 border-t">
-          <button
-            type="button"
-            onClick={() => setEditingEmpId(null)}
-            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
-          >
-            ยกเลิก
-          </button>
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-          >
-            💾 บันทึก
-          </button>
+        <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+            <h3 className="text-lg font-semibold text-black mb-4">
+              แก้ไขข้อมูลพนักงาน
+            </h3>
+            <form
+              className="space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmitEditEmp(editingEmpId);
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+                required
+              />
+              <input
+                type="text"
+                placeholder="First Name"
+                value={EmpFirstName}
+                onChange={(e) => setEmpFirstName(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                value={EmpLastName}
+                onChange={(e) => setEmpLasttName(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+              />
+              <input
+                type="text"
+                placeholder="Phone"
+                value={EmpPhone}
+                onChange={(e) => setEmpPhone(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+              />
+              <input
+                type="text"
+                placeholder="Address"
+                value={EmpAdress}
+                onChange={(e) => setEmpAdress(e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
+              />
+              <div className="flex justify-end gap-2 pt-3 ">
+                <button
+                  type="button"
+                  onClick={() => setEditingEmpId(null)}
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                >
+                   บันทึก
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
-            <MonthlyIncomeChart/>
+
     </>
 
 

@@ -209,12 +209,12 @@ const router = useRouter();
     <>
     <Navbar />
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-8">🐱 ดูแลและอัปเดตข้อมูลแมว</h2>
+      <h2 className="text-3xl font-bold mb-8">ดูแลและอัปเดตข้อมูลแมว</h2>
       <form onSubmit={handleSave}>
         <div className="bg-white rounded-lg shadow-lg p-6">
           {/* เลือกแมว */}
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-l font-medium mb-2">
               เลือกแมวที่ต้องการอัปเดต
             </label>
             <select
@@ -243,23 +243,13 @@ const router = useRouter();
                       🐱
                     </div>
                     <div>
-                      <h4 className="font-semibold">{catInfo.name}</h4>
-                      <p className="text-sm text-gray-600">{catInfo.details}</p>
-                      <p className="text-sm text-gray-600">{catInfo.room}</p>
+                      <h4 className="font-semibold text-xl">{catInfo.name}</h4>
                     </div>
-                  </div>
-                  <div className="text-sm">
-                    <p>
-                      <strong>เจ้าของ:</strong> {catInfo.owner}
-                    </p>
-                    <p>
-                      <strong>เบอร์โทร:</strong> {catInfo.phone}
-                    </p>
                   </div>
                 </div>
 
                 {/* Checklist */}
-                <h4 className="font-semibold mb-3">✅ เช็กลิสต์ประจำวัน</h4>
+                <h4 className="font-semibold mb-3">เช็กลิสต์ประจำวัน</h4>
                 <div className="space-y-2 mb-4">
                   {Object.entries(checklist).map(([key, val]) => (
                     <label key={key} className="flex items-center">
@@ -406,9 +396,9 @@ const router = useRouter();
 
                 <button
                   type="submit"
-                  className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-semibold"
+                  className="w-full bg-[#225EC4] hover:bg-[#063d8c] text-white py-3 rounded-lg font-semibold"
                 >
-                  💾 บันทึกอัปเดต
+                  บันทึกอัปเดต
                 </button>
               </div>
             </div>
