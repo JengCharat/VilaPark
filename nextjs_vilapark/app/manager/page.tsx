@@ -93,7 +93,7 @@ export default function Manager() {
       }
     };
     fetchRoomData();
-  }, [rooms]);
+  }, []);
 
   useEffect(() => {
     const fetchRoomData = async () => {
