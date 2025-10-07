@@ -1,7 +1,7 @@
 "use client";
 
 import "../globals.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "../components/Navbar";
 
@@ -31,7 +31,8 @@ type Booking = {
 type Cat = { id: number; name: string };
 type Room = { id: number; roomNumber: string; type: string; price: number };
 
-export default function DashboardBookingPage() {
+// แยก Component หลักออกมาเพื่อใช้ Suspense
+function BookingFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams(); // ✅ ใช้ query string
   const stepFromQuery = Number(searchParams.get("step")) || 1;
@@ -45,23 +46,6 @@ export default function DashboardBookingPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch("http://localhost:8081/bookings/future");
-        const data = await res.json();
-        setBookings(data);
-      } catch (e) {
-        console.error("Failed to fetch bookings:", e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-
-
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   const [isRoomAvailable, setIsRoomAvailable] = useState<boolean | null>(null);
   const checkAvailability = async () => {
@@ -71,9 +55,6 @@ export default function DashboardBookingPage() {
       checkoutDate: bookingData.checkoutDate,
     };
 
-    // alert(payload.roomId)
-    // alert(payload.checkinDate)
-    // alert(payload.checkoutDate)
     try {
       const res = await fetch("http://localhost:8081/bookings/check-availability", {
         method: "POST",
@@ -98,6 +79,7 @@ export default function DashboardBookingPage() {
     checkoutDate: "",
     roomId: 0,
   });
+  
   useEffect(() => {
     if (!bookingData.checkinDate || !bookingData.checkoutDate || bookingData.roomId === 0) {
       setIsRoomAvailable(null);
@@ -107,16 +89,6 @@ export default function DashboardBookingPage() {
     checkAvailability();
   }, [bookingData.checkinDate, bookingData.checkoutDate, bookingData.roomId]);
   //////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
 
   const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
 
@@ -173,6 +145,22 @@ export default function DashboardBookingPage() {
       .catch(() => setRooms([]));
   }, []);
 
+  // ✅ โหลด bookings
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch("http://localhost:8081/bookings/future");
+        const data = await res.json();
+        setBookings(data);
+      } catch (e) {
+        console.error("Failed to fetch bookings:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
   const handleBookingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setBookingData({ ...bookingData, [name]: value });
@@ -189,6 +177,13 @@ export default function DashboardBookingPage() {
   // ✅ Step Control
   const nextStep = () => setStep((s) => Math.min(s + 1, 4));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+
+  // ✅ Update URL when step changes
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('step', step.toString());
+    window.history.replaceState({}, '', url.toString());
+  }, [step]);
 
   // ✅ Submit
   const handleSubmit = async () => {
@@ -253,32 +248,29 @@ export default function DashboardBookingPage() {
 
           {/* Step Indicator */}
           <div className="bg-white rounded-lg shadow-lg p-8">
-
-
             <div className="mb-10">
-  {/* Step Titles */}
-  <div className="flex justify-between text-sm font-medium mb-3">
-    {["เลือกวัน/ห้อง", "เลือกแมว", "ข้อมูลเจ้าของ", "ยืนยัน"].map((label, i) => (
-      <div
-        key={i}
-        className={`transition-colors duration-300 ${
-          step === i + 1 ? "text-[#225EC4] font-semibold" : "text-gray-400"
-        }`}
-      >
-        {i + 1}. {label}
-      </div>
-    ))}
-  </div>
+              {/* Step Titles */}
+              <div className="flex justify-between text-sm font-medium mb-3">
+                {["เลือกวัน/ห้อง", "เลือกแมว", "ข้อมูลเจ้าของ", "ยืนยัน"].map((label, i) => (
+                  <div
+                    key={i}
+                    className={`transition-colors duration-300 ${
+                      step === i + 1 ? "text-[#225EC4] font-semibold" : "text-gray-400"
+                    }`}
+                  >
+                    {i + 1}. {label}
+                  </div>
+                ))}
+              </div>
 
-  {/* Progress Bar */}
-  <div className="relative w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-    <div
-      className="absolute top-0 left-0 bg-[#225EC4] h-2 rounded-full transition-all duration-500 ease-in-out"
-      style={{ width: `${step * 25}%` }}
-    ></div>
-  </div>
-</div>
-
+              {/* Progress Bar */}
+              <div className="relative w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div
+                  className="absolute top-0 left-0 bg-[#225EC4] h-2 rounded-full transition-all duration-500 ease-in-out"
+                  style={{ width: `${step * 25}%` }}
+                ></div>
+              </div>
+            </div>
 
             {/* STEP 1 */}
             {step === 1 && (
@@ -345,7 +337,6 @@ export default function DashboardBookingPage() {
                   >
                     ถัดไป
                   </button></div>
-
               </div>
             )}
 
@@ -396,8 +387,6 @@ export default function DashboardBookingPage() {
                     ถัดไป
                   </button>
                 </div>
-
-
               </div>
             )}
 
@@ -545,7 +534,22 @@ export default function DashboardBookingPage() {
           <Calendar bookings={bookings} loading={loading} />
         </div>
       </div>
-
     </>
+  );
+}
+
+// Component หลักที่ใช้ Suspense
+export default function DashboardBookingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white text-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#225EC4] mx-auto"></div>
+          <p className="mt-4 text-gray-600">กำลังโหลด...</p>
+        </div>
+      </div>
+    }>
+      <BookingFormContent />
+    </Suspense>
   );
 }
