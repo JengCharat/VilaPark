@@ -72,7 +72,7 @@ const router = useRouter();
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`http://localhost:8081/users/${userId}/roles`)
+    fetch(`http://64.71.156.99:9090/users/${userId}/roles`)
       .then((res) => res.json())
       .then((data: RoleDTO[]) => {
         setRoles(data);
@@ -89,7 +89,7 @@ const router = useRouter();
 
   // โหลดแมวทั้งหมด
   useEffect(() => {
-    fetch("http://localhost:8081/cats")
+    fetch("http://64.71.156.99:9090/cats")
       .then((res) => res.json())
       .then((cats: Cat[]) => setCats(cats))
       .catch(console.error);
@@ -107,7 +107,7 @@ const router = useRouter();
     setCatInfo(cat);
     setShowForm(true);
 
-    fetch(`http://localhost:8081/api/daily-updates/cat/${selectedCatId}`)
+    fetch(`http://64.71.156.99:9090/api/daily-updates/cat/${selectedCatId}`)
       .then((res) => res.json())
       .then((data: DailyUpdate[]) => {
         const today = new Date().toISOString().slice(0, 10);
@@ -148,7 +148,7 @@ const router = useRouter();
     if (img.file) formData.append("files", img.file);
   });
   if (formData.has("files")) {
-    const res = await fetch("http://localhost:8081/api/daily-updates/upload", {
+    const res = await fetch("http://64.71.156.99:9090/api/daily-updates/upload", {
       method: "POST",
       body: formData,
     });
@@ -181,7 +181,7 @@ const router = useRouter();
       imageUrls: uploadedUrls,
     };
 
-    const res = await fetch("http://localhost:8081/api/daily-updates", {
+    const res = await fetch("http://64.71.156.99:9090/api/daily-updates", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

@@ -35,7 +35,7 @@ export default function MonthlyIncomeChart() {
   useEffect(() => {
     const fetchIncome = async () => {
       try {
-        const res = await fetch("http://localhost:8081/income");
+        const res = await fetch("http://64.71.156.99:9090/income");
         const data: Income[] = await res.json();
         setIncomeData(data);
       } catch (err) {

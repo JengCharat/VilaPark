@@ -82,7 +82,7 @@ export default function AddPetPage() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:8081/cats", {
+      const res = await fetch("http://64.71.156.99:9090/cats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

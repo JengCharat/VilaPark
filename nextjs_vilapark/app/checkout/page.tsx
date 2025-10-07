@@ -102,7 +102,7 @@ type PaymentMethod = "cash" | "transfer" | "credit";
 type Charge = { label: string; amount: number };
 
 /* ===== API base ===== */
-const API = "http://localhost:8081";
+const API = "http://64.71.156.99:9090";
 
 /* ===== fetch helper ===== */
 async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {

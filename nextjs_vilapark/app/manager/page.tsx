@@ -69,7 +69,7 @@ export default function Manager() {
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`http://localhost:8081/users/${userId}/roles`)
+    fetch(`http://64.71.156.99:9090/users/${userId}/roles`)
       .then((res) => res.json())
       .then((data: RoleDTO[]) => {
         setRoles(data);

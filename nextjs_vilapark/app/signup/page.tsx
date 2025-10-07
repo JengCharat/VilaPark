@@ -19,7 +19,7 @@ export default function SignupPage() {
     setSuccess("");
 
     try {
-      const res = await fetch("http://localhost:8081/api/auth/signup", {
+      const res = await fetch("http://64.71.156.99:9090/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

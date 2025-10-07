@@ -60,7 +60,7 @@ const [bookings, setBookings] = useState<Booking[]>([]);
 const [loading, setLoading] = useState(true);
 
 useEffect(() => {
-  fetch("http://localhost:8081/bookings/future") // endpoint ตาม backend ของคุณ
+  fetch("http://64.71.156.99:9090/bookings/future") // endpoint ตาม backend ของคุณ
     .then((res) => res.json())
     .then((data) => setBookings(data))
     .catch((err) => console.error(err))
@@ -92,7 +92,7 @@ const checkAvailability = async () => {
   };
 
   try {
-    const res = await fetch("http://localhost:8081/bookings/check-availability", {
+    const res = await fetch("http://64.71.156.99:9090/bookings/check-availability", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -146,7 +146,7 @@ useEffect(() => {
 
     // ✅ โหลดข้อมูลห้องทั้งหมด
     useEffect(() => {
-        fetch("http://localhost:8081/rooms")
+        fetch("http://64.71.156.99:9090/rooms")
             .then((res) => res.json())
             .then((data) => setRooms(data))
             .catch(() => setRooms([]));
@@ -155,12 +155,12 @@ useEffect(() => {
     // ✅ โหลดข้อมูล user + cats เมื่อกรอก userId
     useEffect(() => {
         if (!userId) return;
-        fetch(`http://localhost:8081/users/${userId}`)
+        fetch(`http://64.71.156.99:9090/users/${userId}`)
             .then((res) => res.json())
             .then((data) => setUser(data))
             .catch(() => setUser(null));
 
-        fetch(`http://localhost:8081/cats/by-owner/${userId}`)
+        fetch(`http://64.71.156.99:9090/cats/by-owner/${userId}`)
             .then((res) => res.json())
             .then((data) => setCats(data))
             .catch(() => setCats([]));
@@ -191,7 +191,7 @@ useEffect(() => {
             status: "Pending",
         };
 
-        const res = await fetch("http://localhost:8081/bookings", {
+        const res = await fetch("http://64.71.156.99:9090/bookings", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(bookingData),
