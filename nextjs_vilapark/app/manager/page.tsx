@@ -28,6 +28,8 @@ type RoleDTO = {
   id: number;
   name: string;
 };
+
+import MonthlyIncomeChart from "../components/IncomeChart";
 export default function Manager() {
     const router = useRouter();
   const [roomNumber, setRoomNumber] = useState("");
@@ -631,6 +633,7 @@ export default function Manager() {
   </div>
 )}
 
+            <MonthlyIncomeChart/>
     </>
 
 
