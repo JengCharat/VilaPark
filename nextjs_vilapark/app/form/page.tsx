@@ -1,7 +1,7 @@
 "use client";
 
 import "../globals.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "../components/Navbar";
 
@@ -31,20 +31,39 @@ type Booking = {
 type Cat = { id: number; name: string };
 type Room = { id: number; roomNumber: string; type: string; price: number };
 
-export default function DashboardBookingPage() {
+// แยก Component หลักออกมาเพื่อใช้ Suspense
+function BookingFormContent() {
   const router = useRouter();
-  const searchParams = useSearchParams(); // ✅ ใช้ query string
+  const searchParams = useSearchParams();
   const stepFromQuery = Number(searchParams.get("step")) || 1;
 
   const [user, setUser] = useState<UserDTO | null>(null);
   const [cats, setCats] = useState<Cat[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
-  const [step, setStep] = useState(stepFromQuery); // ✅ เริ่มที่ step จาก query
+  const [step, setStep] = useState(stepFromQuery);
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [isRoomAvailable, setIsRoomAvailable] = useState<boolean | null>(null);
+  const [bookingData, setBookingData] = useState({
+    checkinDate: "",
+    checkoutDate: "",
+    roomId: 0,
+  });
+
+  const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
+
+  const [contactInfo, setContactInfo] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    address: "",
+  });
+
+  // ✅ โหลด bookings
   useEffect(() => {
     async function fetchData() {
       try {
@@ -60,73 +79,41 @@ export default function DashboardBookingPage() {
     fetchData();
   }, []);
 
+  // ✅ ตรวจสอบความพร้อมของห้อง
+  const checkAvailability = async () => {
+    const payload = {
+      roomId: bookingData.roomId,
+      checkinDate: bookingData.checkinDate,
+      checkoutDate: bookingData.checkoutDate,
+    };
 
+    try {
+      const res = await fetch("http://localhost:8081/bookings/check-availability", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-const [isRoomAvailable, setIsRoomAvailable] = useState<boolean | null>(null);
-const checkAvailability = async () => {
-  const payload = {
-    roomId: bookingData.roomId,
-    checkinDate: bookingData.checkinDate,
-    checkoutDate: bookingData.checkoutDate,
+      const available = await res.json();
+      setIsRoomAvailable(available);
+
+      if (!available) {
+        alert("ห้องนี้ไม่ว่างในช่วงวันที่เลือก");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("ไม่สามารถเช็คสถานะห้องได้");
+    }
   };
 
-            // alert(payload.roomId)
-            // alert(payload.checkinDate)
-            // alert(payload.checkoutDate)
-  try {
-    const res = await fetch("http://localhost:8081/bookings/check-availability", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const available = await res.json();
-    setIsRoomAvailable(available);
-
-    if (!available) {
-      alert("ห้องนี้ไม่ว่างในช่วงวันที่เลือก");
+  useEffect(() => {
+    if (!bookingData.checkinDate || !bookingData.checkoutDate || bookingData.roomId === 0) {
+      setIsRoomAvailable(null);
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    alert("ไม่สามารถเช็คสถานะห้องได้");
-  }
-};
 
-  const [bookingData, setBookingData] = useState({
-    checkinDate: "",
-    checkoutDate: "",
-    roomId: 0,
-  });
-useEffect(() => {
-  if (!bookingData.checkinDate || !bookingData.checkoutDate || bookingData.roomId === 0) {
-    setIsRoomAvailable(null); 
-    return;
-  }
-
-  checkAvailability();
-}, [bookingData.checkinDate, bookingData.checkoutDate, bookingData.roomId]);
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-  const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
-
-  const [contactInfo, setContactInfo] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
-    address: "",
-  });
+    checkAvailability();
+  }, [bookingData.checkinDate, bookingData.checkoutDate, bookingData.roomId]);
 
   // ✅ โหลด user จาก localStorage และ prefill
   useEffect(() => {
@@ -190,6 +177,13 @@ useEffect(() => {
   const nextStep = () => setStep((s) => Math.min(s + 1, 4));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
+  // ✅ Update URL when step changes
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('step', step.toString());
+    window.history.replaceState({}, '', url.toString());
+  }, [step]);
+
   // ✅ Submit
   const handleSubmit = async () => {
     if (!user) return alert("ไม่พบข้อมูลผู้ใช้");
@@ -197,6 +191,10 @@ useEffect(() => {
     if (!bookingData.roomId) return alert("กรุณาเลือกห้อง");
     if (!bookingData.checkinDate || !bookingData.checkoutDate)
       return alert("กรุณากรอกวันที่ครบถ้วน");
+
+    if (isRoomAvailable === false) {
+      return alert("ห้องไม่ว่างในช่วงวันที่เลือก กรุณาเลือกใหม่");
+    }
 
     const updatedUser = {
       ...user,
@@ -274,6 +272,17 @@ useEffect(() => {
             </div>
           </div>
 
+          {/* Availability Status */}
+          {isRoomAvailable !== null && (
+            <div className={`mb-4 p-3 rounded-lg text-center font-semibold ${
+              isRoomAvailable 
+                ? "bg-green-100 text-green-800 border border-green-300" 
+                : "bg-red-100 text-red-800 border border-red-300"
+            }`}>
+              {isRoomAvailable ? "✅ ห้องว่างในช่วงวันที่เลือก" : "❌ ห้องไม่ว่างในช่วงวันที่เลือก"}
+            </div>
+          )}
+
           {/* STEP 1 */}
           {step === 1 && (
             <div>
@@ -291,6 +300,7 @@ useEffect(() => {
                     value={bookingData.checkinDate}
                     onChange={handleBookingChange}
                     className="w-full p-3 border rounded-lg"
+                    min={new Date().toISOString().split('T')[0]}
                   />
                 </div>
                 <div>
@@ -303,6 +313,7 @@ useEffect(() => {
                     value={bookingData.checkoutDate}
                     onChange={handleBookingChange}
                     className="w-full p-3 border rounded-lg"
+                    min={bookingData.checkinDate || new Date().toISOString().split('T')[0]}
                   />
                 </div>
               </div>
@@ -317,10 +328,11 @@ useEffect(() => {
                     onClick={() =>
                       setBookingData({ ...bookingData, roomId: room.id })
                     }
-                    className={`p-4 border rounded-lg cursor-pointer hover:border-purple-500 transition ${bookingData.roomId === room.id
+                    className={`p-4 border rounded-lg cursor-pointer hover:border-purple-500 transition ${
+                      bookingData.roomId === room.id
                         ? "border-purple-600 bg-purple-50"
                         : "border-gray-300"
-                      }`}
+                    }`}
                   >
                     <h4 className="font-semibold">{room.type}</h4>
                     <p className="text-sm text-gray-600">
@@ -335,7 +347,8 @@ useEffect(() => {
 
               <button
                 onClick={nextStep}
-                className="mt-6 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+                disabled={!bookingData.checkinDate || !bookingData.checkoutDate || bookingData.roomId === 0}
+                className="mt-6 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 ถัดไป
               </button>
@@ -359,7 +372,15 @@ useEffect(() => {
               {loadingCats ? (
                 <p>⏳ กำลังโหลดข้อมูลแมว...</p>
               ) : cats.length === 0 ? (
-                <p>❌ ยังไม่มีแมวในระบบ</p>
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">❌ ยังไม่มีแมวในระบบ</p>
+                  <button
+                    onClick={() => router.push("/addpet?redirect=form&step=2")}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                  >
+                    เพิ่มแมวแรกของคุณ
+                  </button>
+                </div>
               ) : (
                 <select
                   value={selectedCatId ?? ""}
@@ -378,13 +399,14 @@ useEffect(() => {
               <div className="flex space-x-4 mt-6">
                 <button
                   onClick={prevStep}
-                  className="bg-gray-500 text-white px-6 py-3 rounded-lg"
+                  className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
                 >
                   ย้อนกลับ
                 </button>
                 <button
                   onClick={nextStep}
-                  className="bg-purple-600 text-white px-6 py-3 rounded-lg"
+                  disabled={!selectedCatId}
+                  className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   ถัดไป
                 </button>
@@ -397,58 +419,79 @@ useEffect(() => {
             <div>
               <h3 className="text-xl font-semibold mb-4">ข้อมูลเจ้าของ</h3>
               <div className="grid md:grid-cols-2 gap-6">
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder="ชื่อ"
-                  value={contactInfo.firstName}
+                <div>
+                  <label className="block text-sm font-medium mb-2">ชื่อ</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="ชื่อ"
+                    value={contactInfo.firstName}
+                    onChange={handleContactChange}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">นามสกุล</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="นามสกุล"
+                    value={contactInfo.lastName}
+                    onChange={handleContactChange}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">เบอร์โทรศัพท์</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="เบอร์โทรศัพท์"
+                    value={contactInfo.phone}
+                    onChange={handleContactChange}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">อีเมล</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="อีเมล"
+                    value={contactInfo.email}
+                    onChange={handleContactChange}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium mb-2">ที่อยู่</label>
+                <textarea
+                  name="address"
+                  placeholder="ที่อยู่"
+                  value={contactInfo.address}
                   onChange={handleContactChange}
-                  className="p-3 border rounded-lg"
-                />
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="นามสกุล"
-                  value={contactInfo.lastName}
-                  onChange={handleContactChange}
-                  className="p-3 border rounded-lg"
-                />
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="เบอร์โทรศัพท์"
-                  value={contactInfo.phone}
-                  onChange={handleContactChange}
-                  className="p-3 border rounded-lg"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="อีเมล"
-                  value={contactInfo.email}
-                  onChange={handleContactChange}
-                  className="p-3 border rounded-lg"
+                  rows={3}
+                  className="w-full p-3 border rounded-lg"
+                  required
                 />
               </div>
-              <textarea
-                name="address"
-                placeholder="ที่อยู่"
-                value={contactInfo.address}
-                onChange={handleContactChange}
-                rows={3}
-                className="w-full p-3 border rounded-lg mt-4"
-              />
 
               <div className="flex justify-between mt-6">
                 <button
                   onClick={prevStep}
-                  className="px-6 py-3 bg-gray-500 text-white rounded-lg"
+                  className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
                 >
                   ย้อนกลับ
                 </button>
                 <button
                   onClick={nextStep}
-                  className="px-6 py-3 bg-purple-600 text-white rounded-lg"
+                  disabled={!contactInfo.firstName || !contactInfo.lastName || !contactInfo.phone || !contactInfo.email || !contactInfo.address}
+                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   ถัดไป
                 </button>
@@ -460,51 +503,73 @@ useEffect(() => {
           {step === 4 && (
             <div>
               <h3 className="text-xl font-semibold mb-4">ยืนยันข้อมูลการจอง</h3>
-              <div className="space-y-4">
+              <div className="space-y-6 bg-gray-50 p-6 rounded-lg">
                 <div>
-                  <h4 className="font-semibold">ข้อมูลการจอง</h4>
-                  <p>เช็คอิน: {bookingData.checkinDate}</p>
-                  <p>เช็คเอาท์: {bookingData.checkoutDate}</p>
-                  {rooms.find((r) => r.id === bookingData.roomId) && (
-                    <p>
-                      ห้อง: {rooms.find((r) => r.id === bookingData.roomId)?.type} -{" "}
-                      {rooms.find((r) => r.id === bookingData.roomId)?.roomNumber}
-                    </p>
-                  )}
+                  <h4 className="font-semibold text-lg mb-2">ข้อมูลการจอง</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <p><strong>เช็คอิน:</strong> {bookingData.checkinDate}</p>
+                    <p><strong>เช็คเอาท์:</strong> {bookingData.checkoutDate}</p>
+                    {rooms.find((r) => r.id === bookingData.roomId) && (
+                      <>
+                        <p><strong>ประเภทห้อง:</strong> {rooms.find((r) => r.id === bookingData.roomId)?.type}</p>
+                        <p><strong>เลขห้อง:</strong> {rooms.find((r) => r.id === bookingData.roomId)?.roomNumber}</p>
+                        <p><strong>ราคาต่อวัน:</strong> ฿{rooms.find((r) => r.id === bookingData.roomId)?.price}</p>
+                        <p><strong>สถานะ:</strong> 
+                          <span className={`ml-2 ${isRoomAvailable ? 'text-green-600' : 'text-red-600'}`}>
+                            {isRoomAvailable ? 'ว่าง' : 'ไม่ว่าง'}
+                          </span>
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold">แมวที่เลือก</h4>
+                  <h4 className="font-semibold text-lg mb-2">แมวที่เลือก</h4>
                   <p>{cats.find((c) => c.id === selectedCatId)?.name ?? "ไม่ได้เลือกแมว"}</p>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold">ข้อมูลเจ้าของ</h4>
-                  <p>
-                    {contactInfo.firstName} {contactInfo.lastName}
-                  </p>
-                  <p>📞 {contactInfo.phone}</p>
-                  <p>📧 {contactInfo.email}</p>
-                  <p>🏠 {contactInfo.address}</p>
+                  <h4 className="font-semibold text-lg mb-2">ข้อมูลเจ้าของ</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <p><strong>ชื่อ-นามสกุล:</strong> {contactInfo.firstName} {contactInfo.lastName}</p>
+                    <p><strong>📞 โทรศัพท์:</strong> {contactInfo.phone}</p>
+                    <p><strong>📧 อีเมล:</strong> {contactInfo.email}</p>
+                    <p><strong>🏠 ที่อยู่:</strong> {contactInfo.address}</p>
+                  </div>
                 </div>
               </div>
 
               <div className="flex justify-between mt-6">
-                <button onClick={prevStep} className="px-6 py-3 bg-gray-500 text-white rounded-lg">
+                <button 
+                  onClick={prevStep} 
+                  className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                >
                   ย้อนกลับ
                 </button>
-                <button onClick={handleSubmit} className="px-6 py-3 bg-purple-600 text-white rounded-lg">
-                  ยืนยันการจอง
+                <button 
+                  onClick={handleSubmit} 
+                  disabled={isRoomAvailable === false}
+                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {isRoomAvailable === false ? 'ห้องไม่ว่าง' : 'ยืนยันการจอง'}
                 </button>
               </div>
             </div>
           )}
 
-      <Calendar bookings={bookings} loading={loading} />
+          <Calendar bookings={bookings} loading={loading} />
         </div>
-
       </div>
-
     </>
+  );
+}
+
+// Component หลักที่ใช้ Suspense
+export default function DashboardBookingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <BookingFormContent />
+    </Suspense>
   );
 }

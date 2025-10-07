@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "../components/Navbar";
 import Swal from "sweetalert2";
@@ -71,10 +71,6 @@ function blobToBase64(res: Response): Promise<string> {
   }));
 }
 
-
-
-
-
 const bahtCurrency = (n: number) =>
   n.toLocaleString("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: 2 });
 
@@ -138,21 +134,6 @@ const nightsBetween = (d1: string, d2: string) => {
   const diff = Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
   return Math.max(1, diff || 1);
 };
-
-/* ========= สร้าง PDF ใบเสร็จ ========= */
-// === jsPDF helpers (client only) ===
-async function fileToBase64(url: string): Promise<string> {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Load font failed: ${url}`);
-  const buf = await res.arrayBuffer();
-  // to base64
-  let bin = "";
-  const bytes = new Uint8Array(buf);
-  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-  return btoa(bin);
-}
-
-
 
 // === ปุ่มสร้าง PDF ใบเสร็จ ===
 // ---------- PDF generator (เวอร์ชันแก้) ----------
@@ -264,9 +245,8 @@ export async function generateReceiptPDF(opts: {
   doc.save(`receipt_${opts.bookingId}.pdf`);
 }
 
-
-/* ===== page ===== */
-export default function CheckoutPage() {
+// แยก Component หลักออกมาเพื่อใช้ Suspense
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const queryBookingId = searchParams.get("bookingId");
 
@@ -402,68 +382,63 @@ export default function CheckoutPage() {
   const total = useMemo(() => charges.reduce((s, c) => s + c.amount, 0), [charges]);
 
   /* 4) confirm checkout */
-  // ถ้ายังไม่ได้ import ให้ใส่ด้านบนของไฟล์
-// import Swal from "sweetalert2";
+  const onConfirmCheckout = async () => {
+    if (!selectedId) return;
+    if (!paymentMethod) {
+      setActionMsg("กรุณาเลือกวิธีการชำระเงินก่อน");
+      return;
+    }
 
-const onConfirmCheckout = async () => {
-  if (!selectedId) return;
-  if (!paymentMethod) {
-    setActionMsg("กรุณาเลือกวิธีการชำระเงินก่อน");
-    return;
-  }
-
-  try {
-    setActionMsg(null);
-
-    // 1) ยืนยัน Check-out
-    const res1 = await fetch(`${API}/bookings/${selectedId}/checkout`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentMethod }),
-    });
-    const t1 = await res1.text();
-    if (!res1.ok) throw new Error(t1 || "Checkout failed");
-
-    // 2) บันทึกรายได้ (ใช้ endpoint ที่รองรับจริง)
-    const res2 = await fetch(`${API}/income/from-booking/${selectedId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: Number(total),       // ยอดที่ลูกค้าจ่าย
-        paymentMethod,               // "cash" | "transfer" | "credit"
-      }),
-    });
-    const t2 = await res2.text();
-    if (!res2.ok) throw new Error(t2 || "บันทึกรายได้ไม่สำเร็จ");
-
-    // 3) ป็อปอัปสำเร็จ
-    await Swal.fire({
-      icon: "success",
-      title: "Check-out สำเร็จ",
-      text: "บันทึกรายได้เรียบร้อย",
-      confirmButtonText: "OK",
-      confirmButtonColor: "#22c55e",
-    });
-
-    setActionMsg("✅ ดำเนินการ Check-out และบันทึกรายได้สำเร็จ");
-  } catch (e: any) {
-    let msg = e?.message || "เกิดข้อผิดพลาด";
     try {
-      const j = JSON.parse(msg);
-      msg = j.message || j.error || msg;
-    } catch {}
-    setActionMsg(`❌ ${msg}`);
+      setActionMsg(null);
 
-    await Swal.fire({
-      icon: "error",
-      title: "เกิดข้อผิดพลาด",
-      text: msg,
-      confirmButtonText: "OK",
-    });
-  }
-};
+      // 1) ยืนยัน Check-out
+      const res1 = await fetch(`${API}/bookings/${selectedId}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentMethod }),
+      });
+      const t1 = await res1.text();
+      if (!res1.ok) throw new Error(t1 || "Checkout failed");
 
+      // 2) บันทึกรายได้ (ใช้ endpoint ที่รองรับจริง)
+      const res2 = await fetch(`${API}/income/from-booking/${selectedId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: Number(total),       // ยอดที่ลูกค้าจ่าย
+          paymentMethod,               // "cash" | "transfer" | "credit"
+        }),
+      });
+      const t2 = await res2.text();
+      if (!res2.ok) throw new Error(t2 || "บันทึกรายได้ไม่สำเร็จ");
 
+      // 3) ป็อปอัปสำเร็จ
+      await Swal.fire({
+        icon: "success",
+        title: "Check-out สำเร็จ",
+        text: "บันทึกรายได้เรียบร้อย",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#22c55e",
+      });
+
+      setActionMsg("✅ ดำเนินการ Check-out และบันทึกรายได้สำเร็จ");
+    } catch (e: any) {
+      let msg = e?.message || "เกิดข้อผิดพลาด";
+      try {
+        const j = JSON.parse(msg);
+        msg = j.message || j.error || msg;
+      } catch {}
+      setActionMsg(`❌ ${msg}`);
+
+      await Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: msg,
+        confirmButtonText: "OK",
+      });
+    }
+  };
 
   // ชื่อผู้ปกครอง (กันซ้ำ)
   const displayGuardian = (() => {
@@ -651,5 +626,24 @@ const onConfirmCheckout = async () => {
         </main>
       </div>
     </>
+  );
+}
+
+// Component หลักที่ใช้ Suspense
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">กำลังโหลด...</p>
+          </div>
+        </div>
+      </>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }
