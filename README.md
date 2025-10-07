@@ -1,6 +1,11 @@
 # MySQL + Spring + Next
 ## Files about Login and Register
 
+
+Login with jwt cookie
+REF:https://github.com/bezkoder/spring-boot-login-example.git
+
+
 ### 1. com.vilapark.controller
 #### 1.1 AuthController
 - Handles authentication endpoints
