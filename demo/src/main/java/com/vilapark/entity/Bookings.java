@@ -3,7 +3,10 @@ package com.vilapark.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.vilapark.entity.Users;
+import com.vilapark.entity.Room;
+import com.vilapark.entity.Cat;    
 @Entity
 @Table(name = "bookings")
 public class Bookings {
@@ -11,11 +14,13 @@ public class Bookings {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
+    @Column(name = "user_id", nullable = false)
     private Long userId;
-
+    
+    @Column(name = "cat_id", nullable = false)
     private Long catId;
-
+    
     @Column(name = "room_id", nullable = false)
     private Long roomId;
 
@@ -37,6 +42,25 @@ private Room room;
 public Room getRoom() {
     return room;
 }
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JsonIgnoreProperties({ "password", "bookings", "cats" })
+    private Users user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cat_id", insertable = false, updatable = false)
+    @JsonIgnoreProperties({ "owner", "bookings" })
+    private Cat cat;
+
+    // ถ้ามีเอนทิตีห้อง ให้ใช้ชื่อนั้น (Room/Rooms) ให้ตรงโปรเจ็กต์
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", insertable = false, updatable = false)
+    @JsonIgnoreProperties({ "bookings" })
+    private Room room;
+
+
 
     public Bookings() {
         // ตั้งค่า createdAt เป็นเวลาปัจจุบัน

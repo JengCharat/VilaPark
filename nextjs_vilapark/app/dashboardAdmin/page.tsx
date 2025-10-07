@@ -167,7 +167,7 @@ export default function DashboardAdmin() {
                 <MenuButton icon="🐈" title="ดูแมว" href="/catcare" color="hover:bg-orange-50 text-orange-600" />
                 {/* ปุ่มที่อัปเดตให้ลิงก์ไปหน้าสต็อก */}
                 <MenuButton icon="📦" title="เช็กสต็อก" href="/stock" color="hover:bg-green-50 text-green-600" />
-                <MenuButton icon="💰" title="คิดเงิน" href="/billing" color="hover:bg-yellow-50 text-yellow-600" />
+                <MenuButton icon="💰" title="คิดเงิน" href="/checkout" color="hover:bg-yellow-50 text-yellow-600" />
             </div>
         </div>
       </div>

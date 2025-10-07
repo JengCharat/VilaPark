@@ -5,6 +5,10 @@ import com.vilapark.repository.BookingRepository;
 import com.vilapark.dto.BookingUIResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;                 // (ถ้ามีใช้)
+import org.springframework.web.server.ResponseStatusException; // (ถ้ามีใช้)
+
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -29,11 +33,13 @@ public class BookingController {
         return bookingRepository.findAll();
     }
 
-    // ดึงข้อมูล Booking ตาม ID
     @GetMapping("/{id}")
-    public Optional<Bookings> getBookingById(@PathVariable Long id) {
-        return bookingRepository.findById(id);
-    }
+public ResponseEntity<Bookings> getBookingById(@PathVariable Long id) {
+  return bookingRepository.findById(id)
+    .map(ResponseEntity::ok)
+    .orElse(ResponseEntity.notFound().build());
+}
+
 
     // เพิ่ม Booking ใหม่
     @PostMapping public Bookings createBooking(@RequestBody Bookings booking) {

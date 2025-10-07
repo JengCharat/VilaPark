@@ -2,10 +2,10 @@ package com.vilapark.controller;
 
 import com.vilapark.entity.Room;
 import com.vilapark.repository.RoomRepository;
+import org.springframework.http.ResponseEntity;    // ✅ เพิ่ม
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/rooms")
@@ -24,34 +24,38 @@ public class RoomController {
         return roomRepository.findAll();
     }
 
-    // ดึงข้อมูลห้องตาม ID
+    // ✅ GET /rooms/{id}
     @GetMapping("/{id}")
-    public Optional<Room> getRoomById(@PathVariable Long id) {
-        return roomRepository.findById(id);
+    public ResponseEntity<Room> getRoomById(@PathVariable Long id) {
+        return roomRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // เพิ่มห้องใหม่
+    // POST /rooms
     @PostMapping
-    public Room createRoom(@RequestBody Room room) {
-        return roomRepository.save(room);
+    public ResponseEntity<Room> createRoom(@RequestBody Room room) {
+        Room saved = roomRepository.save(room);
+        return ResponseEntity.ok(saved);
     }
 
-    // แก้ไขข้อมูลห้อง
+    // PUT /rooms/{id}
     @PutMapping("/{id}")
-    public Room updateRoom(@PathVariable Long id, @RequestBody Room roomDetails) {
+    public ResponseEntity<Room> updateRoom(@PathVariable Long id, @RequestBody Room roomDetails) {
         return roomRepository.findById(id).map(room -> {
             room.setRoomNumber(roomDetails.getRoomNumber());
             room.setType(roomDetails.getType());
             room.setPrice(roomDetails.getPrice());
             room.setStatus(roomDetails.getStatus());
-            return roomRepository.save(room);
-        }).orElseThrow(() -> new RuntimeException("ไม่พบห้อง ID: " + id));
+            return ResponseEntity.ok(roomRepository.save(room));
+        }).orElse(ResponseEntity.notFound().build());
     }
 
-    // ลบห้อง
+    // DELETE /rooms/{id}
     @DeleteMapping("/{id}")
-    public String deleteRoom(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
+        if (!roomRepository.existsById(id)) return ResponseEntity.notFound().build();
         roomRepository.deleteById(id);
-        return "ห้อง ID " + id + " ถูกลบแล้ว";
+        return ResponseEntity.noContent().build();
     }
 }
