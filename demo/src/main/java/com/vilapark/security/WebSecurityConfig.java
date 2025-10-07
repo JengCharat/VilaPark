@@ -119,6 +119,8 @@ public class WebSecurityConfig {
         "http://127.0.0.1:3000",
         "http://vps19.heliohost.us",
         "https://vps19.heliohost.us",
+         "http://64.71.156.99",
+        "https://64.71.156.99",
         "http://vilapark.app",
         "https://vilapark.app"
     ));
