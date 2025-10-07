@@ -22,7 +22,7 @@ export default function StockPage() {
   const loadStocks = async () => {
     setIsLoading(true); // เริ่มโหลด
     try {
-      const res = await fetch("http://64.71.156.99:9090/api/stocks");
+      const res = await fetch("https://www.vilapark.app/api/api/stocks");
       if (!res.ok) {
         throw new Error("Failed to fetch stock data");
       }
@@ -38,7 +38,7 @@ export default function StockPage() {
   // ... (ฟังก์ชัน updateStock เหมือนเดิม) ...
   const updateStock = async (id: number, action: "increment" | "decrement") => {
     try {
-      await fetch(`http://64.71.156.99:9090/api/stocks/${id}/${action}`, {
+      await fetch(`https://www.vilapark.app/api/api/stocks/${id}/${action}`, {
         method: "PUT",
       });
       loadStocks();

@@ -72,7 +72,7 @@ const router = useRouter();
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`http://64.71.156.99:9090/users/${userId}/roles`)
+    fetch(`https://www.vilapark.app/api/users/${userId}/roles`)
       .then((res) => res.json())
       .then((data: RoleDTO[]) => {
         setRoles(data);
@@ -89,7 +89,7 @@ const router = useRouter();
 
   // โหลดแมวทั้งหมด
   useEffect(() => {
-    fetch("http://64.71.156.99:9090/cats")
+    fetch("https://www.vilapark.app/api/cats")
       .then((res) => res.json())
       .then((cats: Cat[]) => setCats(cats))
       .catch(console.error);
@@ -107,7 +107,7 @@ const router = useRouter();
     setCatInfo(cat);
     setShowForm(true);
 
-    fetch(`http://64.71.156.99:9090/api/daily-updates/cat/${selectedCatId}`)
+    fetch(`https://www.vilapark.app/api/api/daily-updates/cat/${selectedCatId}`)
       .then((res) => res.json())
       .then((data: DailyUpdate[]) => {
         const today = new Date().toISOString().slice(0, 10);
@@ -148,7 +148,7 @@ const router = useRouter();
     if (img.file) formData.append("files", img.file);
   });
   if (formData.has("files")) {
-    const res = await fetch("http://64.71.156.99:9090/api/daily-updates/upload", {
+    const res = await fetch("https://www.vilapark.app/api/api/daily-updates/upload", {
       method: "POST",
       body: formData,
     });
@@ -181,7 +181,7 @@ const router = useRouter();
       imageUrls: uploadedUrls,
     };
 
-    const res = await fetch("http://64.71.156.99:9090/api/daily-updates", {
+    const res = await fetch("https://www.vilapark.app/api/api/daily-updates", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

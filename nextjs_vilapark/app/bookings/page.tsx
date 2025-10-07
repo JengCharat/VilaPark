@@ -18,7 +18,7 @@ export default function Bookings() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://64.71.156.99:9090/api/bookings")
+    fetch("https://www.vilapark.app/api/api/bookings")
       .then((res) => res.json())
       .then((data: Booking[]) => {
         setBookings(data);

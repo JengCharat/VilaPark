@@ -20,7 +20,7 @@ export default function BookingsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("http://64.71.156.99:9090/bookings/future");
+        const res = await fetch("https://www.vilapark.app/api/bookings/future");
         const data = await res.json();
         setBookings(data);
       } catch (e) {

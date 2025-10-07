@@ -22,7 +22,7 @@ interface BookingTask {
 }
 
 // --- API Base URL (แก้ที่นี่ที่เดียวถ้ามีการเปลี่ยนแปลง) ---
-const API_BASE_URL = 'http://64.71.156.99:9090/bookings';
+const API_BASE_URL = 'https://www.vilapark.app/api/bookings';
 
 export default function DashboardAdmin() {
   const [summary, setSummary] = useState<SummaryData | null>(null);

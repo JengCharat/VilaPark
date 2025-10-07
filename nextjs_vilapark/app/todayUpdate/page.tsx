@@ -51,7 +51,7 @@ export default function TodayUpdate() {
   useEffect(() => {
     if (!user) return;
 
-    fetch(`http://64.71.156.99:9090/cats/owner/${user.id}`)
+    fetch(`https://www.vilapark.app/api/cats/owner/${user.id}`)
       .then((res) => res.json())
       .then((myCats: Cat[]) => {
         setCats(myCats);
@@ -62,7 +62,7 @@ export default function TodayUpdate() {
 
         Promise.all(
           myCats.map((cat) =>
-            fetch(`http://64.71.156.99:9090/api/daily-updates/cat/${cat.id}`)
+            fetch(`https://www.vilapark.app/api/api/daily-updates/cat/${cat.id}`)
               .then((res) => res.json())
               .then((updates: DailyUpdate[]) => {
                 const todayUpdate = updates.find((u) => u.updateDate === today);
@@ -140,7 +140,7 @@ export default function TodayUpdate() {
             {update.imageUrls.map((url, idx) => (
               <img
                 key={idx}
-                src={`http://64.71.156.99:9090${url}`}
+                src={`https://www.vilapark.app/api${url}`}
                 alt={`update-${update.id}-${idx}`}
                 className="w-full h-48 object-cover rounded-lg shadow-sm  transition-transform duration-300"
               />
