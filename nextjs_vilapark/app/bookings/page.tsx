@@ -18,7 +18,7 @@ export default function Bookings() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8081/api/bookings")
+    fetch("http://64.71.156.99:9090/api/bookings")
       .then((res) => res.json())
       .then((data: Booking[]) => {
         setBookings(data);
