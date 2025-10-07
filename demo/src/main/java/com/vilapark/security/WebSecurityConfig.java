@@ -109,23 +109,11 @@ public class WebSecurityConfig {
   }
 
   // ⭐ กำหนด CORS ชัดเจน (dev)
-  @Bean
-  public CorsConfigurationSource corsConfigurationSource() {
+@Bean
+public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration cfg = new CorsConfiguration();
 
-    // ถ้าหน้าเว็บวิ่งจาก Next.js ที่ 3000
-    cfg.setAllowedOrigins(List.of(
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://vps19.heliohost.us",
-        "https://vps19.heliohost.us",
-         "http://64.71.156.99",
-        "https://64.71.156.99",
-        "http://vilapark.app",
-        "https://vilapark.app"
-    ));
-    // หรือถ้าช่วง dev อยากให้สะดวกมาก ๆ ใช้ pattern แทน (อย่าใช้ในโปรดักชัน):
-    // cfg.addAllowedOriginPattern("*");
+    cfg.addAllowedOriginPattern("*");
 
     cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     cfg.setAllowedHeaders(List.of("*"));
@@ -134,6 +122,6 @@ public class WebSecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", cfg);
     return source;
-  }
+}
 }
 
