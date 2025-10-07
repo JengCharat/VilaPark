@@ -53,7 +53,7 @@ useEffect(() => {
         setIsAdmin(admin);
 
         // ✅ redirect ถ้าไม่ใช่ admin
-        if (!admin) {
+        if (isAdmin) {
           router.push("/dashboard");
         }
       })
