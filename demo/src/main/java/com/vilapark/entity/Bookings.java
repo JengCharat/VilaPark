@@ -35,9 +35,9 @@ public class Bookings {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-@ManyToOne(fetch = FetchType.LAZY)
-@JoinColumn(name = "room_id", insertable = false, updatable = false)
-private Room room;
+// @ManyToOne(fetch = FetchType.LAZY)
+// @JoinColumn(name = "room_id", insertable = false, updatable = false)
+// private Room room;
 
 public Room getRoom() {
     return room;
