@@ -190,7 +190,7 @@ useEffect(() => {
             status: "Pending",
         };
 
-        const res = await fetch("http://localhost:8081/api/bookings", {
+        const res = await fetch("http://localhost:8081/bookings", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(bookingData),
