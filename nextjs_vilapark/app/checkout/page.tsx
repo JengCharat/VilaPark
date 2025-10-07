@@ -16,7 +16,7 @@ import autoTable, { RowInput } from "jspdf-autotable";
 // วางไว้บนสุดของไฟล์ (นอก component) แล้วมีแค่ตัวเดียวเท่านั้น
 // ---- Thai font loader (keep exactly ONE copy in this file) ----
 // ===== Thai font loader (ONE copy only) =====
-let _thaiFontLoaded = false;
+const _thaiFontLoaded = false;
 
 async function fileUrlToBase64Body(url: string): Promise<string> {
   // ดึงไฟล์ แล้วแปลงเป็น dataURL ด้วย FileReader (ไม่กิน stack)
