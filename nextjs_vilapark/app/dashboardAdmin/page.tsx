@@ -41,24 +41,32 @@ export default function DashboardAdmin() {
 const [roles, setRoles] = useState<RoleDTO[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 const router = useRouter();
-
-useEffect(() => {
+ // โหลด userId จาก localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const userObj = JSON.parse(storedUser);
+      setUserId(userObj.id);
+    }
+  }, []);
+ useEffect(() => {
     if (!userId) return;
 
     fetch(`https://vilapark.app/api/users/${userId}/roles`)
       .then((res) => res.json())
       .then((data: RoleDTO[]) => {
         setRoles(data);
-        const admin = data.some((role) => role.name === "ROLE_ADMIN" || role.name === "ROLE_MANAGER" );
+        const admin = data.some((role) => role.name === "ROLE_ADMIN");
         setIsAdmin(admin);
 
         // ✅ redirect ถ้าไม่ใช่ admin
-        if (isAdmin) {
+        if (!admin) {
           router.push("/dashboard");
         }
       })
       .catch(console.error);
   }, [userId, router]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
