@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "../components/Navbar";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 /* ===== เพิ่มสำหรับ PDF ===== */
 import jsPDF from "jspdf";
@@ -400,22 +402,68 @@ export default function CheckoutPage() {
   const total = useMemo(() => charges.reduce((s, c) => s + c.amount, 0), [charges]);
 
   /* 4) confirm checkout */
-  const onConfirmCheckout = async () => {
-    if (!selectedId) return;
-    if (!paymentMethod) { setActionMsg("กรุณาเลือกวิธีการชำระเงินก่อน"); return; }
+  // ถ้ายังไม่ได้ import ให้ใส่ด้านบนของไฟล์
+// import Swal from "sweetalert2";
+
+const onConfirmCheckout = async () => {
+  if (!selectedId) return;
+  if (!paymentMethod) {
+    setActionMsg("กรุณาเลือกวิธีการชำระเงินก่อน");
+    return;
+  }
+
+  try {
+    setActionMsg(null);
+
+    // 1) ยืนยัน Check-out
+    const res1 = await fetch(`${API}/bookings/${selectedId}/checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentMethod }),
+    });
+    const t1 = await res1.text();
+    if (!res1.ok) throw new Error(t1 || "Checkout failed");
+
+    // 2) บันทึกรายได้ (ใช้ endpoint ที่รองรับจริง)
+    const res2 = await fetch(`${API}/income/from-booking/${selectedId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: Number(total),       // ยอดที่ลูกค้าจ่าย
+        paymentMethod,               // "cash" | "transfer" | "credit"
+      }),
+    });
+    const t2 = await res2.text();
+    if (!res2.ok) throw new Error(t2 || "บันทึกรายได้ไม่สำเร็จ");
+
+    // 3) ป็อปอัปสำเร็จ
+    await Swal.fire({
+      icon: "success",
+      title: "Check-out สำเร็จ",
+      text: "บันทึกรายได้เรียบร้อย",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#22c55e",
+    });
+
+    setActionMsg("✅ ดำเนินการ Check-out และบันทึกรายได้สำเร็จ");
+  } catch (e: any) {
+    let msg = e?.message || "เกิดข้อผิดพลาด";
     try {
-      setActionMsg(null);
-      const res = await fetch(`${API}/bookings/${selectedId}/checkout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentMethod }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      setActionMsg("✅ ดำเนินการ Check-out สำเร็จ");
-    } catch (e: any) {
-      setActionMsg(`❌ ${e.message || "ยืนยันการชำระเงินไม่สำเร็จ"}`);
-    }
-  };
+      const j = JSON.parse(msg);
+      msg = j.message || j.error || msg;
+    } catch {}
+    setActionMsg(`❌ ${msg}`);
+
+    await Swal.fire({
+      icon: "error",
+      title: "เกิดข้อผิดพลาด",
+      text: msg,
+      confirmButtonText: "OK",
+    });
+  }
+};
+
+
 
   // ชื่อผู้ปกครอง (กันซ้ำ)
   const displayGuardian = (() => {
