@@ -14,7 +14,7 @@ export default function Navbar() {
     }
   }, []);
 
-  const showPage = (page) => {
+  const showPage = (page:string) => {
     router.push(`/${page}`);
     setUserMenuOpen(false);
   };

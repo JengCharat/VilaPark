@@ -25,6 +25,7 @@ type Cat = {
 
 type RoomOption = {
     id: number;
+    name:string;
     roomNumber: string;
     type: string;
     price: number;
