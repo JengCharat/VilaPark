@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+type User = {
+  id: number;
+  username: string;
+  email: string;
+  roles: string[];
+};
 export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
+const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -14,7 +19,7 @@ export default function Navbar() {
     }
   }, []);
 
-  const showPage = (page) => {
+  const showPage = (page:string) => {
     router.push(`/${page}`);
     setUserMenuOpen(false);
   };
